@@ -33,7 +33,6 @@ spring:
     fail-on-missing-locations: true
     locations: classpath:db/migration
 
-
 springdoc:
   default-produces-media-type: application/json;charset=UTF-8
 
@@ -43,4 +42,6 @@ custom:
     expire-seconds: ${JWT_EXPIRE_SECONDS}
     refresh-expire-seconds: ${JWT_REFRESH_EXPIRE_SECONDS}
 
-
+upbit:
+  websocket:
+    uri: ${UPBIT_WS_URI:wss://api.upbit.com/websocket/v1}
