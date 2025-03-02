@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.coing.domain.user.controller.dto.UserResponse;
 import com.coing.domain.user.entity.User;
 import com.coing.domain.user.repository.UserRepository;
 
@@ -21,7 +22,7 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
-	public User join(String name, String email, String password, String passwordConfirm) {
+	public UserResponse join(String name, String email, String password, String passwordConfirm) {
 
 		log.info("일반 회원 가입 시도 :{}", email);
 
@@ -57,13 +58,12 @@ public class UserService {
 			.password(encodedPassword)
 			.build();
 
-		user = userRepository.save(user);
-
-		return user;
+		User savedUser = userRepository.save(user);
+		return new UserResponse(savedUser.getId(), savedUser.getName(), savedUser.getEmail());
 	}
 
 	@Transactional(readOnly = true)
-	public User login(String email, String password) {
+	public UserResponse login(String email, String password) {
 
 		log.info("회원 로그인 시도 :{}", email);
 
@@ -77,7 +77,7 @@ public class UserService {
 		if (!passwordEncoder.matches(password, user.getPassword())) {
 			throw new IllegalArgumentException("password.mismatch");
 		}
-		
-		return user;
+
+		return new UserResponse(user.getId(), user.getName(), user.getEmail());
 	}
 }
