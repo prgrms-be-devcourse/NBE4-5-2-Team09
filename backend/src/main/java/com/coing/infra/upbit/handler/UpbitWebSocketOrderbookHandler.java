@@ -64,7 +64,7 @@ public class UpbitWebSocketOrderbookHandler extends BinaryWebSocketHandler {
     }
 
     /**
-     * 수신한 메시지를 파싱하여 UpbitDataService로 처리 요청합니다.
+     * 수신한 메시지를 파싱하여 각 타입별로 UpbitDataService로 처리 요청합니다.
      * @param payload JSON 형식의 메시지
      */
     private void processMessage(String payload) {
