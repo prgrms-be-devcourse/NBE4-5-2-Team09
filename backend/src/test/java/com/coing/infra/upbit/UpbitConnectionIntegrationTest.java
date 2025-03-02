@@ -29,17 +29,15 @@ public class UpbitConnectionIntegrationTest {
     private String upbitWebSocketUri;
 
     @Test
-    @DisplayName("Upbit Connection 연결 테스트 - ping 응답 성공")
-    public void testUpbitWebSocketConnectionPing() throws Exception {
-        // 연결 성공 여부를 확인하기 위해 CountDownLatch 사용
+    @DisplayName("Upbit Connection 연결 성공")
+    public void sucessUpbitWebSocketConnectionPing() throws Exception {
+        // Given
         CountDownLatch latch = new CountDownLatch(1);
-
         WebSocketHandler testHandler = new AbstractWebSocketHandler() {
             @Override
             public void afterConnectionEstablished(WebSocketSession session) throws Exception {
                 session.sendMessage(new PingMessage(ByteBuffer.wrap("PING".getBytes(StandardCharsets.UTF_8))));
             }
-
             @Override
             public void handlePongMessage(WebSocketSession session, PongMessage message) {
                 String payload = new String(message.getPayload().array(), StandardCharsets.UTF_8);
@@ -49,9 +47,10 @@ public class UpbitConnectionIntegrationTest {
             }
         };
 
+        // when
         webSocketClient.execute(testHandler, upbitWebSocketUri);
 
-        // 최대 5초 동안 연결 성공 여부 대기
+        // then: 최대 5초 동안 Pong 응답(PING)이 도착하는지 확인
         boolean connected = latch.await(5, TimeUnit.SECONDS);
         assertThat(connected).isTrue();
     }

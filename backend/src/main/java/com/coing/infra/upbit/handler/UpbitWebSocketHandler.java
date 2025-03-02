@@ -40,7 +40,7 @@ public class UpbitWebSocketHandler extends BinaryWebSocketHandler {
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-        for (WebSocketHandler handler : handlers) {
+        for (BinaryWebSocketHandler handler : handlers) {
             try {
                 handler.handleMessage(session, message);
             } catch (Exception e) {
@@ -52,7 +52,7 @@ public class UpbitWebSocketHandler extends BinaryWebSocketHandler {
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        for (WebSocketHandler handler : handlers) {
+        for (BinaryWebSocketHandler handler : handlers) {
             try {
                 handler.handleTransportError(session, exception);
             } catch (Exception e) {
@@ -64,7 +64,7 @@ public class UpbitWebSocketHandler extends BinaryWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        for (WebSocketHandler handler : handlers) {
+        for (BinaryWebSocketHandler handler : handlers) {
             try {
                 handler.afterConnectionClosed(session, closeStatus);
             } catch (Exception e) {
