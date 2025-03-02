@@ -18,9 +18,10 @@ import com.coing.standard.utils.UpbitUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Upbit WebSocket 에 Subscription 메시지를 전송하고 Orderbook(호가) 데이터를 수신합니다.
- * 수신된 메시지를 JSON으로 파싱하여 OrderbookDto로 매핑합니다.
- * 이후 Orderbook 엔티티로 변환하고 가공한 뒤, 필요한 경우 외부로 publish 합니다.
+ * Upbit WebSocket Orderbook Request Handler
+ * <p>
+ * Upbit WebSocket 에 Subscription 메시지를 전송하고 Simple Format 형식의 Orderbook(호가) 데이터를 수신합니다.
+ * 수신된 메시지를 JSON으로 파싱하고 OrderbookDto로 매핑한 후 필요한 경우 외부로 publish 합니다.
  */
 @Component
 public class UpbitWebSocketOrderbookHandler extends BinaryWebSocketHandler {

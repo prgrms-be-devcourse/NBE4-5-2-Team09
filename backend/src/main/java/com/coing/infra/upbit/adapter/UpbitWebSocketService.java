@@ -21,7 +21,10 @@ import com.coing.infra.upbit.handler.UpbitWebSocketHandler;
 import com.coing.infra.upbit.handler.UpbitWebSocketOrderbookHandler;
 
 /**
- * Upbit WebSocket Connection 관리 및 비즈니스 로직을 제공하는 서비스
+ * Upbit WebSocket Connection 관리 서비스
+ * <p>
+ * WebSocketClient를 통해 Upbit 서버와의 연결하고, 연결 실패시 지수 백오프 전략에 따라 재연결을 시도합니다.
+ * 60초마다 PING 메시지를 전송하여 연결 상태를 확인하고, 연결이 끊어진 경우 재연결 로직을 호출합니다.
  */
 @Service
 public class UpbitWebSocketService {
@@ -67,6 +70,7 @@ public class UpbitWebSocketService {
     /**
      * WebSocket 연결을 시도합니다.
      * 비동기적으로 연결 결과를 처리하며, 성공 시 session을 저장하고 재연결 시도 횟수를 초기화합니다.
+     * 연결 실패 또는 예외 발생 시, 재연결 시도
      */
     public synchronized void connect() {
         try {

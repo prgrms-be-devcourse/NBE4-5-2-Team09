@@ -11,6 +11,11 @@ import com.coing.infra.upbit.enums.EnumUpbitWebSocketFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Upbit WebSocket Request Message를 생성하는 Utility Class
+ * <p>
+ * 티켓(ticket), 타입(type), 포맷(format) 정보를 포함한 JSON 배열을 SIMPLE 포맷으로 반환
+ */
 public class UpbitUtils {
 
     private final static ObjectMapper ObjectMapper = new ObjectMapper();

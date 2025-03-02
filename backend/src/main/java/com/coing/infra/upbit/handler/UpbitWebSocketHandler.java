@@ -12,7 +12,10 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 
 /**
- * Upbit WebSocket 통합 Handler
+ * Upbit WebSocket Composite Handler
+ * <p>
+ * 여러 개의 개별 BinaryWebSocketHandler를 리스트로 받아, 하나의 WebSocket 연결에서 모든 이벤트를 순차적으로 처리합니다.
+ * 개별 Handler에서 예외가 발생하더라도 다른 Handler가 정상적으로 동작하도록 개별 try-catch로 처리합니다.
  */
 @Component
 public class UpbitWebSocketHandler extends BinaryWebSocketHandler {
