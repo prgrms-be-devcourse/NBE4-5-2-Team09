@@ -1,3 +1,6 @@
 custom:
   jwt:
     secret-key: "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890123"
+    expire-seconds: 1800
+    refresh-expire-seconds: 604800
+
