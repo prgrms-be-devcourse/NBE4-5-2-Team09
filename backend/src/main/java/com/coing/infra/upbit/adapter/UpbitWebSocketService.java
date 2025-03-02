@@ -25,20 +25,21 @@ public class UpbitWebSocketService {
     private final WebSocketClient webSocketClient;
 	private final UpbitWebSocketHandler webSocketHandler;
 
-    @Value("${upbit.websocket.uri}")
-    private String UPBIT_WEBSOCKET_URI;
+    private final String UPBIT_WEBSOCKET_URI;
 
     private volatile WebSocketSession session;
     private volatile boolean isConnected = false;
 
     public UpbitWebSocketService(
 		WebSocketClient webSocketClient,
-		UpbitWebSocketOrderbookHandler orderbookHandler
+		UpbitWebSocketOrderbookHandler orderbookHandler,
+        @Value("${upbit.websocket.uri}") String upbitWebSocketUri
 	) {
         this.webSocketClient = webSocketClient;
         this.webSocketHandler = new UpbitWebSocketHandler(
                 Arrays.asList(orderbookHandler)
         );
+        this.UPBIT_WEBSOCKET_URI = upbitWebSocketUri;
     }
 
     /**
@@ -49,7 +50,6 @@ public class UpbitWebSocketService {
         connect();
     }
 
-
     /**
      * WebSocket 연결을 시도합니다.
      * 비동기적으로 연결 결과를 처리하며, 성공 시 session을 저장합니다.
@@ -58,10 +58,9 @@ public class UpbitWebSocketService {
         try {
             CompletableFuture<WebSocketSession> future = webSocketClient.execute(webSocketHandler,
                 UPBIT_WEBSOCKET_URI);
-            future.whenComplete((webSocketSession, throwable) -> {
+            future.whenComplete((session, throwable) -> {
                 if (throwable == null) {
-                    session = webSocketSession;
-                    isConnected = session.isOpen();
+                    isConnected = true;
                     logger.info("Upbit WebSocket connected: {}", isConnected);
                 } else {
                     isConnected = false;
@@ -74,5 +73,11 @@ public class UpbitWebSocketService {
         }
     }
 
+    /**
+     * 현재 WebSocket 연결 상태를 반환합니다.
+     */
+    public synchronized boolean isConnected() {
+        return isConnected;
+    }
 
 }

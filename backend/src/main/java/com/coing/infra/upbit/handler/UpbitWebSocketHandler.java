@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
@@ -13,6 +14,7 @@ import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 /**
  * Upbit WebSocket 통합 Handler
  */
+@Component
 public class UpbitWebSocketHandler extends BinaryWebSocketHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(UpbitWebSocketHandler.class);
