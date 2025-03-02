@@ -51,23 +51,22 @@ public class UserServiceTest {
 			.build();
 		when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
-		User result = userService.join(name, email, password, passwordConfirm);
+		// 서비스가 UserResponse를 반환하도록 변경됨
+		var result = userService.join(name, email, password, passwordConfirm);
 
 		assertNotNull(result);
-		assertEquals(email, result.getEmail());
+		assertEquals(email, result.email());
 		verify(userRepository, times(1)).save(any(User.class));
 	}
 
 	@Test
 	@DisplayName("t2: 일반 회원 가입 - 비밀번호 불일치 테스트")
 	void t2() {
-		// given
 		String name = "테스트";
 		String email = "test@test.com";
 		String password = "test";
 		String passwordConfirm = "test2";
 
-		// when & then
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			userService.join(name, email, password, passwordConfirm);
 		});
@@ -77,7 +76,6 @@ public class UserServiceTest {
 	@Test
 	@DisplayName("t3: 일반 회원 가입 - 중복 이메일 테스트")
 	void t3() {
-		// given
 		String name = "테스트";
 		String email = "test@test.com";
 		String password = "test";
@@ -86,10 +84,67 @@ public class UserServiceTest {
 		User existingUser = new User();
 		when(userRepository.findByEmail(email)).thenReturn(Optional.of(existingUser));
 
-		// when & then
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			userService.join(name, email, password, passwordConfirm);
 		});
 		assertEquals("already.registered.email", exception.getMessage());
+	}
+
+	@Test
+	@DisplayName("t4: 일반 회원 로그인 - 정상 동작 테스트")
+	void t4() {
+		String email = "test@test.com";
+		String password = "test";
+		String encodedPassword = "encodedPassword";
+
+		User user = User.builder()
+			.name("테스트")
+			.email(email)
+			.password(encodedPassword)
+			.build();
+
+		when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+		when(passwordEncoder.matches(password, encodedPassword)).thenReturn(true);
+
+		var result = userService.login(email, password);
+
+		assertNotNull(result);
+		assertEquals(email, result.email());
+	}
+
+	@Test
+	@DisplayName("t5: 일반 회원 로그인 - 잘못된 비밀번호 테스트")
+	void t5() {
+		String email = "test@test.com";
+		String password = "test";
+		String encodedPassword = "encodedPassword";
+
+		User user = User.builder()
+			.name("테스트")
+			.email(email)
+			.password(encodedPassword)
+			.build();
+
+		when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+		when(passwordEncoder.matches(password, encodedPassword)).thenReturn(false);
+
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+			userService.login(email, password);
+		});
+		assertEquals("password.mismatch", exception.getMessage());
+	}
+
+	@Test
+	@DisplayName("t6: 일반 회원 로그인 - 사용자 미존재 테스트")
+	void t6() {
+		String email = "test@test.com";
+		String password = "test";
+
+		when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+			userService.login(email, password);
+		});
+		assertEquals("member.not.found", exception.getMessage());
 	}
 }
