@@ -64,4 +64,16 @@ public class UserController {
 		res.put("email", request.email());
 		return ResponseEntity.ok(res);
 	}
+
+	@Operation(summary = "회원 로그아웃")
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(HttpServletResponse response) {
+		Cookie cookie = new Cookie("refreshToken", null);
+		cookie.setHttpOnly(true);
+		cookie.setSecure(true);
+		cookie.setPath("/");
+		cookie.setMaxAge(0);
+		response.addCookie(cookie);
+		return ResponseEntity.ok("로그아웃 성공");
+	}
 }
