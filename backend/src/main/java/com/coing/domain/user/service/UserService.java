@@ -62,4 +62,22 @@ public class UserService {
 		return user;
 	}
 
+	@Transactional(readOnly = true)
+	public User login(String email, String password) {
+
+		log.info("회원 로그인 시도 :{}", email);
+
+		Optional<User> optionalUser = userRepository.findByEmail(email);
+		if (optionalUser.isEmpty()) {
+			throw new IllegalArgumentException("member.not.found");
+		}
+
+		User user = optionalUser.get();
+
+		if (!passwordEncoder.matches(password, user.getPassword())) {
+			throw new IllegalArgumentException("password.mismatch");
+		}
+		
+		return user;
+	}
 }
