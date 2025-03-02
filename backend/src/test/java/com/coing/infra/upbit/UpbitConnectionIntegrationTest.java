@@ -1,4 +1,4 @@
-package com.coing;
+package com.coing.infra.upbit;
 
 import static org.assertj.core.api.Assertions.*;
 
