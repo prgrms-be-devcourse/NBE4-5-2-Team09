@@ -1,4 +1,4 @@
-package com.coing.infra.upbit;
+package com.coing.infra.upbit.adapter;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -21,7 +21,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketClient;
 
-import com.coing.infra.upbit.adapter.UpbitWebSocketService;
 import com.coing.infra.upbit.handler.UpbitWebSocketHandler;
 import com.coing.infra.upbit.handler.UpbitWebSocketOrderbookHandler;
 

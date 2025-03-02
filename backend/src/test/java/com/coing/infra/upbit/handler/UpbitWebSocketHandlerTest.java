@@ -1,4 +1,4 @@
-package com.coing.infra.upbit;
+package com.coing.infra.upbit.handler;
 
 import static org.mockito.Mockito.*;
 
@@ -19,8 +19,6 @@ import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.BinaryWebSocketHandler;
-
-import com.coing.infra.upbit.handler.UpbitWebSocketHandler;
 
 @ExtendWith(MockitoExtension.class)
 public class UpbitWebSocketHandlerTest {
@@ -83,7 +81,7 @@ public class UpbitWebSocketHandlerTest {
 
     @Test
     @DisplayName("handleTransportError() 성공")
-    public void testHandleTransportError() throws Exception {
+    public void successHandleTransportError() throws Exception {
         // when
         Exception ex = new Exception("Exception occurred");
         handler.handleTransportError(session, ex);
@@ -95,7 +93,7 @@ public class UpbitWebSocketHandlerTest {
 
     @Test
     @DisplayName("afterConnectionClosed() 성공")
-    public void testAfterConnectionClosed() throws Exception {
+    public void successAfterConnectionClosed() throws Exception {
         // when
         CloseStatus status = CloseStatus.NORMAL;
         handler.afterConnectionClosed(session, status);

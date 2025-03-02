@@ -55,7 +55,7 @@ public class UpbitWebSocketOrderbookHandler extends BinaryWebSocketHandler {
      */
     @Override
     public void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
-        String payload = new String(((BinaryMessage) message).getPayload().array(), StandardCharsets.UTF_8);
+        String payload = new String(message.getPayload().array(), StandardCharsets.UTF_8);
 
         if (!payload.isEmpty()) {
 			publish(payload);
