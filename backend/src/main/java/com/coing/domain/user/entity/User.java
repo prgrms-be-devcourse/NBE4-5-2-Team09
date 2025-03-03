@@ -2,6 +2,8 @@ package com.coing.domain.user.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,7 +43,8 @@ public class User {
 
 	// 권한
 	@Column(name = "authority", nullable = false)
-	private String authority;
+	@Enumerated(EnumType.STRING)
+	private Authority authority;
 
 	// 이메일 인증 코드
 	@Column(name = "verification_code")
