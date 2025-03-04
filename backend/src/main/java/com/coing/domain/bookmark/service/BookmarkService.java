@@ -16,6 +16,7 @@ import com.coing.domain.bookmark.repository.BookmarkRepository;
 import com.coing.domain.user.entity.User;
 import com.coing.domain.user.repository.UserRepository;
 import com.coing.global.exception.BusinessException;
+import com.coing.util.MessageUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +26,7 @@ public class BookmarkService {
 
 	private final BookmarkRepository bookmarkRepository;
 	private final UserRepository userRepository;
+	private final MessageUtil messageUtil;
 
 	@Transactional
 	public BookmarkResponse addBookmark(BookmarkRequest request) {
@@ -32,17 +34,24 @@ public class BookmarkService {
 		String coinCode = request.coinCode();
 
 		if (bookmarkRepository.existsByUserIdAndCoinCode(userId, coinCode)) {
-			throw new BusinessException("bookmark.already.exists", HttpStatus.BAD_REQUEST);
+			throw new BusinessException(
+				messageUtil.resolveMessage("bookmark.already.exists"),
+				HttpStatus.BAD_REQUEST
+			);
 		}
 
 		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new BusinessException("member.not.found", HttpStatus.NOT_FOUND));
+			.orElseThrow(() -> new BusinessException(
+				messageUtil.resolveMessage("member.not.found"),
+				HttpStatus.NOT_FOUND
+			));
 
 		Bookmark bookmark = Bookmark.builder()
 			.user(user)
 			.coinCode(coinCode)
 			.createAt(LocalDateTime.now())
 			.build();
+
 		Bookmark savedBookmark = bookmarkRepository.save(bookmark);
 		return new BookmarkResponse(
 			savedBookmark.getId(),
@@ -70,7 +79,11 @@ public class BookmarkService {
 	@Transactional
 	public BookmarkResponse updateBookmark(BookmarkUpdateRequest request) {
 		Bookmark bookmark = bookmarkRepository.findById(request.bookmarkId())
-			.orElseThrow(() -> new BusinessException("bookmark.not.found", HttpStatus.NOT_FOUND));
+			.orElseThrow(() -> new BusinessException(
+				messageUtil.resolveMessage("bookmark.not.found"),
+				HttpStatus.NOT_FOUND
+			));
+
 		bookmark.updateCoinCode(request.coinCode());
 		Bookmark updated = bookmarkRepository.save(bookmark);
 		return new BookmarkResponse(
@@ -85,7 +98,10 @@ public class BookmarkService {
 	@Transactional
 	public void deleteBookmark(Long bookmarkId) {
 		if (!bookmarkRepository.existsById(bookmarkId)) {
-			throw new BusinessException("bookmark.not.found", HttpStatus.NOT_FOUND);
+			throw new BusinessException(
+				messageUtil.resolveMessage("bookmark.not.found"),
+				HttpStatus.NOT_FOUND
+			);
 		}
 		bookmarkRepository.deleteById(bookmarkId);
 	}
