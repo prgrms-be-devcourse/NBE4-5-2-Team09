@@ -16,8 +16,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.socket.PingMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -41,12 +39,10 @@ public class UpbitWebSocketConnectionTest {
 	private UpbitWebSocketConnection connection;
 
 	private final String UPBIT_WEBSOCKET_URI = "wss://api.upbit.com/websocket/v1";
-	private final Logger logger = LoggerFactory.getLogger("TestLogger");
 
 	@BeforeEach
 	public void setUp() {
 		connection = new UpbitWebSocketConnection(
-			logger,
 			webSocketClient,
 			handler,
 			UPBIT_WEBSOCKET_URI,

@@ -6,18 +6,19 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
 import org.springframework.web.socket.PingMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketClient;
 
 import com.coing.infra.upbit.handler.UpbitWebSocketHandler;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 하나의 WebSocket 연결을 관리하는 클래스
  */
+@Slf4j
 public class UpbitWebSocketConnection {
-    private final Logger logger;
     private final WebSocketClient webSocketClient;
     private final UpbitWebSocketHandler handler;
     private final String webSocketUri;
@@ -33,12 +34,10 @@ public class UpbitWebSocketConnection {
     private final long BASE_DELAY_SECONDS = 2;
     private final long MAX_DELAY_SECONDS = 60;
 
-    public UpbitWebSocketConnection(Logger logger,
-                                    WebSocketClient webSocketClient,
+    public UpbitWebSocketConnection(WebSocketClient webSocketClient,
                                     UpbitWebSocketHandler handler,
                                     String webSocketUri,
                                     String name) {
-        this.logger = logger;
         this.webSocketClient = webSocketClient;
         this.handler = handler;
         this.webSocketUri = webSocketUri;
@@ -60,16 +59,16 @@ public class UpbitWebSocketConnection {
                     this.session = webSocketSession;
                     this.isConnected = true;
                     this.reconnectAttempts = 0;
-                    logger.info("[{}] WebSocket connected", name);
+                    log.info("[{}] WebSocket connected", name);
                 } else {
                     this.isConnected = false;
-                    logger.error("[{}] WebSocket connection failed: {}", name, throwable.getMessage(), throwable);
+                    log.error("[{}] WebSocket connection failed: {}", name, throwable.getMessage(), throwable);
                     scheduleReconnect();
                 }
             });
         } catch (Exception e) {
             this.isConnected = false;
-            logger.error("[{}] Exception during WebSocket connection: {}", name, e.getMessage(), e);
+            log.error("[{}] Exception during WebSocket connection: {}", name, e.getMessage(), e);
             scheduleReconnect();
         }
     }
@@ -83,10 +82,10 @@ public class UpbitWebSocketConnection {
 	public void scheduleReconnect() {
         if (isReconnecting.compareAndSet(false, true)) {
             long delay = Math.min(MAX_DELAY_SECONDS, BASE_DELAY_SECONDS * (1L << reconnectAttempts));
-            logger.info("[{}] Scheduling reconnection attempt in {} seconds", name, delay);
+            log.info("[{}] Scheduling reconnection attempt in {} seconds", name, delay);
 
             scheduler.schedule(() -> {
-                logger.info("[{}] Attempting reconnect...", name);
+                log.info("[{}] Attempting reconnect...", name);
                 connect();
                 reconnectAttempts++;
                 isReconnecting.set(false);
@@ -101,12 +100,12 @@ public class UpbitWebSocketConnection {
         if (isConnected && session != null && session.isOpen()) {
             try {
                 session.sendMessage(new PingMessage());
-                logger.info("[{}] Sent PING", name);
+                log.info("[{}] Sent PING", name);
             } catch (Exception e) {
-                logger.error("[{}] Failed to send PING: {}", name, e.getMessage(), e);
+                log.error("[{}] Failed to send PING: {}", name, e.getMessage(), e);
             }
         } else {
-            logger.warn("[{}] Session not connected. Scheduling reconnect...", name);
+            log.warn("[{}] Session not connected. Scheduling reconnect...", name);
             scheduleReconnect();
         }
     }
@@ -118,9 +117,9 @@ public class UpbitWebSocketConnection {
         if (session != null && session.isOpen()) {
             try {
                 session.close();
-                logger.info("[{}] WebSocket session closed.", name);
+                log.info("[{}] WebSocket session closed.", name);
             } catch (Exception e) {
-                logger.error("[{}] Error closing session: {}", name, e.getMessage(), e);
+                log.error("[{}] Error closing session: {}", name, e.getMessage(), e);
             }
         }
         isConnected = false;

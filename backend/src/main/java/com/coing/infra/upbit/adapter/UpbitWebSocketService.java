@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -17,13 +15,14 @@ import com.coing.infra.upbit.enums.EnumUpbitWebSocketType;
 import com.coing.infra.upbit.handler.UpbitWebSocketHandler;
 import com.coing.infra.upbit.handler.UpbitWebSocketOrderbookHandler;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 여러 WebSocket Type별로 UpbitWebSocketConnection을 생성하고 관리하는 서비스
  */
 @Service
+@Slf4j
 public class UpbitWebSocketService {
-    private static final Logger logger = LoggerFactory.getLogger(UpbitWebSocketService.class);
-
     private final WebSocketClient webSocketClient;
     private final UpbitWebSocketOrderbookHandler orderbookHandler;
 
@@ -52,7 +51,7 @@ public class UpbitWebSocketService {
                 Arrays.asList(orderbookHandler)
         );
         UpbitWebSocketConnection orderbookConn = new UpbitWebSocketConnection(
-            logger, webSocketClient, orderbookComposite, UPBIT_WEBSOCKET_URI, "ORDERBOOK");
+            webSocketClient, orderbookComposite, UPBIT_WEBSOCKET_URI, "ORDERBOOK");
         connections.put(EnumUpbitWebSocketType.ORDERBOOK, orderbookConn);
         orderbookConn.connect();
 

@@ -2,14 +2,14 @@ package com.coing.infra.upbit.handler;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.BinaryWebSocketHandler;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Upbit WebSocket Composite Handler
@@ -18,10 +18,8 @@ import org.springframework.web.socket.handler.BinaryWebSocketHandler;
  * 개별 Handler에서 예외가 발생하더라도 다른 Handler가 정상적으로 동작하도록 개별 try-catch로 처리합니다.
  */
 @Component
+@Slf4j
 public class UpbitWebSocketHandler extends BinaryWebSocketHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(UpbitWebSocketHandler.class);
-
     private final List<BinaryWebSocketHandler> handlers;
 
 
@@ -35,7 +33,7 @@ public class UpbitWebSocketHandler extends BinaryWebSocketHandler {
             try {
                 handler.afterConnectionEstablished(session);
             } catch (Exception e) {
-                logger.error("Error in handler {} after connection established: {}",
+                log.error("Error in handler {} after connection established: {}",
                         handler.getClass().getSimpleName(), e.getMessage(), e);
             }
         }
@@ -47,7 +45,7 @@ public class UpbitWebSocketHandler extends BinaryWebSocketHandler {
             try {
                 handler.handleMessage(session, message);
             } catch (Exception e) {
-                logger.error("Error in handler {} during message handling: {}",
+                log.error("Error in handler {} during message handling: {}",
                         handler.getClass().getSimpleName(), e.getMessage(), e);
             }
         }
@@ -59,7 +57,7 @@ public class UpbitWebSocketHandler extends BinaryWebSocketHandler {
             try {
                 handler.handleTransportError(session, exception);
             } catch (Exception e) {
-                logger.error("Error in handler {} during transport error handling: {}",
+                log.error("Error in handler {} during transport error handling: {}",
                         handler.getClass().getSimpleName(), e.getMessage(), e);
             }
         }
@@ -71,7 +69,7 @@ public class UpbitWebSocketHandler extends BinaryWebSocketHandler {
             try {
                 handler.afterConnectionClosed(session, closeStatus);
             } catch (Exception e) {
-                logger.error("Error in handler {} after connection closed: {}",
+                log.error("Error in handler {} after connection closed: {}",
                         handler.getClass().getSimpleName(), e.getMessage(), e);
             }
         }

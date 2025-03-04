@@ -2,8 +2,6 @@ package com.coing.infra.upbit.handler;
 
 import java.nio.charset.StandardCharsets;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
@@ -17,6 +15,8 @@ import com.coing.infra.upbit.enums.EnumUpbitRequestType;
 import com.coing.standard.utils.UpbitUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Upbit WebSocket Orderbook Request Handler
  * <p>
@@ -24,9 +24,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 수신된 메시지를 JSON으로 파싱하고 OrderbookDto로 매핑한 후 필요한 경우 외부로 publish 합니다.
  */
 @Component
+@Slf4j
 public class UpbitWebSocketOrderbookHandler extends BinaryWebSocketHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(UpbitWebSocketOrderbookHandler.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final UpbitDataService upbitDataService;
 
@@ -41,9 +40,9 @@ public class UpbitWebSocketOrderbookHandler extends BinaryWebSocketHandler {
 	 */
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        logger.info("Upbit WebSocket Orderbook connection established.");
+        log.info("Upbit WebSocket Orderbook connection established.");
         String subscribeMessage = UpbitUtils.makeRequest(EnumUpbitRequestType.ORDERBOOK);
-        logger.info("Sending subscription message: {}", subscribeMessage);
+        log.info("Sending subscription message: {}", subscribeMessage);
         session.sendMessage(new TextMessage(subscribeMessage));
     }
 
@@ -72,13 +71,13 @@ public class UpbitWebSocketOrderbookHandler extends BinaryWebSocketHandler {
         try {
             // keepalive 메시지인 경우 무시
             if ("{\"status\":\"UP\"}".equals(payload)) {
-                logger.debug("Received keepalive message: {}", payload);
+                log.debug("Received keepalive message: {}", payload);
                 return;
             }
 			OrderbookDto orderbookDto = objectMapper.readValue(payload, OrderbookDto.class);
 			upbitDataService.processOrderbookData(orderbookDto);
         } catch (Exception e) {
-            logger.error("Error processing message: {}", payload, e);
+            log.error("Error processing message: {}", payload, e);
         }
     }
 
@@ -90,9 +89,9 @@ public class UpbitWebSocketOrderbookHandler extends BinaryWebSocketHandler {
     public void publish(String payload) {
 		try {
 			// execute publish if needed.
-			logger.info("Published parsed data: {}", payload);
+			log.info("Published parsed data: {}", payload);
 		} catch (Exception e) {
-			logger.error("Failed to publish parsed data: {}", e.getMessage(), e);
+			log.error("Failed to publish parsed data: {}", e.getMessage(), e);
 		}
     }
 
