@@ -158,5 +158,4 @@ public class UserController {
 		userService.quit(request.email(), request.password());
 		return ResponseEntity.ok("회원 탈퇴 성공");
 	}
-
 }

@@ -3,7 +3,9 @@ package com.coing.domain.user.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.coing.global.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.coing.domain.user.controller.dto.UserResponse;
@@ -58,12 +60,16 @@ public class AuthTokenService {
 
 	public Long getIdFromToken(String authHeader) {
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			throw new IllegalArgumentException("token.required");
+
+			throw new BusinessException("empty.token.provided", HttpStatus.BAD_REQUEST);
+
 		}
 		String token = authHeader.substring("Bearer ".length());
 		Map<String, Object> claims = verifyToken(token);
 		if (claims == null || claims.get("id") == null) {
-			throw new IllegalArgumentException("invalid.token");
+
+			throw new BusinessException("invalid.token", HttpStatus.UNAUTHORIZED);
+
 		}
 		Number id = (Number)claims.get("id");
 		return id.longValue();

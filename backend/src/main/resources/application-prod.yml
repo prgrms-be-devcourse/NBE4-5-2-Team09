@@ -10,4 +10,5 @@ spring:
 
 logging:
   level:
-    org.hibernate: warn
+    root: WARN
+    org.hibernate: WARN
