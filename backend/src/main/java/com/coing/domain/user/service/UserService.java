@@ -91,6 +91,7 @@ public class UserService {
 		User user = optionalUser.get();
 		if (!passwordEncoder.matches(password, user.getPassword())) {
 			throw new BusinessException(messageUtil.resolveMessage("password.mismatch"), HttpStatus.BAD_REQUEST, "");
+
 		}
 		userRepository.delete(user);
 		log.info("회원 탈퇴 성공: {}", email);

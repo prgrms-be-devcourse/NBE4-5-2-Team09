@@ -60,12 +60,16 @@ public class AuthTokenService {
 
 	public Long getIdFromToken(String authHeader) {
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+
 			throw new BusinessException("empty.token.provided", HttpStatus.BAD_REQUEST);
+
 		}
 		String token = authHeader.substring("Bearer ".length());
 		Map<String, Object> claims = verifyToken(token);
 		if (claims == null || claims.get("id") == null) {
+
 			throw new BusinessException("invalid.token", HttpStatus.UNAUTHORIZED);
+
 		}
 		Number id = (Number)claims.get("id");
 		return id.longValue();
