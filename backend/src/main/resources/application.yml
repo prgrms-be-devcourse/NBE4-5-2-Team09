@@ -47,4 +47,4 @@ upbit:
     uri: ${UPBIT_WS_URI:wss://api.upbit.com/websocket/v1}
   market:
     uri:
-      ${UPBIT_MARKET_URI}
+      ${UPBIT_MARKET_URI:https://api.upbit.com/v1/market/all}
