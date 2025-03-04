@@ -4,7 +4,10 @@ import org.springframework.stereotype.Service;
 
 import com.coing.domain.coin.orderbook.entity.Orderbook;
 import com.coing.domain.coin.orderbook.service.OrderbookService;
+import com.coing.domain.coin.ticker.entity.Ticker;
+import com.coing.domain.coin.ticker.service.TickerService;
 import com.coing.infra.upbit.dto.UpbitWebSocketOrderbookDto;
+import com.coing.infra.upbit.dto.UpbitWebSocketTickerDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UpbitDataService {
 	private final OrderbookService orderbookService;
+	private final TickerService tickerService;
 
 	public void processOrderbookData(UpbitWebSocketOrderbookDto dto) {
 		Orderbook orderbook = dto.toEntity();
@@ -26,5 +30,10 @@ public class UpbitDataService {
 		orderbookService.updateLatestOrderbook(orderbook);
 
 		orderbookService.publish(orderbook);
+	}
+
+	public void processTickerData(UpbitWebSocketTickerDto dto) {
+		Ticker ticker = dto.toEntity();
+		tickerService.publish(ticker);
 	}
 }
