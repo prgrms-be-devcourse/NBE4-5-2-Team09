@@ -2,6 +2,7 @@ package com.coing.infra.upbit.adapter;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import org.springframework.web.socket.client.WebSocketClient;
 import com.coing.infra.upbit.enums.EnumUpbitWebSocketType;
 import com.coing.infra.upbit.handler.UpbitWebSocketHandler;
 import com.coing.infra.upbit.handler.UpbitWebSocketOrderbookHandler;
+import com.coing.infra.upbit.handler.UpbitWebSocketTickerHandler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UpbitWebSocketService {
 	private final WebSocketClient webSocketClient;
 	private final UpbitWebSocketOrderbookHandler orderbookHandler;
+	private final UpbitWebSocketTickerHandler tickerHandler;
 	private final Map<EnumUpbitWebSocketType, UpbitWebSocketConnection> connections = new HashMap<>();
 	@Value("${upbit.websocket.uri}")
 	private String UPBIT_WEBSOCKET_URI;
@@ -45,6 +48,15 @@ public class UpbitWebSocketService {
 		connections.put(EnumUpbitWebSocketType.ORDERBOOK, orderbookConn);
 		orderbookConn.connect();
 
+		// TICKER
+		UpbitWebSocketHandler tickerComposite = new UpbitWebSocketHandler(
+			List.of(tickerHandler)
+		);
+		UpbitWebSocketConnection tickerConn = new UpbitWebSocketConnection(
+			webSocketClient, tickerComposite, UPBIT_WEBSOCKET_URI, "TICKER"
+		);
+		connections.put(EnumUpbitWebSocketType.TICKER, tickerConn);
+		tickerConn.connect();
 	}
 
 	/**
