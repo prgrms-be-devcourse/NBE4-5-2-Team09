@@ -39,7 +39,8 @@ springdoc:
 
 custom:
   jwt:
-    secret-key: "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890123"
-    expire-seconds: 1800
-    refresh-expire-seconds: 604800
+    secret-key: ${JWT_SECRET_KEY}
+    expire-seconds: ${JWT_EXPIRE_SECONDS}
+    refresh-expire-seconds: ${JWT_REFRESH_EXPIRE_SECONDS}
+
 
