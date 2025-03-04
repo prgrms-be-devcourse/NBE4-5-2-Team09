@@ -18,15 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class UpbitDataService {
-    private final OrderbookService orderbookService;
+	private final OrderbookService orderbookService;
 
-    public void processOrderbookData(UpbitWebSocketOrderbookDto dto) {
-        Orderbook orderbook = dto.toEntity();
+	public void processOrderbookData(UpbitWebSocketOrderbookDto dto) {
+		Orderbook orderbook = dto.toEntity();
 
-        orderbookService.updateLatestOrderbook(orderbook);
-        log.info("OrderbookSnapshot saved or updated latest for code: {}", orderbook.getCode());
+		orderbookService.updateLatestOrderbook(orderbook);
 
-        orderbookService.publish(orderbook);
-        log.info("Orderbook published for code: {}", orderbook.getCode());
-    }
+		orderbookService.publish(orderbook);
+	}
 }
