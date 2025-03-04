@@ -58,12 +58,12 @@ public class AuthTokenService {
 
 	public Long getIdFromToken(String authHeader) {
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			throw new IllegalArgumentException("인증 토큰이 제공되지 않았습니다.");
+			throw new IllegalArgumentException("token.required");
 		}
 		String token = authHeader.substring("Bearer ".length());
 		Map<String, Object> claims = verifyToken(token);
 		if (claims == null || claims.get("id") == null) {
-			throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+			throw new IllegalArgumentException("invalid.token");
 		}
 		Number id = (Number)claims.get("id");
 		return id.longValue();

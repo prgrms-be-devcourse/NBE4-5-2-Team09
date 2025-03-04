@@ -6,8 +6,10 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +20,7 @@ import com.coing.domain.user.service.AuthTokenService;
 import com.coing.domain.user.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -126,6 +129,34 @@ public class UserController {
 		res.put("email", email);
 
 		return ResponseEntity.ok(res);
+	}
+
+	@Operation(summary = "회원 탈퇴")
+	@DeleteMapping("/signout")
+	public ResponseEntity<?> signOut(
+		@RequestBody @Validated UserLoginRequest request,
+		@Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body("token.required");
+		}
+
+		String accessToken = authHeader.substring("Bearer ".length());
+		Map<String, Object> claims = authTokenService.verifyToken(accessToken);
+		if (claims == null || claims.get("email") == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body("invalid.token");
+		}
+
+		String tokenEmail = (String)claims.get("email");
+		if (!tokenEmail.equals(request.email())) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body("email.token.mismatch");
+		}
+
+		userService.quit(request.email(), request.password());
+		return ResponseEntity.ok("회원 탈퇴 성공");
 	}
 
 }

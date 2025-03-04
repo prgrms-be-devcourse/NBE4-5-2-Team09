@@ -80,4 +80,17 @@ public class UserService {
 
 		return new UserResponse(user.getId(), user.getName(), user.getEmail());
 	}
+
+	public void quit(String email, String password) {
+		Optional<User> optionalUser = userRepository.findByEmail(email);
+		if (optionalUser.isEmpty()) {
+			throw new IllegalArgumentException("member.not.found");
+		}
+		User user = optionalUser.get();
+		if (!passwordEncoder.matches(password, user.getPassword())) {
+			throw new IllegalArgumentException("password.mismatch");
+		}
+		userRepository.delete(user);
+		log.info("회원 탈퇴 성공: {}", email);
+	}
 }
