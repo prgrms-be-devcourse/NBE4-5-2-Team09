@@ -1,4 +1,4 @@
-package com.coing.standard.utils;
+package com.coing.util;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -6,15 +6,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.coing.infra.upbit.enums.EnumUpbitRequestType;
-import com.coing.util.Ut;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class UpbitUtilsTest {
+public class UtilTest {
 	private final ObjectMapper mapper = new ObjectMapper();
 
 	@Test
-	@DisplayName("makeRequest() 성공 - ORDERBOOK")
+	@DisplayName("Upbit makeRequest() 성공 - ORDERBOOK")
 	public void successMakeRequestOrderbook() throws Exception {
 		// given
 		EnumUpbitRequestType requestType = EnumUpbitRequestType.ORDERBOOK;
