@@ -14,16 +14,6 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 	bearerFormat = "JWT"
 )
 
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
-
-@SecurityScheme(
-	name = "bearerAuth",
-	type = SecuritySchemeType.HTTP,
-	scheme = "bearer",
-	bearerFormat = "JWT"
-)
-
 @SpringBootApplication
 @EnableScheduling
 public class CoingApplication {
