@@ -56,4 +56,10 @@ public class MarketService {
 			throw new BusinessException("", HttpStatus.NOT_FOUND);
 		}
 	}
+
+	public List<MarketResponse> getAllMarkets() {
+		return marketRepository.findAll().stream()
+			.map(MarketResponse::from)
+			.toList();
+	}
 }
