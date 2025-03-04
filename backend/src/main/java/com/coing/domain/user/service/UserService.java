@@ -2,6 +2,8 @@ package com.coing.domain.user.service;
 
 import java.util.Optional;
 
+import com.coing.global.exception.BusinessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,28 +29,28 @@ public class UserService {
 		log.info("일반 회원 가입 시도 :{}", email);
 
 		if (name == null || name.trim().isEmpty()) {
-			throw new IllegalArgumentException("name.required");
+			throw new BusinessException("name.required", HttpStatus.BAD_REQUEST);
 		}
 
 		if (email == null || email.trim().isEmpty()) {
-			throw new IllegalArgumentException("email.required");
+			throw new BusinessException("email.required", HttpStatus.BAD_REQUEST);
 		}
 
 		if (password == null || password.trim().isEmpty()) {
-			throw new IllegalArgumentException("password.required");
+			throw new BusinessException("password.required", HttpStatus.BAD_REQUEST);
 		}
 
 		if (passwordConfirm == null || passwordConfirm.trim().isEmpty()) {
-			throw new IllegalArgumentException("password.confirm.required");
+			throw new BusinessException("password.confirm.required", HttpStatus.BAD_REQUEST);
 		}
 
 		if (!password.equals(passwordConfirm)) {
-			throw new IllegalArgumentException("password.mismatch");
+			throw new BusinessException("password.mismatch", HttpStatus.UNAUTHORIZED);
 		}
 
 		Optional<User> existing = userRepository.findByEmail(email);
 		if (existing.isPresent()) {
-			throw new IllegalArgumentException("already.registered.email");
+			throw new BusinessException("already.registered.email", HttpStatus.CONFLICT);
 		}
 
 		String encodedPassword = passwordEncoder.encode(password);
@@ -69,13 +71,13 @@ public class UserService {
 
 		Optional<User> optionalUser = userRepository.findByEmail(email);
 		if (optionalUser.isEmpty()) {
-			throw new IllegalArgumentException("member.not.found");
+			throw new BusinessException("member.not.found", HttpStatus.NOT_FOUND);
 		}
 
 		User user = optionalUser.get();
 
 		if (!passwordEncoder.matches(password, user.getPassword())) {
-			throw new IllegalArgumentException("password.mismatch");
+			throw new BusinessException("password.mismatch", HttpStatus.UNAUTHORIZED);
 		}
 
 		return new UserResponse(user.getId(), user.getName(), user.getEmail());
