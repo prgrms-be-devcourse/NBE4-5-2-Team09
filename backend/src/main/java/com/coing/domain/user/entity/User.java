@@ -1,21 +1,18 @@
 package com.coing.domain.user.entity;
 
+import java.util.UUID;
+
+import org.hibernate.annotations.UuidGenerator;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import com.coing.domain.bookmark.entity.Bookmark;
 
 import jakarta.persistence.CascadeType;
-import java.util.UUID;
-
-import org.hibernate.annotations.UuidGenerator;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
@@ -52,6 +49,7 @@ public class User {
 
 	// 권한
 	@Column(name = "authority", nullable = false)
+	@Enumerated(EnumType.STRING)
 	private Authority authority;
 
 	@PrePersist
@@ -75,5 +73,9 @@ public class User {
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Bookmark> bookmarks = new ArrayList<>();
+
+	// // 관리자 코드 추후 추가
+	// @Column(name = "admin_code")
+	// private String adminCode;
 
 }
