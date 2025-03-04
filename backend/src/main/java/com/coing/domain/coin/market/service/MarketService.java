@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.coing.domain.coin.market.dto.MarketDto;
@@ -29,9 +30,10 @@ public class MarketService {
 	private final MarketRepository marketRepository;
 	private final RestTemplate restTemplate;
 
+	@Transactional
 	@Scheduled(initialDelay = 0, fixedRate = 6 * 60 * 60 * 1000)
 	public void updateCoinList() {
-		log.info("업비트 마켓 목록 자동 업데이트");
+		log.info("[Market] Market list auto update");
 		fetchAndUpdateCoins();
 	}
 
@@ -48,18 +50,19 @@ public class MarketService {
 
 			marketRepository.saveAll(markets);
 		} catch (Exception e) {
-			log.error("[Upbit Rest Api Error] " + e.getMessage());
-			throw new BusinessException("", HttpStatus.NOT_FOUND);
+			log.error("[Market] Upbit Rest Api Error: {}", e.getMessage());
+			throw new BusinessException("[Market] Failed to fetch market data", HttpStatus.NOT_FOUND);
 		}
 	}
 
 	public List<Market> getAllMarkets() {
-		log.info("업비트 마켓 목록 전체 조회 요청");
+		log.info("[Market] Get all market list");
 		return marketRepository.findAll();
 	}
 
+	@Transactional
 	public void refreshMarketList() {
-		log.info("업비트 마켓 목록 갱신 요청");
+		log.info("[Market] Refresh market list");
 		fetchAndUpdateCoins();
 	}
 }
