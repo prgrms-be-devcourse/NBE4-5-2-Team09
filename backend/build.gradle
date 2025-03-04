@@ -35,12 +35,11 @@ dependencies {
     testRuntimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
-   	implementation 'org.flywaydb:flyway-core'
-	  implementation 'org.flywaydb:flyway-mysql'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
 
-   	testImplementation("org.springframework.boot:spring-boot-starter-test") {
-		exclude group: "org.mockito"
-	}
+    testImplementation("org.springframework.boot:spring-boot-starter-test") 
+
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
