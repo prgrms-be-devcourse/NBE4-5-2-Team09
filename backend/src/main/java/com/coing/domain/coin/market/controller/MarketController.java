@@ -2,6 +2,7 @@ package com.coing.domain.coin.market.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,4 +26,10 @@ public class MarketController {
 		return ResponseEntity.ok(marketService.getAllMarkets());
 	}
 
+	@Operation(summary = "새로고침 요청")
+	@PostMapping("/refresh")
+	public ResponseEntity<?> refreshMarkets() {
+		marketService.refreshMarketList();
+		return ResponseEntity.ok("업비트 종목 목록이 갱신되었습니다.");
+	}
 }
