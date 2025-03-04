@@ -193,32 +193,4 @@ public class UserController {
 		return ResponseEntity.ok("회원 탈퇴 성공");
 	}
 
-	@Operation(summary = "회원 탈퇴")
-	@DeleteMapping("/signout")
-	public ResponseEntity<?> signOut(
-		@RequestBody @Validated UserLoginRequest request,
-		@Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-				.body("token.required");
-		}
-
-		String accessToken = authHeader.substring("Bearer ".length());
-		Map<String, Object> claims = authTokenService.verifyToken(accessToken);
-		if (claims == null || claims.get("email") == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-				.body("invalid.token");
-		}
-
-		String tokenEmail = (String)claims.get("email");
-		if (!tokenEmail.equals(request.email())) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-				.body("email.token.mismatch");
-		}
-
-		userService.quit(request.email(), request.password());
-		return ResponseEntity.ok("회원 탈퇴 성공");
-	}
-
 }
