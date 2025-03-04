@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.coing.domain.coin.market.controller.dto.MarketResponse;
+import com.coing.domain.coin.market.dto.MarketDto;
 import com.coing.domain.coin.market.entity.Market;
 import com.coing.domain.coin.market.repository.MarketRepository;
 import com.coing.global.exception.BusinessException;
@@ -31,24 +31,20 @@ public class MarketService {
 
 	@Scheduled(initialDelay = 0, fixedRate = 6 * 60 * 60 * 1000)
 	public void updateCoinList() {
-		log.info("업비트 코인 목록 자동 업데이트");
+		log.info("업비트 마켓 목록 자동 업데이트");
 		fetchAndUpdateCoins();
 	}
 
 	private void fetchAndUpdateCoins() {
 		try {
-			ResponseEntity<MarketResponse[]> response = restTemplate.getForEntity(UPBIT_MARKET_URI,
-				MarketResponse[].class);
+			ResponseEntity<MarketDto[]> response = restTemplate.getForEntity(UPBIT_MARKET_URI,
+				MarketDto[].class);
 
 			log.info(Arrays.toString(response.getBody()));
 
 			List<Market> markets = Arrays.stream(response.getBody())
-				.map(c -> Market.builder()
-					.code(c.market())
-					.koreanName(c.koreanName())
-					.englishName(c.englishName())
-					.build()
-				).toList();
+				.map(MarketDto::toEntity)
+				.toList();
 
 			marketRepository.saveAll(markets);
 		} catch (Exception e) {
@@ -57,14 +53,13 @@ public class MarketService {
 		}
 	}
 
-	public List<MarketResponse> getAllMarkets() {
-		return marketRepository.findAll().stream()
-			.map(MarketResponse::from)
-			.toList();
+	public List<Market> getAllMarkets() {
+		log.info("업비트 마켓 목록 전체 조회 요청");
+		return marketRepository.findAll();
 	}
 
 	public void refreshMarketList() {
-		log.info("마켓 목록 갱신이 요청되었습니다");
+		log.info("업비트 마켓 목록 갱신 요청");
 		fetchAndUpdateCoins();
 	}
 }
