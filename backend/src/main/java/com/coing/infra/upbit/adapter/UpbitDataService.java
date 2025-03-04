@@ -1,11 +1,15 @@
 package com.coing.infra.upbit.adapter;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.springframework.stereotype.Service;
 
 import com.coing.domain.coin.entity.Orderbook;
+import com.coing.domain.coin.entity.Ticker;
 import com.coing.infra.upbit.dto.OrderbookDto;
+import com.coing.infra.upbit.dto.TickerDto;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UpbitDataService {
 	private final AtomicReference<Orderbook> lastOrderbook = new AtomicReference<>();
+	private final AtomicReference<Ticker> lastTicker = new AtomicReference<>();
 
 	public void processOrderbookData(OrderbookDto orderbookDto) {
 		Orderbook orderbook = orderbookDto.toEntity();
@@ -27,5 +32,14 @@ public class UpbitDataService {
 
 	public Orderbook getLastOrderbook() {
 		return lastOrderbook.get();
+	}
+
+	public void processTickerData(TickerDto tickerDto) {
+		Ticker ticker = tickerDto.toEntity();
+		lastTicker.set(ticker);
+	}
+
+	public Ticker getLastTicker() {
+		return lastTicker.get();
 	}
 }
