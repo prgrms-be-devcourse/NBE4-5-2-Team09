@@ -36,3 +36,11 @@ spring:
 
 springdoc:
   default-produces-media-type: application/json;charset=UTF-8
+
+custom:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    expire-seconds: ${JWT_EXPIRE_SECONDS}
+    refresh-expire-seconds: ${JWT_REFRESH_EXPIRE_SECONDS}
+
+
