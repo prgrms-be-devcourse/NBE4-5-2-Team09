@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,14 +38,17 @@ public class User {
 	@Column(name = "password", nullable = false)
 	private String password;
 
-	// 주소
-	@Column(name = "address", nullable = false)
-	private String address;
-
 	// 권한
 	@Column(name = "authority", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Authority authority;
+
+	@PrePersist
+	public void prePersist() {
+		if (authority == null) {
+			authority = Authority.USER;
+		}
+	}
 
 	// 이메일 인증 코드
 	@Column(name = "verification_code")

@@ -20,6 +20,7 @@ import com.coing.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -70,10 +71,61 @@ public class UserController {
 	public ResponseEntity<?> logout(HttpServletResponse response) {
 		Cookie cookie = new Cookie("refreshToken", null);
 		cookie.setHttpOnly(true);
-		cookie.setSecure(true);
+		cookie.setSecure(false);
 		cookie.setPath("/");
 		cookie.setMaxAge(0);
 		response.addCookie(cookie);
 		return ResponseEntity.ok("로그아웃 성공");
 	}
+
+	@Operation(summary = "토큰 재발급")
+	@PostMapping("/refresh")
+	public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+		// 쿠키에서 refreshToken 값 추출
+		Cookie[] cookies = request.getCookies();
+		if (cookies == null) {
+			throw new IllegalArgumentException("refresh.token.required");
+		}
+		String refreshToken = null;
+		for (Cookie cookie : cookies) {
+			if ("refreshToken".equals(cookie.getName())) {
+				refreshToken = cookie.getValue();
+				break;
+			}
+		}
+		if (refreshToken == null) {
+			throw new IllegalArgumentException("refresh.token.required");
+		}
+
+		// 리프레시 토큰 검증
+		Map<String, Object> claims = authTokenService.verifyToken(refreshToken);
+		if (claims == null) {
+			throw new IllegalArgumentException("invalid.refresh.token");
+		}
+
+		// 토큰 클레임에서 사용자 정보 추출
+		Long userId = ((Number)claims.get("id")).longValue();
+		String email = (String)claims.get("email");
+
+		UserResponse userResponse = new UserResponse(userId, "", email);
+
+		// 새 액세스 토큰과 리프레시 토큰 생성
+		String newAccessToken = authTokenService.genAccessToken(userResponse);
+		String newRefreshToken = authTokenService.genRefreshToken(userResponse);
+
+		// 새 리프레시 토큰을 쿠키에 설정 (7일 유효)
+		Cookie newRefreshCookie = new Cookie("refreshToken", newRefreshToken);
+		newRefreshCookie.setHttpOnly(true);
+		newRefreshCookie.setSecure(false);
+		newRefreshCookie.setPath("/");
+		newRefreshCookie.setMaxAge(604800); // 7일 (초 단위)
+		response.addCookie(newRefreshCookie);
+
+		Map<String, String> res = new HashMap<>();
+		res.put("token", newAccessToken);
+		res.put("email", email);
+
+		return ResponseEntity.ok(res);
+	}
+
 }

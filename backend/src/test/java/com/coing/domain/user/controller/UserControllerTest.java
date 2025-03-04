@@ -41,4 +41,5 @@ public class UserControllerTest {
 			.andExpect(content().string("로그아웃 성공"))
 			.andExpect(cookie().maxAge("refreshToken", 0));
 	}
+
 }
