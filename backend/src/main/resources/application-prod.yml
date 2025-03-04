@@ -1,0 +1,13 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    validateOnMigrate: true
+    cleanDisabled: true
+
+logging:
+  level:
+    org.hibernate: warn

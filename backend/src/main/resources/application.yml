@@ -1,3 +1,42 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: coing
+  profiles:
+    active: ${SPRING_ACTIVE_PROFILES:dev}
+  config:
+    import: optional:file:../.env[.properties]
+  output:
+    ansi:
+      enabled: always
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&connectTimeout=20000&useSSL=false
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      auto-commit: false
+
+  jpa:
+    open-in-view: false
+
+  flyway: # managing database migration
+    enabled: false
+    baseline-on-migrate: true
+    baseline-version: 0
+    fail-on-missing-locations: true
+    locations: classpath:db/migration
+
+
+springdoc:
+  default-produces-media-type: application/json;charset=UTF-8
+
 custom:
   jwt:
     secret-key: "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890123"
