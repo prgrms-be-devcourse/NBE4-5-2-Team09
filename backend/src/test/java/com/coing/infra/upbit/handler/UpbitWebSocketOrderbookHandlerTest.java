@@ -23,34 +23,34 @@ import com.coing.infra.upbit.dto.UpbitWebSocketOrderbookDto;
 @ExtendWith(MockitoExtension.class)
 public class UpbitWebSocketOrderbookHandlerTest {
 
-    @Mock
-    private UpbitDataService upbitDataService;
+	@Mock
+	private UpbitDataService upbitDataService;
 
-    @Mock
-    private WebSocketSession session;
+	@Mock
+	private WebSocketSession session;
 
-	 @InjectMocks
-    private UpbitWebSocketOrderbookHandler handler;
+	@InjectMocks
+	private UpbitWebSocketOrderbookHandler handler;
 
-    @Test
-    @DisplayName("afterConnectionEstablished() 성공")
-    public void successAfterConnectionEstablished() throws Exception {
-        // when
-        handler.afterConnectionEstablished(session);
+	@Test
+	@DisplayName("afterConnectionEstablished() 성공")
+	public void successAfterConnectionEstablished() throws Exception {
+		// when
+		handler.afterConnectionEstablished(session);
 
-        // then
-        ArgumentCaptor<TextMessage> captor = ArgumentCaptor.forClass(TextMessage.class);
-        verify(session, times(1)).sendMessage(captor.capture());
-        String sentMessage = captor.getValue().getPayload();
-        assertThat(sentMessage).isNotEmpty();
-        assertThat(sentMessage).contains("orderbook");
-    }
+		// then
+		ArgumentCaptor<TextMessage> captor = ArgumentCaptor.forClass(TextMessage.class);
+		verify(session, times(1)).sendMessage(captor.capture());
+		String sentMessage = captor.getValue().getPayload();
+		assertThat(sentMessage).isNotEmpty();
+		assertThat(sentMessage).contains("orderbook");
+	}
 
-    @Test
-    @DisplayName("handleBinaryMessage() 성공")
-    public void successHandleBinaryMessage() {
-        // given
-        String jsonSimpleFormatPayload = """
+	@Test
+	@DisplayName("handleBinaryMessage() 성공")
+	public void successHandleBinaryMessage() {
+		// given
+		String jsonSimpleFormatPayload = """
 			{
 			  "ty": "orderbook",
 			  "cd": "KRW-BTC",
@@ -69,41 +69,43 @@ public class UpbitWebSocketOrderbookHandlerTest {
 			  "lv": 10000
 			}
 			""".stripIndent();
-        BinaryMessage binaryMessage = new BinaryMessage(ByteBuffer.wrap(jsonSimpleFormatPayload.getBytes(StandardCharsets.UTF_8)));
+		BinaryMessage binaryMessage = new BinaryMessage(
+			ByteBuffer.wrap(jsonSimpleFormatPayload.getBytes(StandardCharsets.UTF_8)));
 
-        // when
+		// when
 		UpbitWebSocketOrderbookHandler spyHandler = spy(handler);
-        spyHandler.handleBinaryMessage(session, binaryMessage);
-
-        // then
-        verify(upbitDataService, times(1)).processOrderbookData(any(UpbitWebSocketOrderbookDto.class));
-    }
-
-    @Test
-    @DisplayName("handleBinaryMessage() Keepalive 메시지 무시")
-    public void testHandleBinaryMessageIgnoresKeepalive() throws Exception {
-        // given: keepalive 메시지
-        String keepalivePayload = "{\"status\":\"UP\"}";
-        BinaryMessage binaryMessage = new BinaryMessage(ByteBuffer.wrap(keepalivePayload.getBytes(StandardCharsets.UTF_8)));
-
-        // when
-        handler.handleBinaryMessage(session, binaryMessage);
-
-        // then
-        verify(upbitDataService, never()).processOrderbookData(any(UpbitWebSocketOrderbookDto.class));
-    }
-
-    @Test
-    @DisplayName("handleBinaryMessage() 실패 - Invalid Json Payload")
-    public void failureHandleBinaryMessage() throws Exception {
-        // given: 유효하지 않은 JSON payload
-        String invalidJson = "invalid json";
-        BinaryMessage binaryMessage = new BinaryMessage(ByteBuffer.wrap(invalidJson.getBytes(StandardCharsets.UTF_8)));
-
-        // when
-        handler.handleBinaryMessage(session, binaryMessage);
+		spyHandler.handleBinaryMessage(session, binaryMessage);
 
 		// then
-        verify(upbitDataService, never()).processOrderbookData(any(UpbitWebSocketOrderbookDto.class));
-    }
+		verify(upbitDataService, times(1)).processOrderbookData(any(UpbitWebSocketOrderbookDto.class));
+	}
+
+	@Test
+	@DisplayName("handleBinaryMessage() Keepalive 메시지 무시")
+	public void testHandleBinaryMessageIgnoresKeepalive() throws Exception {
+		// given: keepalive 메시지
+		String keepalivePayload = "{\"status\":\"UP\"}";
+		BinaryMessage binaryMessage = new BinaryMessage(
+			ByteBuffer.wrap(keepalivePayload.getBytes(StandardCharsets.UTF_8)));
+
+		// when
+		handler.handleBinaryMessage(session, binaryMessage);
+
+		// then
+		verify(upbitDataService, never()).processOrderbookData(any(UpbitWebSocketOrderbookDto.class));
+	}
+
+	@Test
+	@DisplayName("handleBinaryMessage() 실패 - Invalid Json Payload")
+	public void failureHandleBinaryMessage() throws Exception {
+		// given: 유효하지 않은 JSON payload
+		String invalidJson = "invalid json";
+		BinaryMessage binaryMessage = new BinaryMessage(ByteBuffer.wrap(invalidJson.getBytes(StandardCharsets.UTF_8)));
+
+		// when
+		handler.handleBinaryMessage(session, binaryMessage);
+
+		// then
+		verify(upbitDataService, never()).processOrderbookData(any(UpbitWebSocketOrderbookDto.class));
+	}
 }

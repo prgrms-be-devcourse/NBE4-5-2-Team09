@@ -1,5 +1,6 @@
 package com.coing.domain.coin.orderbook.service;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -16,6 +17,7 @@ import com.coing.domain.coin.orderbook.dto.OrderbookDto;
 import com.coing.domain.coin.orderbook.entity.Orderbook;
 import com.coing.domain.coin.orderbook.entity.OrderbookSnapshot;
 import com.coing.domain.coin.orderbook.repository.OrderbookSnapshotRepository;
+import com.coing.util.Ut;
 
 import lombok.RequiredArgsConstructor;
 
@@ -151,6 +153,7 @@ public class OrderbookService {
 	public void publish(Orderbook orderbook) {
 		double volatility = getCachedVolatility(orderbook.getCode());
 		OrderbookDto dto = OrderbookDto.from(orderbook, volatility);
-		simpMessageSendingOperations.convertAndSend("/sub/coin/orderbook", dto);
+		String convertedMessage = new String(Ut.Json.toString(dto).getBytes(), StandardCharsets.UTF_8);
+		simpMessageSendingOperations.convertAndSend("/sub/coin/orderbook", convertedMessage);
 	}
 }

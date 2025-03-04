@@ -19,11 +19,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 
-import com.coing.domain.coin.orderbook.dto.OrderbookDto;
 import com.coing.domain.coin.orderbook.entity.Orderbook;
 import com.coing.domain.coin.orderbook.entity.OrderbookSnapshot;
 import com.coing.domain.coin.orderbook.entity.OrderbookUnit;
 import com.coing.domain.coin.orderbook.repository.OrderbookSnapshotRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderbookServiceTest {
@@ -37,6 +39,7 @@ public class OrderbookServiceTest {
 	OrderbookService orderbookService;
 
 	private Orderbook testOrderbook;
+	private final ObjectMapper mapper = new ObjectMapper();
 
 	@BeforeEach
 	public void setUp() {
@@ -193,7 +196,7 @@ public class OrderbookServiceTest {
 
 	@Test
 	@DisplayName("publish 성공")
-	void publish() {
+	void publish() throws JsonProcessingException {
 		// when
 		orderbookService.addMidPrice("KRW-BTC", 100.0);
 		orderbookService.addMidPrice("KRW-BTC", 110.0);
@@ -201,11 +204,13 @@ public class OrderbookServiceTest {
 		orderbookService.publish(testOrderbook);
 
 		// then
-		ArgumentCaptor<OrderbookDto> dtoCaptor = ArgumentCaptor.forClass(OrderbookDto.class);
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(simpMessageSendingOperations, times(1))
-			.convertAndSend(eq("/sub/coin/orderbook"), dtoCaptor.capture());
-		OrderbookDto dto = dtoCaptor.getValue();
-		assertEquals("KRW-BTC", dto.code());
-		assertEquals(5.0, dto.volatility());
+			.convertAndSend(eq("/sub/coin/orderbook"), captor.capture());
+
+		String actualValue = captor.getValue();
+		JsonNode jsonNode = mapper.readTree(actualValue);
+		assertEquals("orderbook", jsonNode.get("type").asText());
+		assertEquals("KRW-BTC", jsonNode.get("code").asText());
 	}
 }

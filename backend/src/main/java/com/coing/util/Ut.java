@@ -22,6 +22,8 @@ import io.jsonwebtoken.security.Keys;
 
 @Component
 public class Ut {
+	private static final ObjectMapper objectMapper = new ObjectMapper();
+
 	public static class Jwt {
 		public static String createToken(String keyString, int expireSeconds, Map<String, Object> claims) {
 
@@ -74,8 +76,18 @@ public class Ut {
 		}
 	}
 
+	public static class Json {
+
+		public static String toString(Object obj) {
+			try {
+				return objectMapper.writeValueAsString(obj);
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
 	public static class Upbit {
-		private final static ObjectMapper ObjectMapper = new ObjectMapper();
 
 		public static String makeRequest(EnumUpbitRequestType type) throws JsonProcessingException {
 			UpbitWebSocketTicketDto ticketDto = UpbitWebSocketTicketDto.builder()
@@ -92,7 +104,7 @@ public class Ut {
 				.build();
 
 			List<Object> dataList = Arrays.asList(ticketDto, typeDto, formatDto);
-			return ObjectMapper.writeValueAsString(dataList);
+			return objectMapper.writeValueAsString(dataList);
 		}
 	}
 }
