@@ -44,4 +44,7 @@ custom:
 
 upbit:
   websocket:
-    uri: ${UPBIT_WS_URI:wss://api.upbit.com/websocket/v1}
+    uri: ${UPBIT_WS_URI}
+  market:
+    uri:
+      ${UPBIT_MARKET_URI}
