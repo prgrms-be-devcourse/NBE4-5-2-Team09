@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
+import com.coing.global.exception.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,7 +68,7 @@ public class UserServiceTest {
 		String password = "test";
 		String passwordConfirm = "test2";
 
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+		Exception exception = assertThrows(BusinessException.class, () -> {
 			userService.join(name, email, password, passwordConfirm);
 		});
 		assertEquals("password.mismatch", exception.getMessage());
@@ -84,7 +85,7 @@ public class UserServiceTest {
 		User existingUser = new User();
 		when(userRepository.findByEmail(email)).thenReturn(Optional.of(existingUser));
 
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+		Exception exception = assertThrows(BusinessException.class, () -> {
 			userService.join(name, email, password, passwordConfirm);
 		});
 		assertEquals("already.registered.email", exception.getMessage());
@@ -128,7 +129,7 @@ public class UserServiceTest {
 		when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 		when(passwordEncoder.matches(password, encodedPassword)).thenReturn(false);
 
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+		Exception exception = assertThrows(BusinessException.class, () -> {
 			userService.login(email, password);
 		});
 		assertEquals("password.mismatch", exception.getMessage());
@@ -142,7 +143,7 @@ public class UserServiceTest {
 
 		when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+		Exception exception = assertThrows(BusinessException.class, () -> {
 			userService.login(email, password);
 		});
 		assertEquals("member.not.found", exception.getMessage());
