@@ -19,62 +19,61 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class OrderbookDto {
+	@JsonProperty("ty")
+	private String type;
 
-    @JsonProperty("ty")
-    private String type;
+	@JsonProperty("cd")
+	private String code;
 
-    @JsonProperty("cd")
-    private String code;
+	@JsonProperty("tas")
+	private Double totalAskSize;
 
-    @JsonProperty("tas")
-    private Double totalAskSize;
+	@JsonProperty("tbs")
+	private Double totalBidSize;
 
-    @JsonProperty("tbs")
-    private Double totalBidSize;
+	@JsonProperty("obu")
+	private List<OrderbookUnitDto> orderbookUnits;
 
-    @JsonProperty("obu")
-    private List<OrderbookUnitDto> orderbookUnits;
+	@JsonProperty("tms")
+	private Long timestamp;
 
-    @JsonProperty("tms")
-    private Long timestamp;
+	@JsonProperty("lv")
+	private Double level;
 
-    @JsonProperty("lv")
-    private Double level;
+	@JsonProperty("st")
+	private String streamType;
 
-    @JsonProperty("st")
-    private String streamType;
+	public Orderbook toEntity() {
+		Orderbook.OrderbookBuilder orderbookBuilder = Orderbook.builder()
+			.type(this.type)
+			.code(this.code)
+			.totalAskSize(this.totalAskSize)
+			.totalBidSize(this.totalBidSize)
+			.timestamp(this.timestamp)
+			.level(this.level);
 
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class OrderbookUnitDto {
-        @JsonProperty("ap")
-        private Double askPrice;
+		return orderbookBuilder.build();
+	}
 
-        @JsonProperty("bp")
-        private Double bidPrice;
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class OrderbookUnitDto {
+		@JsonProperty("ap")
+		private Double askPrice;
 
-        @JsonProperty("as")
-        private Double askSize;
+		@JsonProperty("bp")
+		private Double bidPrice;
 
-        @JsonProperty("bs")
-        private Double bidSize;
+		@JsonProperty("as")
+		private Double askSize;
 
-        public Orderbook.OrderbookUnit toEntity() {
-            return new Orderbook.OrderbookUnit(askPrice, bidPrice, askSize, bidSize);
-        }
-    }
+		@JsonProperty("bs")
+		private Double bidSize;
 
-    public Orderbook toEntity() {
-        Orderbook.OrderbookBuilder orderbookBuilder = Orderbook.builder()
-            .type(this.type)
-            .code(this.code)
-            .totalAskSize(this.totalAskSize)
-            .totalBidSize(this.totalBidSize)
-            .timestamp(this.timestamp)
-            .level(this.level);
-
-        return orderbookBuilder.build();
-    }
+		public Orderbook.OrderbookUnit toEntity() {
+			return new Orderbook.OrderbookUnit(askPrice, bidPrice, askSize, bidSize);
+		}
+	}
 
 }

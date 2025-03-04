@@ -18,14 +18,14 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class UpbitDataService {
-    private final AtomicReference<Orderbook> lastOrderbook = new AtomicReference<>();
+	private final AtomicReference<Orderbook> lastOrderbook = new AtomicReference<>();
 
-    public void processOrderbookData(OrderbookDto orderbookDto) {
-        Orderbook orderbook = orderbookDto.toEntity();
-        lastOrderbook.set(orderbook);
-    }
+	public void processOrderbookData(OrderbookDto orderbookDto) {
+		Orderbook orderbook = orderbookDto.toEntity();
+		lastOrderbook.set(orderbook);
+	}
 
-    public Orderbook getLastOrderbook() {
-        return lastOrderbook.get();
-    }
+	public Orderbook getLastOrderbook() {
+		return lastOrderbook.get();
+	}
 }

@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
 /**
  * Upbit WebSocket Request Ticket Field
  * 일반적으로 용도를 식별하기 위해 ticket 이라는 필드값이 필요하다.
@@ -17,6 +16,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UpbitWebSocketTicketDto {
-    @NotBlank
+	@NotBlank
 	String ticket;
 }

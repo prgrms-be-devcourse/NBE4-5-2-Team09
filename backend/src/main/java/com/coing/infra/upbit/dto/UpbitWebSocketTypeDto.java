@@ -23,11 +23,11 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UpbitWebSocketTypeDto {
 	@NotBlank
-    private String type;
+	private String type;
 	@NotEmpty
-    private List<String> codes;
+	private List<String> codes;
 	@JsonProperty("is_only_snapshot")
-    private Boolean isOnlySnapshot;
+	private Boolean isOnlySnapshot;
 	@JsonProperty("is_only_realtime")
-    private Boolean isOnlyRealtime;
+	private Boolean isOnlyRealtime;
 }

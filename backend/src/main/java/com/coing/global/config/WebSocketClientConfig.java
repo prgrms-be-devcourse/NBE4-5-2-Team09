@@ -8,8 +8,8 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 @Configuration
 public class WebSocketClientConfig {
 
-    @Bean
-    public WebSocketClient webSocketClient() {
-        return new StandardWebSocketClient();
-    }
+	@Bean
+	public WebSocketClient webSocketClient() {
+		return new StandardWebSocketClient();
+	}
 }

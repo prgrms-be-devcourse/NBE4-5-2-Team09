@@ -10,16 +10,16 @@ import lombok.Getter;
  */
 @Getter
 public enum EnumUpbitRequestType {
-    TICKER("ticker", List.of("KRW-EOS")),
-    TRADE("trade", List.of("KRW-BTC", "KRW-ETH")),
-    ORDERBOOK("orderbook", List.of("KRW-ADA")),
-    CANDLE("candle", List.of("KRW-ADA"));
+	TICKER("ticker", List.of("KRW-EOS")),
+	TRADE("trade", List.of("KRW-BTC", "KRW-ETH")),
+	ORDERBOOK("orderbook", List.of("KRW-ADA")),
+	CANDLE("candle", List.of("KRW-ADA"));
 
 	private final String value;
-    private final List<String> defaultCodes;
+	private final List<String> defaultCodes;
 
-    EnumUpbitRequestType(String value, List<String> defaultCodes) {
-        this.value = value;
-        this.defaultCodes = defaultCodes;
-    }
+	EnumUpbitRequestType(String value, List<String> defaultCodes) {
+		this.value = value;
+		this.defaultCodes = defaultCodes;
+	}
 }
