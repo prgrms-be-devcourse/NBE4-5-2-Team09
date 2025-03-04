@@ -18,7 +18,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import com.coing.infra.upbit.adapter.UpbitDataService;
-import com.coing.infra.upbit.dto.OrderbookDto;
+import com.coing.infra.upbit.dto.UpbitWebSocketOrderbookDto;
 
 @ExtendWith(MockitoExtension.class)
 public class UpbitWebSocketOrderbookHandlerTest {
@@ -76,8 +76,7 @@ public class UpbitWebSocketOrderbookHandlerTest {
         spyHandler.handleBinaryMessage(session, binaryMessage);
 
         // then
-        verify(upbitDataService, times(1)).processOrderbookData(any(OrderbookDto.class));
-		verify(spyHandler, timeout(500).times(1)).publish(any(String.class));
+        verify(upbitDataService, times(1)).processOrderbookData(any(UpbitWebSocketOrderbookDto.class));
     }
 
     @Test
@@ -91,7 +90,7 @@ public class UpbitWebSocketOrderbookHandlerTest {
         handler.handleBinaryMessage(session, binaryMessage);
 
         // then
-        verify(upbitDataService, never()).processOrderbookData(any(OrderbookDto.class));
+        verify(upbitDataService, never()).processOrderbookData(any(UpbitWebSocketOrderbookDto.class));
     }
 
     @Test
@@ -105,6 +104,6 @@ public class UpbitWebSocketOrderbookHandlerTest {
         handler.handleBinaryMessage(session, binaryMessage);
 
 		// then
-        verify(upbitDataService, never()).processOrderbookData(any(OrderbookDto.class));
+        verify(upbitDataService, never()).processOrderbookData(any(UpbitWebSocketOrderbookDto.class));
     }
 }
