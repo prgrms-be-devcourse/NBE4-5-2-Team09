@@ -14,8 +14,6 @@ spring:
   jackson:
     serialization:
       fail-on-empty-beans: false
-  messages:
-    basename: messages
 
   datasource:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&connectTimeout=20000&useSSL=false
