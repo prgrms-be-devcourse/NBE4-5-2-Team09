@@ -13,7 +13,7 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<BasicResponse> handleBusinessException(BusinessException exception) {
-        log.info("[ExceptionHandler] Message: {}, Detail: {}", exception.getMessage(), exception.getDetail());
+        log.warn("[ExceptionHandler] Message: {}, Detail: {}", exception.getMessage(), exception.getDetail());
 
         return BasicResponse.to(exception);
     }
@@ -24,8 +24,8 @@ public class RestExceptionHandler {
 
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        BusinessException businessException = new BusinessException("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다.");
-        log.error("[ExceptionHandler] Message: {}, Detail: {}", businessException.getMessage(), exception.getMessage());
+        BusinessException businessException = new BusinessException("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        log.error("[ExceptionHandler] Message: {}, Detail: {}", businessException.getMessage(), businessException.getDetail());
 
         return ResponseEntity
                 .status(status)
