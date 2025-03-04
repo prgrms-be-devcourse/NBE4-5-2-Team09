@@ -62,4 +62,9 @@ public class MarketService {
 			.map(MarketResponse::from)
 			.toList();
 	}
+
+	public void refreshMarketList() {
+		log.info("마켓 목록 갱신이 요청되었습니다");
+		fetchAndUpdateCoins();
+	}
 }
