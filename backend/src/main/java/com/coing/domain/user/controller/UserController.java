@@ -2,6 +2,7 @@ package com.coing.domain.user.controller;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +54,7 @@ public class UserController {
 			BasicResponse response = new BasicResponse(
 				HttpStatus.CREATED,
 				"회원가입 성공",
-				"userId: " + user.id() + ", name: " + user.name() + ", email: " + user.email()
+				"userId: " + user.id().toString() + ", name: " + user.name() + ", email: " + user.email()
 			);
 			return ResponseEntity.status(HttpStatus.CREATED).body(response);
 		} catch (Exception e) {
@@ -137,7 +138,10 @@ public class UserController {
 					"");
 			}
 
-			Long userId = ((Number)claims.get("id")).longValue();
+			// 기존 Long 대신 String으로 받아 UUID로 변환
+			String userIdStr = (String)claims.get("id");
+			UUID userId = UUID.fromString(userIdStr);
+
 			String email = (String)claims.get("email");
 
 			// 이름은 필요 없으므로 빈 문자열 처리
@@ -192,5 +196,4 @@ public class UserController {
 		userService.quit(request.email(), request.password());
 		return ResponseEntity.ok("회원 탈퇴 성공");
 	}
-
 }
