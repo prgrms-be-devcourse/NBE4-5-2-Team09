@@ -8,21 +8,20 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.coing.domain.bookmark.controller.dto.BookmarkRequest;
 import com.coing.domain.bookmark.controller.dto.BookmarkResponse;
 import com.coing.domain.bookmark.controller.dto.BookmarkUpdateRequest;
 import com.coing.domain.bookmark.entity.Bookmark;
 import com.coing.domain.bookmark.repository.BookmarkRepository;
+import com.coing.domain.coin.market.entity.Market;
+import com.coing.domain.coin.market.repository.MarketRepository;
+import com.coing.domain.user.CustomUserPrincipal;
 import com.coing.domain.user.entity.User;
 import com.coing.domain.user.repository.UserRepository;
-import com.coing.domain.user.service.AuthTokenService;
 import com.coing.global.exception.BusinessException;
 import com.coing.util.MessageUtil;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -30,58 +29,39 @@ import lombok.RequiredArgsConstructor;
 public class BookmarkService {
 
 	private final BookmarkRepository bookmarkRepository;
+	private final MarketRepository marketRepository;
 	private final UserRepository userRepository;
 	private final MessageUtil messageUtil;
-	private final AuthTokenService authTokenService;
-
-	/**
-	 * 현재 HttpServletRequest의 Authorization 헤더에서 JWT 토큰을 추출하고,
-	 * AuthTokenService를 사용하여 클레임에서 사용자 id (UUID)를 반환합니다.
-	 */
-	private UUID getCurrentUserIdFromRequest() {
-		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
-		String authHeader = request.getHeader("Authorization");
-		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			throw new BusinessException(messageUtil.resolveMessage("empty.token.provided"), HttpStatus.UNAUTHORIZED,
-				"");
-		}
-		String token = authHeader.substring("Bearer ".length());
-		var claims = authTokenService.verifyToken(token);
-		if (claims == null || claims.get("id") == null) {
-			throw new BusinessException(messageUtil.resolveMessage("invalid.token"), HttpStatus.UNAUTHORIZED, "");
-		}
-		String userIdStr = claims.get("id").toString();
-		return UUID.fromString(userIdStr);
-	}
 
 	@Transactional
-	public BookmarkResponse addBookmark(BookmarkRequest request) {
-		UUID userId = getCurrentUserIdFromRequest();
+	public BookmarkResponse addBookmark(BookmarkRequest request, CustomUserPrincipal principal) {
+		UUID userId = principal.id();
 		String coinCode = request.coinCode();
 
-		if (bookmarkRepository.existsByUserIdAndCoinCode(userId, coinCode)) {
-			throw new BusinessException(
-				messageUtil.resolveMessage("bookmark.already.exists"),
-				HttpStatus.BAD_REQUEST
-			);
+		// 기존 북마크 존재 여부 확인
+		if (bookmarkRepository.existsByUserIdAndMarketCode(userId, coinCode)) {
+			throw new BusinessException(messageUtil.resolveMessage("bookmark.already.exists"),
+				HttpStatus.BAD_REQUEST);
 		}
 
 		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new BusinessException(
-				messageUtil.resolveMessage("member.not.found"),
-				HttpStatus.NOT_FOUND
-			));
+			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("member.not.found"),
+				HttpStatus.NOT_FOUND));
+
+		Market market = marketRepository.findById(coinCode)
+			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("market.not.found"),
+				HttpStatus.NOT_FOUND));
 
 		Bookmark bookmark = Bookmark.builder()
 			.user(user)
-			.coinCode(coinCode)
+			.market(market)
 			.createAt(LocalDateTime.now())
 			.build();
 
 		Bookmark savedBookmark = bookmarkRepository.save(bookmark);
 		return new BookmarkResponse(
 			savedBookmark.getId(),
-			savedBookmark.getCoinCode(),
+			savedBookmark.getMarket().getCode(),
 			savedBookmark.getCreateAt(),
 			savedBookmark.getUpdateAt()
 		);
@@ -93,46 +73,57 @@ public class BookmarkService {
 		return bookmarks.stream()
 			.map(b -> new BookmarkResponse(
 				b.getId(),
-				b.getCoinCode(),
+				b.getMarket().getCode(),
 				b.getCreateAt(),
 				b.getUpdateAt()
 			))
 			.collect(Collectors.toList());
 	}
 
-	// 서비스 내에서는 인증된 사용자의 북마크 조회도 쉽게 처리할 수 있도록 별도 메서드 추가
 	@Transactional(readOnly = true)
-	public List<BookmarkResponse> getBookmarksForCurrentUser() {
-		UUID userId = getCurrentUserIdFromRequest();
-		return getBookmarksByUser(userId);
+	public List<BookmarkResponse> getBookmarksForCurrentUser(CustomUserPrincipal principal) {
+		return getBookmarksByUser(principal.id());
 	}
 
 	@Transactional
-	public BookmarkResponse updateBookmark(BookmarkUpdateRequest request) {
+	public BookmarkResponse updateBookmark(BookmarkUpdateRequest request, CustomUserPrincipal principal) {
 		Bookmark bookmark = bookmarkRepository.findById(request.bookmarkId())
-			.orElseThrow(() -> new BusinessException(
-				messageUtil.resolveMessage("bookmark.not.found"),
-				HttpStatus.NOT_FOUND
-			));
+			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("bookmark.not.found"),
+				HttpStatus.NOT_FOUND));
 
-		bookmark.updateCoinCode(request.coinCode());
+		// 인증된 사용자가 북마크의 소유자인지 확인
+		if (!bookmark.getUser().getId().equals(principal.id())) {
+			throw new BusinessException(messageUtil.resolveMessage("bookmark.access.denied"),
+				HttpStatus.FORBIDDEN);
+		}
+
+		// 새로운 Market 정보 가져오기
+		Market newMarket = marketRepository.findById(request.coinCode())
+			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("market.not.found"),
+				HttpStatus.NOT_FOUND));
+
+		bookmark.updateMarket(newMarket);
 		Bookmark updated = bookmarkRepository.save(bookmark);
 		return new BookmarkResponse(
 			updated.getId(),
-			updated.getCoinCode(),
+			updated.getMarket().getCode(),
 			updated.getCreateAt(),
 			updated.getUpdateAt()
 		);
 	}
 
 	@Transactional
-	public void deleteBookmark(Long bookmarkId) {
-		if (!bookmarkRepository.existsById(bookmarkId)) {
-			throw new BusinessException(
-				messageUtil.resolveMessage("bookmark.not.found"),
-				HttpStatus.NOT_FOUND
-			);
+	public void deleteBookmark(UUID userId, Long bookmarkId) {
+		Bookmark bookmark = bookmarkRepository.findById(bookmarkId)
+			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("bookmark.not.found"),
+				HttpStatus.NOT_FOUND));
+
+		// 인증된 사용자가 북마크의 소유자인지 확인
+		if (!bookmark.getUser().getId().equals(userId)) {
+			throw new BusinessException(messageUtil.resolveMessage("bookmark.access.denied"),
+				HttpStatus.FORBIDDEN);
 		}
+
 		bookmarkRepository.deleteById(bookmarkId);
 	}
 }

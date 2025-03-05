@@ -10,5 +10,5 @@ import com.coing.domain.bookmark.entity.Bookmark;
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 	List<Bookmark> findByUserId(UUID userId);
 
-	boolean existsByUserIdAndCoinCode(UUID userId, String coinCode);
+	boolean existsByUserIdAndMarketCode(UUID userId, String coinCode);
 }
