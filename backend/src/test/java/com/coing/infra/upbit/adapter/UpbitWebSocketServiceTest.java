@@ -17,6 +17,7 @@ import org.springframework.web.socket.client.WebSocketClient;
 
 import com.coing.infra.upbit.enums.EnumUpbitWebSocketType;
 import com.coing.infra.upbit.handler.UpbitWebSocketOrderbookHandler;
+import com.coing.infra.upbit.handler.UpbitWebSocketTickerHandler;
 
 @ExtendWith(MockitoExtension.class)
 public class UpbitWebSocketServiceTest {
@@ -26,6 +27,9 @@ public class UpbitWebSocketServiceTest {
 
     @Mock
     private UpbitWebSocketOrderbookHandler orderbookHandler;
+
+	@Mock
+	private UpbitWebSocketTickerHandler tickerHandler;
 
     @InjectMocks
     private UpbitWebSocketService service;
@@ -49,7 +53,7 @@ public class UpbitWebSocketServiceTest {
             (Map<EnumUpbitWebSocketType, UpbitWebSocketConnection>)
             ReflectionTestUtils.getField(service, "connections");
 
-		assertEquals(1, connections.size());
+		assertEquals(2, connections.size());
 	}
 
 	@Test
