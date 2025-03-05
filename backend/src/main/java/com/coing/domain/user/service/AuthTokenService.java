@@ -3,11 +3,10 @@ package com.coing.domain.user.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.coing.global.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.coing.domain.user.CustomUserPrincipal;
 import com.coing.domain.user.controller.dto.UserResponse;
 import com.coing.util.Ut;
 
@@ -50,28 +49,23 @@ public class AuthTokenService {
 		return token;
 	}
 
-	// 토큰 검증 및 클레임 추출
-	public Map<String, Object> verifyToken(String token) {
-		if (!Ut.Jwt.isValidToken(jwtSecretKey, token)) {
-			return null;
-		}
-		return Ut.Jwt.getPayload(jwtSecretKey, token);
+	public String genAccessToken(CustomUserPrincipal principal) {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("id", principal.id());
+		claims.put("email", principal.email());
+		// 필요 시 권한이나 기타 정보 추가
+		String token = Ut.Jwt.createToken(jwtSecretKey, jwtExpireSeconds, claims);
+		log.info("JWT 액세스 토큰 생성(CustomUserPrincipal): {}", principal.email());
+		return token;
 	}
 
-	public Long getIdFromToken(String authHeader) {
-		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-
-			throw new BusinessException("empty.token.provided", HttpStatus.BAD_REQUEST);
-
-		}
-		String token = authHeader.substring("Bearer ".length());
-		Map<String, Object> claims = verifyToken(token);
-		if (claims == null || claims.get("id") == null) {
-
-			throw new BusinessException("invalid.token", HttpStatus.UNAUTHORIZED);
-
-		}
-		Number id = (Number)claims.get("id");
-		return id.longValue();
+	public String genRefreshToken(CustomUserPrincipal principal) {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("id", principal.id());
+		claims.put("email", principal.email());
+		// 필요 시 권한이나 기타 정보 추가
+		String token = Ut.Jwt.createToken(jwtSecretKey, jwtRefreshExpireSeconds, claims);
+		log.info("JWT 리프레시 토큰 생성(CustomUserPrincipal): {}", principal.email());
+		return token;
 	}
 }

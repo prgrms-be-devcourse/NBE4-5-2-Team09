@@ -2,6 +2,7 @@ package com.coing.domain.bookmark.entity;
 
 import java.time.LocalDateTime;
 
+import com.coing.domain.coin.market.entity.Market;
 import com.coing.domain.user.entity.User;
 
 import jakarta.persistence.Column;
@@ -31,14 +32,15 @@ public class Bookmark {
 	@Column(name = "bookmark_id")
 	private Long id;
 
-	// 북마크를 등록한 회원의 식별자
+	// 북마크를 등록한 회원
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	// 북마크 대상 코인 코드 (예: "KRW-BTC")
-	@Column(nullable = false, name = "coin_id")
-	private String coinCode;
+	// 북마크 대상 마켓 (코인 ID와 동일한 역할을 함; 예: "KRW-BTC")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "coin_id", nullable = false)
+	private Market market;
 
 	@Column(nullable = false, name = "create_at")
 	private LocalDateTime createAt;
@@ -46,8 +48,9 @@ public class Bookmark {
 	@Column(name = "update_at")
 	private LocalDateTime updateAt;
 
-	public void updateCoinCode(String newCoinCode) {
-		this.coinCode = newCoinCode;
+	// 마켓 정보를 업데이트할 때 사용하는 메서드
+	public void updateMarket(Market newMarket) {
+		this.market = newMarket;
 		this.updateAt = LocalDateTime.now();
 	}
 }
