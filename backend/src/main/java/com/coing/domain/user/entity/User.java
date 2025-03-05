@@ -6,6 +6,10 @@ import java.util.List;
 import com.coing.domain.bookmark.entity.Bookmark;
 
 import jakarta.persistence.CascadeType;
+import java.util.UUID;
+
+import org.hibernate.annotations.UuidGenerator;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -30,9 +34,10 @@ import lombok.NoArgsConstructor;
 public class User {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "user_id")
-	private Long id;
+	@GeneratedValue
+	@UuidGenerator
+	@Column(name = "user_id", updatable = false, nullable = false)
+	private UUID id;
 
 	@Column(name = "user_name", nullable = false)
 	private String name;
@@ -47,7 +52,6 @@ public class User {
 
 	// 권한
 	@Column(name = "authority", nullable = false)
-	@Enumerated(EnumType.STRING)
 	private Authority authority;
 
 	@PrePersist
@@ -71,9 +75,5 @@ public class User {
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Bookmark> bookmarks = new ArrayList<>();
-
-	// // 관리자 코드 추후 추가
-	// @Column(name = "admin_code")
-	// private String adminCode;
 
 }
