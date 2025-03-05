@@ -55,9 +55,14 @@ public class MarketService {
 		}
 	}
 
-	public List<Market> getAllMarkets() {
+	public List<Market> getAllCoins() {
 		log.info("[Market] Get all market list");
 		return marketRepository.findAll();
+	}
+
+	public List<Market> getAllCoinsByMarket(String type) {
+		log.info("[Market] Get all KRW market list");
+		return marketRepository.findByCodeStartingWith(type);
 	}
 
 	@Transactional

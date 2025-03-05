@@ -99,7 +99,7 @@ public class MarketServiceTest {
 		when(marketRepository.findAll()).thenReturn(mockMarkets);
 
 		// When
-		List<Market> markets = marketService.getAllMarkets();
+		List<Market> markets = marketService.getAllCoins();
 
 		// Then
 		assertNotNull(markets);

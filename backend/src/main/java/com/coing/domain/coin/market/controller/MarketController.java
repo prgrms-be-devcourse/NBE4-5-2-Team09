@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.coing.domain.coin.market.controller.dto.MarketResponse;
@@ -25,8 +26,16 @@ public class MarketController {
 
 	@Operation(summary = "종목 전체 조회")
 	@GetMapping
-	public ResponseEntity<List<MarketResponse>> getMarkets() {
-		return ResponseEntity.ok(marketService.getAllMarkets().stream()
+	public ResponseEntity<List<MarketResponse>> getCoins() {
+		return ResponseEntity.ok(marketService.getAllCoins().stream()
+			.map(MarketResponse::from)
+			.toList());
+	}
+
+	@Operation(summary = "마켓별 종목 전체 조회")
+	@GetMapping("/market")
+	public ResponseEntity<List<MarketResponse>> getCoinsByMarket(@RequestParam("type") String type) {
+		return ResponseEntity.ok(marketService.getAllCoinsByMarket(type).stream()
 			.map(MarketResponse::from)
 			.toList());
 	}
