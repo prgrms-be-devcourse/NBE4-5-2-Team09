@@ -1,4 +1,4 @@
-package com.coing.domain.coin.ticker.entity.enums;
+package com.coing.domain.coin.common.enums;
 
 public enum Change {
 	RISE, // 상승

@@ -16,10 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 
+import com.coing.domain.coin.common.enums.AskBid;
+import com.coing.domain.coin.common.enums.Change;
 import com.coing.domain.coin.ticker.dto.TickerDto;
 import com.coing.domain.coin.ticker.entity.Ticker;
-import com.coing.domain.coin.ticker.entity.enums.AskBid;
-import com.coing.domain.coin.ticker.entity.enums.Change;
 import com.coing.domain.coin.ticker.entity.enums.MarketState;
 import com.coing.domain.coin.ticker.entity.enums.MarketWarning;
 import com.fasterxml.jackson.core.JsonProcessingException;

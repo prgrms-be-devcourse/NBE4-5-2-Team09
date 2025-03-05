@@ -16,6 +16,7 @@ import com.coing.infra.upbit.enums.EnumUpbitWebSocketType;
 import com.coing.infra.upbit.handler.UpbitWebSocketHandler;
 import com.coing.infra.upbit.handler.UpbitWebSocketOrderbookHandler;
 import com.coing.infra.upbit.handler.UpbitWebSocketTickerHandler;
+import com.coing.infra.upbit.handler.UpbitWebSocketTradeHandler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class UpbitWebSocketService {
 	private final WebSocketClient webSocketClient;
 	private final UpbitWebSocketOrderbookHandler orderbookHandler;
 	private final UpbitWebSocketTickerHandler tickerHandler;
+	private final UpbitWebSocketTradeHandler tradeHandler;
 	private final Map<EnumUpbitWebSocketType, UpbitWebSocketConnection> connections = new HashMap<>();
 	@Value("${upbit.websocket.uri}")
 	private String UPBIT_WEBSOCKET_URI;
@@ -57,6 +59,15 @@ public class UpbitWebSocketService {
 		);
 		connections.put(EnumUpbitWebSocketType.TICKER, tickerConn);
 		tickerConn.connect();
+
+		// TRADE
+		UpbitWebSocketHandler tradeComposite = new UpbitWebSocketHandler(
+			List.of(tradeHandler)
+		);
+		UpbitWebSocketConnection tradeConn = new UpbitWebSocketConnection(
+			webSocketClient, tradeComposite, UPBIT_WEBSOCKET_URI, "TRADE");
+		connections.put(EnumUpbitWebSocketType.TRADE, tradeConn);
+		tradeConn.connect();
 	}
 
 	/**

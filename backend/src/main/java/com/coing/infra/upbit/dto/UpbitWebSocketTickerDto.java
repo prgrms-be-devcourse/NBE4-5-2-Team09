@@ -3,9 +3,9 @@ package com.coing.infra.upbit.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.coing.domain.coin.common.enums.AskBid;
+import com.coing.domain.coin.common.enums.Change;
 import com.coing.domain.coin.ticker.entity.Ticker;
-import com.coing.domain.coin.ticker.entity.enums.AskBid;
-import com.coing.domain.coin.ticker.entity.enums.Change;
 import com.coing.domain.coin.ticker.entity.enums.MarketState;
 import com.coing.domain.coin.ticker.entity.enums.MarketWarning;
 import com.coing.util.LocalDateDeserializer;
