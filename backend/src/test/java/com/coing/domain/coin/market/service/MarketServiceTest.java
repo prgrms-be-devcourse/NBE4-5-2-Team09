@@ -1,9 +1,11 @@
 package com.coing.domain.coin.market.service;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -43,13 +45,13 @@ public class MarketServiceTest {
 	void setUp() {
 		// Test setup: initialize mock data
 		mockMarketDtos = new MarketDto[] {
-			new MarketDto("KRW-BTC", "KRW", "BTC"),
-			new MarketDto("KRW-ETH", "KRW", "ETH")
+			new MarketDto("KRW-BTC", "비트코인", "BTC"),
+			new MarketDto("KRW-ETH", "이더리움", "ETH"),
 		};
 	}
 
 	@Test
-	@DisplayName("t1: 마켓 목록 자동 갱신 - 정상 동작 테스트")
+	@DisplayName("t1: 코인 목록 자동 갱신 - 정상 동작 테스트")
 	void testUpdateCoinList_Success() {
 		// Given
 		ResponseEntity<MarketDto[]> responseEntity = ResponseEntity.ok(mockMarketDtos);
@@ -63,7 +65,7 @@ public class MarketServiceTest {
 	}
 
 	@Test
-	@DisplayName("t2: 마켓 목록 자동 갱신 - 외부 api error 테스트")
+	@DisplayName("t2: 코인 목록 자동 갱신 - 외부 api error 테스트")
 	void testUpdateCoinList_Exception() {
 		// Given
 		when(restTemplate.getForEntity(UPBIT_MARKET_URI, MarketDto[].class)).thenThrow(
@@ -77,7 +79,7 @@ public class MarketServiceTest {
 	}
 
 	@Test
-	@DisplayName("t3: 마켓 목록 갱신 요청 - 정상 동작 테스트")
+	@DisplayName("t3: 코인 목록 갱신 요청 - 정상 동작 테스트")
 	void testRefreshMarketList_Success() {
 		// Given
 		ResponseEntity<MarketDto[]> responseEntity = ResponseEntity.ok(mockMarketDtos);
@@ -91,7 +93,7 @@ public class MarketServiceTest {
 	}
 
 	@Test
-	@DisplayName("t4: 마켓 목록 전체 조회 - 정상 동작 테스트")
+	@DisplayName("t4: 코인 목록 전체 조회 - 정상 동작 테스트")
 	void testGetAllMarkets() {
 		// Given
 		List<Market> mockMarkets = Arrays.asList(new Market("KRW-BTC", "비트코인", "Bitcoin"),
@@ -104,5 +106,39 @@ public class MarketServiceTest {
 		// Then
 		assertNotNull(markets);
 		assertEquals(2, markets.size());
+	}
+
+	@Test
+	@DisplayName("t5: 마켓별 코인 목록 조회 - 정상 동작 테스트")
+	void getAllCoinsByMarket_ShouldReturnFilteredMarkets() {
+		// given
+		String type = "KRW";
+		List<Market> mockMarkets = Arrays.asList(
+			new Market("KRW-BTC", "비트코인", "Bitcoin"),
+			new Market("KRW-ETH", "이더리움", "Ethereum")
+		);
+		when(marketRepository.findByCodeStartingWith(type)).thenReturn(mockMarkets);
+
+		// when
+		List<Market> result = marketService.getAllCoinsByMarket(type);
+
+		// then
+		assertThat(result).hasSize(2);
+		assertThat(result.get(0).getCode()).isEqualTo("KRW-BTC");
+		assertThat(result.get(1).getCode()).isEqualTo("KRW-ETH");
+	}
+
+	@Test
+	@DisplayName("t5: 마켓별 코인 목록 조회 - 정확한 마켓명이 아닐 시 빈 리스트 반환")
+	void getAllCoinsByMarket_ShouldReturnEmptyList_WhenNoMatchingMarkets() {
+		// given
+		String type = "USD";
+		when(marketRepository.findByCodeStartingWith(type)).thenReturn(Collections.emptyList());
+
+		// when
+		List<Market> result = marketService.getAllCoinsByMarket(type);
+
+		// then
+		assertThat(result).isEmpty();
 	}
 }
