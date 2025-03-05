@@ -1,5 +1,6 @@
 package com.coing.infra.upbit.handler;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -9,7 +10,6 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -19,10 +19,19 @@ import lombok.extern.slf4j.Slf4j;
  * 개별 Handler에서 예외가 발생하더라도 다른 Handler가 정상적으로 동작하도록 개별 try-catch로 처리합니다.
  */
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class UpbitWebSocketHandler extends BinaryWebSocketHandler {
 	private final List<BinaryWebSocketHandler> handlers;
+
+	// 기본 생성자: dedicated 모드로 사용할 경우 빈 리스트 사용
+	public UpbitWebSocketHandler() {
+		this.handlers = Collections.emptyList();
+	}
+
+	// Composite 방식으로 사용할 경우
+	public UpbitWebSocketHandler(List<BinaryWebSocketHandler> handlers) {
+		this.handlers = handlers;
+	}
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
