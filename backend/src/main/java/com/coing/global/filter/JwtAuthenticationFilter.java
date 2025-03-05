@@ -4,6 +4,7 @@ import static com.coing.util.Ut.Jwt.*;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,20 +47,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		Map<String, Object> claims = getPayload(secretKey, token);
-		Long id = ((Number)claims.get("id")).longValue();
+		// id가 String 형태로 반환되므로 이를 UUID로 변환합니다.
+		UUID id = UUID.fromString(claims.get("id").toString());
 		String email = (String)claims.get("email");
-		// String authority = (String) claims.get("authority");
-
-		// // 권한 설정
-		// Collection<GrantedAuthority> authorities = new ArrayList<>();
-		// if (authority != null) {
-		// 	authorities.add(new SimpleGrantedAuthority(authority));
-		// 	log.debug("User authority set: {}", authority);
-		// }
-
-		Authentication authentication = new UsernamePasswordAuthenticationToken(
-			email, null);
-
+		// 필요에 따라 id나 기타 정보를 Authentication에 추가할 수 있습니다.
+		Authentication authentication = new UsernamePasswordAuthenticationToken(email, null);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		filterChain.doFilter(request, response);
