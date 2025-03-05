@@ -1,11 +1,10 @@
 package com.coing.domain.user.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.coing.domain.bookmark.entity.Bookmark;
 
@@ -49,7 +48,6 @@ public class User {
 
 	// 권한
 	@Column(name = "authority", nullable = false)
-	@Enumerated(EnumType.STRING)
 	private Authority authority;
 
 	@PrePersist

@@ -28,17 +28,17 @@ public class BookmarkController {
 
 	private final BookmarkService bookmarkService;
 
-	// 북마크 등록
+	// 북마크 등록 (클라이언트는 coinCode만 전송)
 	@PostMapping("/create")
 	public ResponseEntity<BookmarkResponse> addBookmark(@RequestBody @Validated BookmarkRequest request) {
 		BookmarkResponse response = bookmarkService.addBookmark(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	// 회원별 북마크 조회
-	@GetMapping("/user/{userId}")
-	public ResponseEntity<List<BookmarkResponse>> getBookmarksByUser(@PathVariable Long userId) {
-		List<BookmarkResponse> responses = bookmarkService.getBookmarksByUser(userId);
+	// 현재 인증된 사용자의 북마크 조회 (userId를 직접 입력받지 않음)
+	@GetMapping("/user")
+	public ResponseEntity<List<BookmarkResponse>> getBookmarksForCurrentUser() {
+		List<BookmarkResponse> responses = bookmarkService.getBookmarksForCurrentUser();
 		return ResponseEntity.ok(responses);
 	}
 
