@@ -101,7 +101,7 @@ public class MarketServiceTest {
 		when(marketRepository.findAll()).thenReturn(mockMarkets);
 
 		// When
-		List<Market> markets = marketService.getAllCoins();
+		List<Market> markets = marketService.getAllMarkets();
 
 		// Then
 		assertNotNull(markets);
@@ -109,7 +109,7 @@ public class MarketServiceTest {
 	}
 
 	@Test
-	@DisplayName("t5: 마켓별 코인 목록 조회 - 정상 동작 테스트")
+	@DisplayName("t5: 기준 통화별 마켓 목록 조회 - 정상 동작 테스트")
 	void getAllCoinsByMarket_ShouldReturnFilteredMarkets() {
 		// given
 		String type = "KRW";
@@ -120,7 +120,7 @@ public class MarketServiceTest {
 		when(marketRepository.findByCodeStartingWith(type)).thenReturn(mockMarkets);
 
 		// when
-		List<Market> result = marketService.getAllCoinsByMarket(type);
+		List<Market> result = marketService.getAllMarketsByQuote(type);
 
 		// then
 		assertThat(result).hasSize(2);
@@ -129,14 +129,14 @@ public class MarketServiceTest {
 	}
 
 	@Test
-	@DisplayName("t5: 마켓별 코인 목록 조회 - 정확한 마켓명이 아닐 시 빈 리스트 반환")
+	@DisplayName("t5: 기준 통화별 마켓 목록 조회 - 정확한 기준 통화명이 아닐 시 빈 리스트 반환")
 	void getAllCoinsByMarket_ShouldReturnEmptyList_WhenNoMatchingMarkets() {
 		// given
 		String type = "USD";
 		when(marketRepository.findByCodeStartingWith(type)).thenReturn(Collections.emptyList());
 
 		// when
-		List<Market> result = marketService.getAllCoinsByMarket(type);
+		List<Market> result = marketService.getAllMarketsByQuote(type);
 
 		// then
 		assertThat(result).isEmpty();

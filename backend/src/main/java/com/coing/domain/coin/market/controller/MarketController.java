@@ -24,18 +24,18 @@ public class MarketController {
 
 	private final MarketService marketService;
 
-	@Operation(summary = "종목 전체 조회")
+	@Operation(summary = "마켓 전체 조회")
 	@GetMapping
-	public ResponseEntity<List<MarketResponse>> getCoins() {
-		return ResponseEntity.ok(marketService.getAllCoins().stream()
+	public ResponseEntity<List<MarketResponse>> getMarkets() {
+		return ResponseEntity.ok(marketService.getAllMarkets().stream()
 			.map(MarketResponse::from)
 			.toList());
 	}
 
-	@Operation(summary = "마켓별 종목 전체 조회")
-	@GetMapping("/market")
-	public ResponseEntity<List<MarketResponse>> getCoinsByMarket(@RequestParam("type") String type) {
-		return ResponseEntity.ok(marketService.getAllCoinsByMarket(type).stream()
+	@Operation(summary = "기준 통화별 마켓 전체 조회")
+	@GetMapping("/quote")
+	public ResponseEntity<List<MarketResponse>> getMarketsByQuote(@RequestParam("type") String type) {
+		return ResponseEntity.ok(marketService.getAllMarketsByQuote(type).stream()
 			.map(MarketResponse::from)
 			.toList());
 	}
