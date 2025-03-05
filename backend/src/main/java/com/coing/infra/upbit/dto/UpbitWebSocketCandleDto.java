@@ -16,41 +16,42 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UpbitWebSocketCandleDto {
 
-	// 요청 타입: "candle.1s"
+	// 요청 타입: candle.1s
+	@JsonProperty("ty")
 	private String type;
 
-	// 마켓 코드 (예: "KRW-BTC")
+	@JsonProperty("cd")
 	private String code;
 
-	@JsonProperty("candle_date_time_utc")
+	@JsonProperty("cdttmu")
 	private String candleDateTimeUtc;
 
-	@JsonProperty("candle_date_time_kst")
+	@JsonProperty("cdttmk")
 	private String candleDateTimeKst;
 
-	@JsonProperty("opening_price")
+	@JsonProperty("op")
 	private double openingPrice;
 
-	@JsonProperty("high_price")
+	@JsonProperty("hp")
 	private double highPrice;
 
-	@JsonProperty("low_price")
+	@JsonProperty("lp")
 	private double lowPrice;
 
-	@JsonProperty("trade_price")
+	@JsonProperty("tp")
 	private double tradePrice;
 
-	@JsonProperty("candle_acc_trade_volume")
+	@JsonProperty("catv")
 	private double candleAccTradeVolume;
 
-	@JsonProperty("candle_acc_trade_price")
+	@JsonProperty("catp")
 	private double candleAccTradePrice;
 
 	// 마지막 틱이 저장된 시각 (millisecond)
-	@JsonProperty("timestamp")
+	@JsonProperty("tms")
 	private long timestamp;
 
 	// 스트림 타입 (SNAPSHOT 또는 REALTIME)
-	@JsonProperty("stream_type")
+	@JsonProperty("st")
 	private String streamType;
 }
