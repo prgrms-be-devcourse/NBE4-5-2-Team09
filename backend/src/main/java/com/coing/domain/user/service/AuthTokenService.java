@@ -32,7 +32,8 @@ public class AuthTokenService {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("id", userResponse.id());
 		claims.put("email", userResponse.email());
-		// claims.put("authority", user.getAuthority()); // 나중에 권한 관련 추가되면 주석 해제
+		claims.put("name", userResponse.name()); // 유저 이름 추가
+		// claims.put("authority", userResponse.getAuthority()); // 나중에 권한 관련 추가
 		String token = Ut.Jwt.createToken(jwtSecretKey, jwtExpireSeconds, claims);
 		log.info("JWT 액세스 토큰 생성: {}", userResponse.email());
 		return token;
@@ -43,27 +44,29 @@ public class AuthTokenService {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("id", userResponse.id());
 		claims.put("email", userResponse.email());
-		// claims.put("authority", user.getAuthority());
+		claims.put("name", userResponse.name()); // 유저 이름 추가
 		String token = Ut.Jwt.createToken(jwtSecretKey, jwtRefreshExpireSeconds, claims);
 		log.info("JWT 리프레시 토큰 생성: {}", userResponse.email());
 		return token;
 	}
 
+	// 액세스 토큰 생성: CustomUserPrincipal을 사용
 	public String genAccessToken(CustomUserPrincipal principal) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("id", principal.id());
 		claims.put("email", principal.email());
-		// 필요 시 권한이나 기타 정보 추가
+		claims.put("name", principal.name()); // 유저 이름 추가
 		String token = Ut.Jwt.createToken(jwtSecretKey, jwtExpireSeconds, claims);
 		log.info("JWT 액세스 토큰 생성(CustomUserPrincipal): {}", principal.email());
 		return token;
 	}
 
+	// 리프레시 토큰 생성: CustomUserPrincipal을 사용
 	public String genRefreshToken(CustomUserPrincipal principal) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("id", principal.id());
 		claims.put("email", principal.email());
-		// 필요 시 권한이나 기타 정보 추가
+		claims.put("name", principal.name()); // 유저 이름 추가
 		String token = Ut.Jwt.createToken(jwtSecretKey, jwtRefreshExpireSeconds, claims);
 		log.info("JWT 리프레시 토큰 생성(CustomUserPrincipal): {}", principal.email());
 		return token;
