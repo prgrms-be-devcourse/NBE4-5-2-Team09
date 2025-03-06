@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/coins")
+@RequestMapping("/api/market")
 @RequiredArgsConstructor
 @Tag(name = "Market API", description = "종목 조회 관련 API 엔드포인트")
 public class MarketController {
