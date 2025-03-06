@@ -1,19 +1,13 @@
 package com.coing.domain.user.entity;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
 
-import com.coing.domain.bookmark.entity.Bookmark;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -68,12 +62,4 @@ public class User {
 	// 비밀번호 재설정 코드
 	@Column(name = "reset_password_code")
 	private String resetPasswordCode;
-
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Bookmark> bookmarks = new ArrayList<>();
-
-	// // 관리자 코드 추후 추가
-	// @Column(name = "admin_code")
-	// private String adminCode;
-
 }
