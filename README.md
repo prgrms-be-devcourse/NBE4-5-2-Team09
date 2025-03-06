@@ -20,6 +20,22 @@ docker-compose down
 
 ```
 
+**Run Frontend (Next.js)**
+
+```bash
+# Navigate to frontend project directory
+cd frontend
+
+# Start Next.js development server
+npm install  # Install dependencies (only needed once)
+npm run dev  # Start development server
+
+# Use OpenAPI to generate TypeScript types for the backend API
+npm run codegen # Generate openapi typeScript definitions
+npm run codegen:watch # Watch for API changes and regenerate types automatically
+
+```
+
 ## Database Settings
 
 애플리케이션에서 데이터베이스 설정을 환경별 파일로 분리하여, 각 환경에 맞는 DB 연결 정보, JPA ddl-auto, 로깅 레벨 등을 세팅했습니다.

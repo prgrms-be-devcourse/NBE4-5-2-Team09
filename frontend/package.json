@@ -3,15 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate-api-schema": "openapi-typescript src/lib/api/schema.json -o src/lib/api/schema.d.ts"
+    "generate-api-schema": "openapi-typescript src/lib/api/schema.json -o src/lib/api/schema.d.ts",
+    "codegen": "openapi-typescript ../api_schema.json -o ./src/lib/api/generated/schema.d.ts",
+    "codegen:watch": "nodemon --watch ../api_schema.json --exec \"npm run codegen\""
   },
   "dependencies": {
+    "jose": "^6.0.8",
     "next": "15.2.1",
-    "openapi-typescript": "^7.6.1",
+    "openapi-fetch": "^0.13.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
@@ -23,6 +26,8 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.2.1",
+    "nodemon": "^3.1.9",
+    "openapi-typescript": "^7.6.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

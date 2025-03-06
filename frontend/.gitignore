@@ -41,5 +41,4 @@ yarn-error.log*
 next-env.d.ts
 
 # custom
-src/lib/api/schema.d.ts
-src/lib/api/schema.json
+**/generated/
