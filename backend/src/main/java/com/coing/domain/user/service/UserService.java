@@ -1,6 +1,7 @@
 package com.coing.domain.user.service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -96,4 +97,13 @@ public class UserService {
 		userRepository.delete(user);
 		log.info("회원 탈퇴 성공: {}", email);
 	}
+
+	public UserResponse findById(UUID id) {
+		return userRepository.findById(id)
+			.map(user -> new UserResponse(user.getId(), user.getName(), user.getEmail()))
+			.orElseThrow(
+				() -> new BusinessException(messageUtil.resolveMessage("member.not.found"), HttpStatus.BAD_REQUEST,
+					""));
+	}
+
 }

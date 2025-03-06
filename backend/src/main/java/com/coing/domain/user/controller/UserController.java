@@ -1,5 +1,8 @@
 package com.coing.domain.user.controller;
 
+import java.util.Map;
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -78,7 +81,7 @@ public class UserController {
 		return ResponseEntity.ok(basicResponse);
 	}
 
-	@Operation(summary = "회원 로그아웃")
+	@Operation(summary = "회원 로그아웃", security = @SecurityRequirement(name = "bearerAuth"))
 	@PostMapping("/logout")
 	public ResponseEntity<BasicResponse> logout(HttpServletResponse response,
 		@AuthenticationPrincipal CustomUserPrincipal principal) {
@@ -97,17 +100,11 @@ public class UserController {
 		return ResponseEntity.ok(new BasicResponse(HttpStatus.OK, "로그아웃 성공", "userEmail: " + principal.email()));
 	}
 
-	@Operation(summary = "토큰 재발급", security = @SecurityRequirement(name = "bearerAuth"))
+	@Operation(summary = "토큰 재발급")
 	@PostMapping("/refresh")
-	public ResponseEntity<BasicResponse> refreshToken(HttpServletRequest request, HttpServletResponse response,
-		@AuthenticationPrincipal CustomUserPrincipal principal) {
-		if (principal == null) {
-			throw new BusinessException(messageUtil.resolveMessage("empty.token.provided"), HttpStatus.UNAUTHORIZED,
-				"");
-		}
-
+	public ResponseEntity<BasicResponse> refreshToken(HttpServletRequest request, HttpServletResponse response) {
 		Cookie[] cookies = request.getCookies();
-		if (cookies == null) {
+		if (cookies == null || cookies.length == 0) {
 			throw new BusinessException(messageUtil.resolveMessage("refresh.token.required"), HttpStatus.BAD_REQUEST,
 				"");
 		}
@@ -120,20 +117,33 @@ public class UserController {
 			}
 		}
 
-		if (refreshToken == null) {
+		if (refreshToken == null || refreshToken.trim().isEmpty()) {
 			throw new BusinessException(messageUtil.resolveMessage("invalid.refresh.token"), HttpStatus.BAD_REQUEST,
 				"");
 		}
 
-		String newAccessToken = authTokenService.genAccessToken(principal);
-		String newRefreshToken = authTokenService.genRefreshToken(principal);
+		// refresh 토큰 검증: verifyToken이 null을 반환하면 토큰이 유효하지 않음을 의미합니다.
+		Map<String, Object> claims = authTokenService.verifyToken(refreshToken);
+		if (claims == null || claims.get("id") == null) {
+			throw new BusinessException(messageUtil.resolveMessage("invalid.refresh.token"), HttpStatus.BAD_REQUEST,
+				"");
+		}
+
+		UUID id = UUID.fromString(claims.get("id").toString());
+		UserResponse user = userService.findById(id);
+		if (user == null) {
+			throw new BusinessException(messageUtil.resolveMessage("member.not.found"), HttpStatus.BAD_REQUEST, "");
+		}
+
+		String newAccessToken = authTokenService.genAccessToken(user);
+		String newRefreshToken = authTokenService.genRefreshToken(user);
 
 		// 새로운 리프레시 토큰을 쿠키에 설정
 		Cookie newRefreshCookie = new Cookie("refreshToken", newRefreshToken);
 		newRefreshCookie.setHttpOnly(true);
-		newRefreshCookie.setSecure(false);
+		newRefreshCookie.setSecure(false); // 개발 환경, 운영 시 true로 설정
 		newRefreshCookie.setPath("/");
-		newRefreshCookie.setMaxAge(604800); // 7일 (초 단위)
+		newRefreshCookie.setMaxAge(604800); // 7일
 		response.addCookie(newRefreshCookie);
 
 		// 새 액세스 토큰을 응답 헤더에 추가

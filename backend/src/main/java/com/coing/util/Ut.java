@@ -2,6 +2,7 @@ package com.coing.util;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,8 @@ import com.coing.infra.upbit.enums.EnumUpbitWebSocketFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
@@ -105,6 +108,21 @@ public class Ut {
 
 			List<Object> dataList = Arrays.asList(ticketDto, typeDto, formatDto);
 			return objectMapper.writeValueAsString(dataList);
+		}
+	}
+
+	public static Map<String, Object> verifyToken(String secretKey, String token) {
+		try {
+			SecretKey sKey = Keys.hmacShaKeyFor(secretKey.getBytes());
+			Claims claims = Jwts.parser()
+				.setSigningKey(sKey)
+				.build()
+				.parseClaimsJws(token)
+				.getBody();
+			return new HashMap<>(claims);
+		} catch (JwtException e) {
+			// 토큰 검증 실패
+			return null;
 		}
 	}
 }

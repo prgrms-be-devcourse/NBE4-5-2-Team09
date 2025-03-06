@@ -71,4 +71,14 @@ public class AuthTokenService {
 		log.info("JWT 리프레시 토큰 생성(CustomUserPrincipal): {}", principal.email());
 		return token;
 	}
+
+	public Map<String, Object> verifyToken(String token) {
+		try {
+			// Ut.Jwt.verifyToken() 메서드를 사용하여 토큰을 검증하고 클레임을 반환한다고 가정합니다.
+			return Ut.verifyToken(jwtSecretKey, token);
+		} catch (Exception e) {
+			log.error("토큰 검증 실패", e);
+			return null;
+		}
+	}
 }
