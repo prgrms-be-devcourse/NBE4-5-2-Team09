@@ -1,7 +1,9 @@
 package com.coing.domain.user.controller.dto;
 
+import java.util.UUID;
+
 public record UserResponse(
-	Long id,
+	UUID id,
 	String name,
 	String email
 ) {

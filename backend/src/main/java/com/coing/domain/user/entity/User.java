@@ -1,11 +1,12 @@
 package com.coing.domain.user.entity;
 
+import java.util.UUID;
+
+import org.hibernate.annotations.UuidGenerator;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -23,9 +24,10 @@ import lombok.NoArgsConstructor;
 public class User {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "user_id")
-	private Long id;
+	@GeneratedValue
+	@UuidGenerator
+	@Column(name = "user_id", updatable = false, nullable = false)
+	private UUID id;
 
 	@Column(name = "user_name", nullable = false)
 	private String name;
@@ -40,7 +42,6 @@ public class User {
 
 	// 권한
 	@Column(name = "authority", nullable = false)
-	@Enumerated(EnumType.STRING)
 	private Authority authority;
 
 	@PrePersist
@@ -61,9 +62,4 @@ public class User {
 	// 비밀번호 재설정 코드
 	@Column(name = "reset_password_code")
 	private String resetPasswordCode;
-
-	// // 관리자 코드 추후 추가
-	// @Column(name = "admin_code")
-	// private String adminCode;
-
 }
