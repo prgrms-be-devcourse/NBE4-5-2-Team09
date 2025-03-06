@@ -1,3 +1,4 @@
 # Custom
 mysql_logs/
 .env*
+api_schema.json
