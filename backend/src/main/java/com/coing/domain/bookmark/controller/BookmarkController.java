@@ -20,6 +20,7 @@ import com.coing.domain.bookmark.service.BookmarkService;
 import com.coing.domain.user.CustomUserPrincipal;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -29,7 +30,7 @@ public class BookmarkController {
 
 	private final BookmarkService bookmarkService;
 
-	@Operation(summary = "북마크 등록")
+	@Operation(summary = "북마크 등록", security = @SecurityRequirement(name = "bearerAuth"))
 	@PostMapping("/bookmark")
 	public ResponseEntity<BookmarkResponse> addBookmark(
 		@RequestBody @Validated BookmarkRequest request,
@@ -38,7 +39,7 @@ public class BookmarkController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	@Operation(summary = "유저 북마크 전체 조회")
+	@Operation(summary = "유저 북마크 전체 조회", security = @SecurityRequirement(name = "bearerAuth"))
 	@GetMapping("/bookmarks")
 	public ResponseEntity<List<BookmarkResponse>> getBookmarksForCurrentUser(
 		@AuthenticationPrincipal CustomUserPrincipal principal) {
@@ -46,7 +47,7 @@ public class BookmarkController {
 		return ResponseEntity.ok(responses);
 	}
 
-	@Operation(summary = "특정 북마크 삭제")
+	@Operation(summary = "특정 북마크 삭제", security = @SecurityRequirement(name = "bearerAuth"))
 	@DeleteMapping("/bookmark/{bookmarkId}")
 	public ResponseEntity<Void> deleteBookmark(
 		@PathVariable("bookmarkId") Long bookmarkId,

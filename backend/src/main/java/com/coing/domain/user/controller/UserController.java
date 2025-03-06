@@ -1,8 +1,5 @@
 package com.coing.domain.user.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +21,7 @@ import com.coing.util.BasicResponse;
 import com.coing.util.MessageUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -65,17 +63,18 @@ public class UserController {
 		String accessToken = authTokenService.genAccessToken(user);
 		String refreshToken = authTokenService.genRefreshToken(user);
 
+		// 리프레시 토큰을 HttpOnly 쿠키에 설정
 		Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
 		refreshCookie.setHttpOnly(true);
-		refreshCookie.setSecure(true);
+		refreshCookie.setSecure(false); // 개발 환경
 		refreshCookie.setPath("/");
 		refreshCookie.setMaxAge(604800); // 7일
 		response.addCookie(refreshCookie);
 
-		Map<String, String> res = new HashMap<>();
-		res.put("token", accessToken);
-		res.put("email", request.email());
-		BasicResponse basicResponse = new BasicResponse(HttpStatus.OK, "로그인 성공", res.toString());
+		// 액세스 토큰을 응답 헤더에 추가 (Bearer 스킴 포함)
+		response.setHeader("Authorization", "Bearer " + accessToken);
+
+		BasicResponse basicResponse = new BasicResponse(HttpStatus.OK, "로그인 성공", "");
 		return ResponseEntity.ok(basicResponse);
 	}
 
@@ -90,7 +89,7 @@ public class UserController {
 
 		Cookie cookie = new Cookie("refreshToken", null);
 		cookie.setHttpOnly(true);
-		cookie.setSecure(false);
+		cookie.setSecure(false); // 개발 환경
 		cookie.setPath("/");
 		cookie.setMaxAge(0);
 		response.addCookie(cookie);
@@ -98,7 +97,7 @@ public class UserController {
 		return ResponseEntity.ok(new BasicResponse(HttpStatus.OK, "로그아웃 성공", "userEmail: " + principal.email()));
 	}
 
-	@Operation(summary = "토큰 재발급")
+	@Operation(summary = "토큰 재발급", security = @SecurityRequirement(name = "bearerAuth"))
 	@PostMapping("/refresh")
 	public ResponseEntity<BasicResponse> refreshToken(HttpServletRequest request, HttpServletResponse response,
 		@AuthenticationPrincipal CustomUserPrincipal principal) {
@@ -129,6 +128,7 @@ public class UserController {
 		String newAccessToken = authTokenService.genAccessToken(principal);
 		String newRefreshToken = authTokenService.genRefreshToken(principal);
 
+		// 새로운 리프레시 토큰을 쿠키에 설정
 		Cookie newRefreshCookie = new Cookie("refreshToken", newRefreshToken);
 		newRefreshCookie.setHttpOnly(true);
 		newRefreshCookie.setSecure(false);
@@ -136,13 +136,13 @@ public class UserController {
 		newRefreshCookie.setMaxAge(604800); // 7일 (초 단위)
 		response.addCookie(newRefreshCookie);
 
-		Map<String, String> res = new HashMap<>();
-		res.put("token", newAccessToken);
-		res.put("email", principal.email());
-		return ResponseEntity.ok(new BasicResponse(HttpStatus.OK, "토큰 재발급 성공", res.toString()));
+		// 새 액세스 토큰을 응답 헤더에 추가
+		response.setHeader("Authorization", "Bearer " + newAccessToken);
+
+		return ResponseEntity.ok(new BasicResponse(HttpStatus.OK, "토큰 재발급 성공", ""));
 	}
 
-	@Operation(summary = "회원 탈퇴")
+	@Operation(summary = "회원 탈퇴", security = @SecurityRequirement(name = "bearerAuth"))
 	@DeleteMapping("/signout")
 	public ResponseEntity<?> signOut(@RequestBody @Validated UserLoginRequest request,
 		@AuthenticationPrincipal CustomUserPrincipal principal) {
