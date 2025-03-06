@@ -47,10 +47,5 @@ public class Bookmark {
 
 	@Column(name = "update_at")
 	private LocalDateTime updateAt;
-
-	// 마켓 정보를 업데이트할 때 사용하는 메서드
-	public void updateMarket(Market newMarket) {
-		this.market = newMarket;
-		this.updateAt = LocalDateTime.now();
-	}
+	
 }
