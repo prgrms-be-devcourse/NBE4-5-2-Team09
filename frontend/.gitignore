@@ -42,3 +42,5 @@ next-env.d.ts
 
 # custom
 **/generated/
+src/lib/api/schema.d.ts
+src/lib/api/schema.json
