@@ -24,14 +24,17 @@ public class EmailSenderService {
 	@Value("${spring.mail.username}")
 	private String senderEmail;
 
+	@Value("${custom.jwt.mail-verification-url}")
+	private String emailVerificationUrl;
+
 	public MimeMessage createEmailVerificationMail(String recipientEmail, String token) throws MessagingException {
 		MimeMessage message = javaMailSender.createMimeMessage();
 		String fromEmail = senderEmail;
 		message.setFrom(fromEmail);
 		message.setRecipients(MimeMessage.RecipientType.TO, recipientEmail);
 		message.setSubject("이메일 인증");
-		// 인증 링크 구성 (도메인은 실제 서비스 URL로 변경)
-		String verificationLink = "http://localhost:8080/api/auth/verify-email?token=" + token;
+		// 인증 링크 구성 (추후 실제 url로 환경 변수 설정 필요)
+		String verificationLink = emailVerificationUrl + token;
 		String body = "<h3>아래 링크를 클릭하여 이메일 인증을 완료하세요.</h3>"
 			+ "<p><a href=\"" + verificationLink + "\">이메일 인증하기</a></p>";
 		message.setText(body, "UTF-8", "html");
