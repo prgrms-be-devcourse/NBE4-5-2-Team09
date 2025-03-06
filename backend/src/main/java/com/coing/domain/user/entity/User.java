@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.With;
 
 @Entity
 @Table(name = "member")
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@With
 public class User {
 
 	@Id
@@ -51,15 +53,14 @@ public class User {
 		}
 	}
 
-	// 이메일 인증 코드
-	@Column(name = "verification_code")
-	private String verificationCode;
-
-	// 이메일 인증 확인
+	// 이메일 인증 여부
 	@Column(name = "verified", nullable = false, columnDefinition = "boolean default false")
 	private boolean verified;
-
-	// 비밀번호 재설정 코드
-	@Column(name = "reset_password_code")
-	private String resetPasswordCode;
+	
+	/**
+	 * 이메일 인증이 완료되었음을 업데이트합니다.
+	 */
+	public User verifyEmail() {
+		return this.withVerified(true);
+	}
 }

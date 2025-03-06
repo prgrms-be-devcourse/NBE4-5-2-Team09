@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
@@ -123,6 +124,17 @@ public class Ut {
 		} catch (JwtException e) {
 			// 토큰 검증 실패
 			return null;
+		}
+	}
+
+	public class AuthTokenUtil {
+		// 메일 인증용 JWT를 생성하는 유틸  (만료 10분)
+		public static String createEmailVerificationToken(String secretKey, UUID userId) {
+			Map<String, Object> claims = new HashMap<>();
+			claims.put("id", userId.toString());
+			// 10분 만료 (600초)
+			int expireSeconds = 600;
+			return Ut.Jwt.createToken(secretKey, expireSeconds, claims);
 		}
 	}
 }
