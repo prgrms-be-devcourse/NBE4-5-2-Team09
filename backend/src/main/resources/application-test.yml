@@ -8,3 +8,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+
+  mail:
+    host: 127.0.0.1
+    port: 0
+    username: dummy
+    password: dummy
