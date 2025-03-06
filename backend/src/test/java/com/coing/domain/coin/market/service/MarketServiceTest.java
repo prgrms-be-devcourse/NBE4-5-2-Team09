@@ -16,6 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
@@ -96,16 +100,21 @@ public class MarketServiceTest {
 	@DisplayName("t4: 코인 목록 전체 조회 - 정상 동작 테스트")
 	void testGetAllMarkets() {
 		// Given
-		List<Market> mockMarkets = Arrays.asList(new Market("KRW-BTC", "비트코인", "Bitcoin"),
-			new Market("KRW-ETH", "이더리움", "Ethereum"));
-		when(marketRepository.findAll()).thenReturn(mockMarkets);
+		List<Market> mockMarkets = Arrays.asList(
+			new Market("KRW-BTC", "비트코인", "Bitcoin"),
+			new Market("KRW-ETH", "이더리움", "Ethereum")
+		);
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Market> mockPage = new PageImpl<>(mockMarkets, pageable, mockMarkets.size());
+
+		when(marketRepository.findAll(pageable)).thenReturn(mockPage);
 
 		// When
-		List<Market> markets = marketService.getAllMarkets();
+		Page<Market> markets = marketService.getAllMarkets(pageable);
 
 		// Then
 		assertNotNull(markets);
-		assertEquals(2, markets.size());
+		assertEquals(2, markets.getContent().size());
 	}
 
 	@Test
@@ -117,15 +126,18 @@ public class MarketServiceTest {
 			new Market("KRW-BTC", "비트코인", "Bitcoin"),
 			new Market("KRW-ETH", "이더리움", "Ethereum")
 		);
-		when(marketRepository.findByCodeStartingWith(type)).thenReturn(mockMarkets);
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Market> mockPage = new PageImpl<>(mockMarkets, pageable, mockMarkets.size());
+
+		when(marketRepository.findByCodeStartingWith(type, pageable)).thenReturn(mockPage);
 
 		// when
-		List<Market> result = marketService.getAllMarketsByQuote(type);
+		Page<Market> result = marketService.getAllMarketsByQuote(type, pageable);
 
 		// then
-		assertThat(result).hasSize(2);
-		assertThat(result.get(0).getCode()).isEqualTo("KRW-BTC");
-		assertThat(result.get(1).getCode()).isEqualTo("KRW-ETH");
+		assertThat(result.getContent()).hasSize(2);
+		assertThat(result.getContent().get(0).getCode()).isEqualTo("KRW-BTC");
+		assertThat(result.getContent().get(1).getCode()).isEqualTo("KRW-ETH");
 	}
 
 	@Test
@@ -133,12 +145,15 @@ public class MarketServiceTest {
 	void getAllCoinsByMarket_ShouldReturnEmptyList_WhenNoMatchingMarkets() {
 		// given
 		String type = "USD";
-		when(marketRepository.findByCodeStartingWith(type)).thenReturn(Collections.emptyList());
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Market> emptyPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
+
+		when(marketRepository.findByCodeStartingWith(type, pageable)).thenReturn(emptyPage);
 
 		// when
-		List<Market> result = marketService.getAllMarketsByQuote(type);
+		Page<Market> result = marketService.getAllMarketsByQuote(type, pageable);
 
 		// then
-		assertThat(result).isEmpty();
+		assertThat(result.getContent()).isEmpty();
 	}
 }
