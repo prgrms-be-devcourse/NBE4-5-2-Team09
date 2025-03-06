@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public record BookmarkResponse(
 	Long id,
-	String coinCode,
+	String code,
 	LocalDateTime createAt,
 	LocalDateTime updateAt
 ) {

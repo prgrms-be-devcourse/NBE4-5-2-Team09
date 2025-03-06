@@ -39,7 +39,7 @@ public class Bookmark {
 
 	// 북마크 대상 마켓 (코인 ID와 동일한 역할을 함; 예: "KRW-BTC")
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "coin_id", nullable = false)
+	@JoinColumn(name = "market_id", nullable = false)
 	private Market market;
 
 	@Column(nullable = false, name = "create_at")

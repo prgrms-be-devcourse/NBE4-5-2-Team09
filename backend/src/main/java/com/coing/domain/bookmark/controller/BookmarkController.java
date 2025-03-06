@@ -47,7 +47,7 @@ public class BookmarkController {
 	}
 
 	@Operation(summary = "특정 북마크 삭제")
-	@DeleteMapping("/{bookmarkId}")
+	@DeleteMapping("/bookmark/{bookmarkId}")
 	public ResponseEntity<Void> deleteBookmark(
 		@PathVariable("bookmarkId") Long bookmarkId,
 		@AuthenticationPrincipal CustomUserPrincipal principal) {

@@ -5,6 +5,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record BookmarkUpdateRequest(
 	@NotNull(message = "{bookmarkId.required}") Long bookmarkId,
-	@NotBlank(message = "{coinCode.required}") String coinCode
+	@NotBlank(message = "{code.required}") String code
 ) {
 }
