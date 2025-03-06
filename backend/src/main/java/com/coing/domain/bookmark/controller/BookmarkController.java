@@ -23,14 +23,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/bookmark")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class BookmarkController {
 
 	private final BookmarkService bookmarkService;
 
 	@Operation(summary = "북마크 등록")
-	@PostMapping("/create")
+	@PostMapping("/bookmark")
 	public ResponseEntity<BookmarkResponse> addBookmark(
 		@RequestBody @Validated BookmarkRequest request,
 		@AuthenticationPrincipal CustomUserPrincipal principal) {
@@ -39,7 +39,7 @@ public class BookmarkController {
 	}
 
 	@Operation(summary = "유저 북마크 전체 조회")
-	@GetMapping("/user")
+	@GetMapping("/bookmarks")
 	public ResponseEntity<List<BookmarkResponse>> getBookmarksForCurrentUser(
 		@AuthenticationPrincipal CustomUserPrincipal principal) {
 		List<BookmarkResponse> responses = bookmarkService.getBookmarksByUser(principal.id());
