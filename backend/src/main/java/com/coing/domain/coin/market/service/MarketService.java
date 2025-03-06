@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -55,9 +57,14 @@ public class MarketService {
 		}
 	}
 
-	public List<Market> getAllMarkets() {
+	public Page<Market> getAllMarkets(Pageable pageable) {
 		log.info("[Market] Get all market list");
-		return marketRepository.findAll();
+		return marketRepository.findAll(pageable);
+	}
+
+	public Page<Market> getAllMarketsByQuote(String type, Pageable pageable) {
+		log.info("[Market] Get all market list by quote currency");
+		return marketRepository.findByCodeStartingWith(type, pageable);
 	}
 
 	@Transactional

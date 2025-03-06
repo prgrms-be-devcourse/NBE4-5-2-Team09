@@ -1,9 +1,11 @@
 package com.coing.domain.coin.market.service;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
@@ -43,13 +49,13 @@ public class MarketServiceTest {
 	void setUp() {
 		// Test setup: initialize mock data
 		mockMarketDtos = new MarketDto[] {
-			new MarketDto("KRW-BTC", "KRW", "BTC"),
-			new MarketDto("KRW-ETH", "KRW", "ETH")
+			new MarketDto("KRW-BTC", "비트코인", "BTC"),
+			new MarketDto("KRW-ETH", "이더리움", "ETH"),
 		};
 	}
 
 	@Test
-	@DisplayName("t1: 마켓 목록 자동 갱신 - 정상 동작 테스트")
+	@DisplayName("t1: 코인 목록 자동 갱신 - 정상 동작 테스트")
 	void testUpdateCoinList_Success() {
 		// Given
 		ResponseEntity<MarketDto[]> responseEntity = ResponseEntity.ok(mockMarketDtos);
@@ -63,7 +69,7 @@ public class MarketServiceTest {
 	}
 
 	@Test
-	@DisplayName("t2: 마켓 목록 자동 갱신 - 외부 api error 테스트")
+	@DisplayName("t2: 코인 목록 자동 갱신 - 외부 api error 테스트")
 	void testUpdateCoinList_Exception() {
 		// Given
 		when(restTemplate.getForEntity(UPBIT_MARKET_URI, MarketDto[].class)).thenThrow(
@@ -77,7 +83,7 @@ public class MarketServiceTest {
 	}
 
 	@Test
-	@DisplayName("t3: 마켓 목록 갱신 요청 - 정상 동작 테스트")
+	@DisplayName("t3: 코인 목록 갱신 요청 - 정상 동작 테스트")
 	void testRefreshMarketList_Success() {
 		// Given
 		ResponseEntity<MarketDto[]> responseEntity = ResponseEntity.ok(mockMarketDtos);
@@ -91,18 +97,63 @@ public class MarketServiceTest {
 	}
 
 	@Test
-	@DisplayName("t4: 마켓 목록 전체 조회 - 정상 동작 테스트")
+	@DisplayName("t4: 코인 목록 전체 조회 - 정상 동작 테스트")
 	void testGetAllMarkets() {
 		// Given
-		List<Market> mockMarkets = Arrays.asList(new Market("KRW-BTC", "비트코인", "Bitcoin"),
-			new Market("KRW-ETH", "이더리움", "Ethereum"));
-		when(marketRepository.findAll()).thenReturn(mockMarkets);
+		List<Market> mockMarkets = Arrays.asList(
+			new Market("KRW-BTC", "비트코인", "Bitcoin"),
+			new Market("KRW-ETH", "이더리움", "Ethereum")
+		);
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Market> mockPage = new PageImpl<>(mockMarkets, pageable, mockMarkets.size());
+
+		when(marketRepository.findAll(pageable)).thenReturn(mockPage);
 
 		// When
-		List<Market> markets = marketService.getAllMarkets();
+		Page<Market> markets = marketService.getAllMarkets(pageable);
 
 		// Then
 		assertNotNull(markets);
-		assertEquals(2, markets.size());
+		assertEquals(2, markets.getContent().size());
+	}
+
+	@Test
+	@DisplayName("t5: 기준 통화별 마켓 목록 조회 - 정상 동작 테스트")
+	void getAllCoinsByMarket_ShouldReturnFilteredMarkets() {
+		// given
+		String type = "KRW";
+		List<Market> mockMarkets = Arrays.asList(
+			new Market("KRW-BTC", "비트코인", "Bitcoin"),
+			new Market("KRW-ETH", "이더리움", "Ethereum")
+		);
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Market> mockPage = new PageImpl<>(mockMarkets, pageable, mockMarkets.size());
+
+		when(marketRepository.findByCodeStartingWith(type, pageable)).thenReturn(mockPage);
+
+		// when
+		Page<Market> result = marketService.getAllMarketsByQuote(type, pageable);
+
+		// then
+		assertThat(result.getContent()).hasSize(2);
+		assertThat(result.getContent().get(0).getCode()).isEqualTo("KRW-BTC");
+		assertThat(result.getContent().get(1).getCode()).isEqualTo("KRW-ETH");
+	}
+
+	@Test
+	@DisplayName("t5: 기준 통화별 마켓 목록 조회 - 정확한 기준 통화명이 아닐 시 빈 리스트 반환")
+	void getAllCoinsByMarket_ShouldReturnEmptyList_WhenNoMatchingMarkets() {
+		// given
+		String type = "USD";
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Market> emptyPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
+
+		when(marketRepository.findByCodeStartingWith(type, pageable)).thenReturn(emptyPage);
+
+		// when
+		Page<Market> result = marketService.getAllMarketsByQuote(type, pageable);
+
+		// then
+		assertThat(result.getContent()).isEmpty();
 	}
 }
