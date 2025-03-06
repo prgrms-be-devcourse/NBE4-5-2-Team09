@@ -6,17 +6,24 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.coing.domain.coin.candle.dto.CandleChartDto;
 import com.coing.domain.coin.candle.entity.CandleSnapshot;
 import com.coing.domain.coin.candle.enums.CandleInterval;
+import com.coing.global.exception.BusinessException;
+import com.coing.util.MessageUtil;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CandleChartService {
+
+	private final MessageUtil messageUtil;
 
 	/**
 	 * 캔들 스냅샷 리스트를 지정된 CandleInterval 단위로 집계하여 CandleChartDto를 생성합니다.
@@ -24,7 +31,7 @@ public class CandleChartService {
 	 */
 	public CandleChartDto aggregateCandles(List<CandleSnapshot> snapshots, CandleInterval interval) {
 		if (snapshots == null || snapshots.isEmpty()) {
-			throw new IllegalArgumentException("캔들 스냅샷 데이터가 없습니다.");
+			throw new BusinessException(messageUtil.resolveMessage("snapshot.not.found"), HttpStatus.NOT_FOUND);
 		}
 		// 입력 데이터 복사 후 정렬 (불변 리스트의 경우에도 가능)
 		List<CandleSnapshot> sortedSnapshots = new ArrayList<>(snapshots);
