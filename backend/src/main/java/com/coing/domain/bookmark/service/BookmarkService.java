@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.coing.domain.bookmark.controller.dto.BookmarkRequest;
 import com.coing.domain.bookmark.controller.dto.BookmarkResponse;
-import com.coing.domain.bookmark.controller.dto.BookmarkUpdateRequest;
 import com.coing.domain.bookmark.entity.Bookmark;
 import com.coing.domain.bookmark.repository.BookmarkRepository;
 import com.coing.domain.coin.market.entity.Market;
@@ -78,38 +77,6 @@ public class BookmarkService {
 				b.getUpdateAt()
 			))
 			.collect(Collectors.toList());
-	}
-
-	@Transactional(readOnly = true)
-	public List<BookmarkResponse> getBookmarksForCurrentUser(CustomUserPrincipal principal) {
-		return getBookmarksByUser(principal.id());
-	}
-
-	@Transactional
-	public BookmarkResponse updateBookmark(BookmarkUpdateRequest request, CustomUserPrincipal principal) {
-		Bookmark bookmark = bookmarkRepository.findById(request.bookmarkId())
-			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("bookmark.not.found"),
-				HttpStatus.NOT_FOUND));
-
-		// 인증된 사용자가 북마크의 소유자인지 확인
-		if (!bookmark.getUser().getId().equals(principal.id())) {
-			throw new BusinessException(messageUtil.resolveMessage("bookmark.access.denied"),
-				HttpStatus.FORBIDDEN);
-		}
-
-		// 새로운 Market 정보 가져오기
-		Market newMarket = marketRepository.findById(request.coinCode())
-			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("market.not.found"),
-				HttpStatus.NOT_FOUND));
-
-		bookmark.updateMarket(newMarket);
-		Bookmark updated = bookmarkRepository.save(bookmark);
-		return new BookmarkResponse(
-			updated.getId(),
-			updated.getMarket().getCode(),
-			updated.getCreateAt(),
-			updated.getUpdateAt()
-		);
 	}
 
 	@Transactional
