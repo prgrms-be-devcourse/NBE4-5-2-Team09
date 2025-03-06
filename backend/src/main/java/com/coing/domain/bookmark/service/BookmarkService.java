@@ -61,8 +61,7 @@ public class BookmarkService {
 		return new BookmarkResponse(
 			savedBookmark.getId(),
 			savedBookmark.getMarket().getCode(),
-			savedBookmark.getCreateAt(),
-			savedBookmark.getUpdateAt()
+			savedBookmark.getCreateAt()
 		);
 	}
 
@@ -73,8 +72,7 @@ public class BookmarkService {
 			.map(b -> new BookmarkResponse(
 				b.getId(),
 				b.getMarket().getCode(),
-				b.getCreateAt(),
-				b.getUpdateAt()
+				b.getCreateAt()
 			))
 			.collect(Collectors.toList());
 	}
