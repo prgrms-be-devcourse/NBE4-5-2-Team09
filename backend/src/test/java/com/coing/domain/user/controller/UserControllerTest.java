@@ -43,20 +43,21 @@ class UserControllerTest {
 	@Test
 	@DisplayName("로그아웃 성공")
 	void t1() throws Exception {
-		// 1) CustomUserPrincipal 생성
+		// CustomUserPrincipal 생성 (이제 이름 필드 포함)
 		var principal = new CustomUserPrincipal(
 			UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-			"tester@example.com"
+			"tester@example.com",
+			"Tester"
 		);
 
-		// 2) Authentication 객체 생성 (권한 ROLE_USER 포함)
+		// Authentication 객체 생성 (권한 ROLE_USER 포함)
 		var auth = new UsernamePasswordAuthenticationToken(
 			principal,
 			null,
 			List.of(new SimpleGrantedAuthority("ROLE_USER"))
 		);
 
-		// 3) MockMvc 요청에 .with(authentication(auth))를 사용하여 인증 정보 주입
+		// 인증 정보 주입
 		mockMvc.perform(post("/api/auth/logout")
 				.with(csrf())
 				.with(authentication(auth))
