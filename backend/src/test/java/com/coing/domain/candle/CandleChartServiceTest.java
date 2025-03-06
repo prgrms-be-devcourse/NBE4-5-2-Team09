@@ -5,18 +5,30 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import com.coing.domain.coin.candle.dto.CandleChartDto;
 import com.coing.domain.coin.candle.entity.CandleSnapshot;
 import com.coing.domain.coin.candle.enums.CandleInterval;
 import com.coing.domain.coin.candle.service.CandleChartService;
+import com.coing.util.MessageUtil;
 
 public class CandleChartServiceTest {
 
+	@Mock
+	private MessageUtil messageUtil;
+
+	@BeforeEach
+	void setUp() {
+		MockitoAnnotations.openMocks(this); // Mockito 초기화
+	}
+
 	@Test
 	public void testAggregateCandles_Minute() {
-		CandleChartService service = new CandleChartService();
+		CandleChartService service = new CandleChartService(messageUtil);
 
 		// 테스트를 위한 샘플 데이터 생성 (1분 단위 집계를 위해 3개의 캔들 스냅샷)
 		LocalDateTime now = LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MINUTES);
