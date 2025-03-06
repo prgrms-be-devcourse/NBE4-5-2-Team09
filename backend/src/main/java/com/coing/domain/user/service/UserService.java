@@ -32,26 +32,37 @@ public class UserService {
 	@Transactional
 	public UserResponse join(UserSignUpRequest request) {
 		log.info("회원가입 시도: {}", request.email());
+
+		// 비밀번호와 비밀번호 확인 일치 여부를 먼저 검사합니다.
+		if (!request.password().equals(request.passwordConfirm())) {
+			throw new BusinessException(
+				messageUtil.resolveMessage("invalid.password.confirm"),
+				HttpStatus.BAD_REQUEST,
+				""
+			);
+		}
+
 		Optional<User> existing = userRepository.findByEmail(request.email());
 		if (existing.isPresent()) {
-			throw new BusinessException(messageUtil.resolveMessage("already.registered.email"),
-				HttpStatus.BAD_REQUEST, "");
+			throw new BusinessException(
+				messageUtil.resolveMessage("already.registered.email"),
+				HttpStatus.BAD_REQUEST,
+				""
+			);
 		}
+
 		String encodedPassword = passwordEncoder.encode(request.password());
 		User userEntity = User.builder()
 			.name(request.name())
 			.email(request.email())
 			.password(encodedPassword)
 			.build();
+
 		User savedUser = userRepository.save(userEntity);
 
-		// 회원가입 후 자동으로 이메일 인증 메일 전송
-		try {
-			emailVerificationService.sendVerificationEmail(savedUser);
-		} catch (Exception e) {
-			log.error("이메일 인증 메일 전송 실패: {}", request.email(), e);
-			// 메일 전송 실패 시 가입은 유지하고, 재전송 API 제공 가능
-		}
+		// 이메일 인증 메일 전송 실패 시 예외 전파 (회원가입 전체 롤백)
+		emailVerificationService.sendVerificationEmail(savedUser);
+
 		return new UserResponse(savedUser.getId(), savedUser.getName(), savedUser.getEmail());
 	}
 

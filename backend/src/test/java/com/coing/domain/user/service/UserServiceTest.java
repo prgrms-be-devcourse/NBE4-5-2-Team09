@@ -15,6 +15,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.coing.domain.user.controller.dto.UserResponse;
+import com.coing.domain.user.controller.dto.UserSignUpRequest;
+import com.coing.domain.user.email.service.EmailVerificationService;
 import com.coing.domain.user.entity.User;
 import com.coing.domain.user.repository.UserRepository;
 import com.coing.global.exception.BusinessException;
@@ -28,9 +30,11 @@ public class UserServiceTest {
 	@Mock
 	private PasswordEncoder passwordEncoder;
 
-	// 반드시 com.coing.util.MessageUtil을 import해야 합니다.
 	@Mock
 	private MessageUtil messageUtil;
+
+	@Mock
+	private EmailVerificationService emailVerificationService;
 
 	@InjectMocks
 	private UserService userService;
@@ -60,8 +64,9 @@ public class UserServiceTest {
 			.build();
 		when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
-		// 서비스가 UserResponse를 반환하도록 변경됨
-		UserResponse result = userService.join(name, email, password, passwordConfirm);
+		// DTO record를 생성해서 전달합니다.
+		UserSignUpRequest request = new UserSignUpRequest(name, email, password, passwordConfirm);
+		UserResponse result = userService.join(request);
 
 		assertNotNull(result);
 		assertEquals(email, result.email());
@@ -76,8 +81,9 @@ public class UserServiceTest {
 		String password = "test";
 		String passwordConfirm = "test2";
 
+		UserSignUpRequest request = new UserSignUpRequest(name, email, password, passwordConfirm);
 		Exception exception = assertThrows(BusinessException.class, () -> {
-			userService.join(name, email, password, passwordConfirm);
+			userService.join(request);
 		});
 		assertEquals("invalid.password.confirm", exception.getMessage());
 	}
@@ -90,11 +96,13 @@ public class UserServiceTest {
 		String password = "test";
 		String passwordConfirm = "test";
 
+		UserSignUpRequest request = new UserSignUpRequest(name, email, password, passwordConfirm);
+
 		User existingUser = new User();
 		when(userRepository.findByEmail(email)).thenReturn(Optional.of(existingUser));
 
 		Exception exception = assertThrows(BusinessException.class, () -> {
-			userService.join(name, email, password, passwordConfirm);
+			userService.join(request);
 		});
 		assertEquals("already.registered.email", exception.getMessage());
 	}
