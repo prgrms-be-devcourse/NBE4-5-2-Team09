@@ -10,4 +10,6 @@ import com.coing.domain.coin.candle.entity.CandleSnapshot;
 @Repository
 public interface CandleSnapshotRepository extends JpaRepository<CandleSnapshot, Long> {
 	Page<CandleSnapshot> findAllByCode(String code, Pageable pageable);
+
+	long countByCode(String code);
 }
