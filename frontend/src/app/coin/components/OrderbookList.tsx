@@ -1,18 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { OrderBook } from "../types";
+import type { Orderbook } from "@/app/types";
 
-interface OrderBookListProps {
-  orderBook: OrderBook;
+interface OrderbookListProps {
+  orderbook: Orderbook;
   currentPrice: number;
 }
 
-export default function OrderBookList({
-  orderBook,
+export default function OrderbookList({
+  orderbook,
   currentPrice,
-}: OrderBookListProps) {
-  const [clientOrderBook, setClientOrderBook] = useState<OrderBook | null>(
+}: OrderbookListProps) {
+  const [clientOrderbook, setClientOrderbook] = useState<Orderbook | null>(
     null
   );
   const [clientCurrentPrice, setClientCurrentPrice] = useState<number | null>(
@@ -21,17 +21,17 @@ export default function OrderBookList({
 
   // `useEffect`를 사용하여 클라이언트에서만 `orderbook` 데이터를 설정
   useEffect(() => {
-    setClientOrderBook(orderBook);
+    setClientOrderbook(orderbook);
     setClientCurrentPrice(currentPrice);
-  }, [orderBook, currentPrice]);
+  }, [orderbook, currentPrice]);
 
   const formatPrice = (price: number) => price.toLocaleString();
   const formatQuantity = (quantity: number) => quantity.toFixed(4);
 
   // 서버 사이드 렌더링 중에는 아무것도 표시하지 않음 (Hydration 오류 방지)
-  if (!clientOrderBook || clientCurrentPrice === null) return null;
+  if (!clientOrderbook || clientCurrentPrice === null) return null;
 
-  const { asks, bids } = clientOrderBook;
+  const { asks, bids } = clientOrderbook;
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">

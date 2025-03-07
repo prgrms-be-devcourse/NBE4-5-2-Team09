@@ -1,5 +1,5 @@
 import createClient from "openapi-fetch";
-import { paths } from "./generated/schema";
+import { paths } from "@/lib/api/generated/schema";
 
 const client = createClient<paths>({
   baseUrl: process.env.SERVER_URL,

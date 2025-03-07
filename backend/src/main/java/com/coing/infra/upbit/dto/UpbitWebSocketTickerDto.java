@@ -120,7 +120,7 @@ public class UpbitWebSocketTickerDto {
 	@JsonProperty("st")
 	private String streamType;
 
-	public Ticker toEntity() {
+	public Ticker toEntity(double oneMinuteRate) {
 		return Ticker.builder()
 			.type(type)
 			.code(code)
@@ -152,6 +152,22 @@ public class UpbitWebSocketTickerDto {
 			.marketState(marketState)
 			.marketWarning(marketWarning)
 			.timestamp(timestamp)
+			.accAskBidRate(calcAccAskBidRate())
+			.highBreakout(calcHighBreakout())
+			.lowBreakout(calcLowBreakout())
+			.oneMinuteRate(oneMinuteRate)
 			.build();
+	}
+
+	private double calcAccAskBidRate() {
+		return (accAskVolume - accBidVolume) / accTradeVolume;
+	}
+
+	private boolean calcHighBreakout() {
+		return tradePrice > highest52WeekPrice;
+	}
+
+	private boolean calcLowBreakout() {
+		return tradePrice < lowest52WeekPrice;
 	}
 }

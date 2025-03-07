@@ -48,4 +48,11 @@ public class Ticker {
 	private MarketState marketState; // 거래 상태
 	private MarketWarning marketWarning; // 유의 종목 여부
 	private Long timestamp; // 타임스탬프
+
+	// 계산된 지표
+	private double accAskBidRate; // 매수/매도 누적 비율
+	private boolean highBreakout; // 52주 최고가 갱신 여부
+	private boolean lowBreakout; // 52주 최저가 갱신 여부
+	private double oneMinuteRate; // 단기 변동률(1분)
 }
+

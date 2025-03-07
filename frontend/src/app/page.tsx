@@ -1,7 +1,8 @@
-import ClientPage from "./ClientPage";
+import { redirect } from "next/navigation";
+import ClientPage from "@/app/ClientPage";
 
 export default function Page() {
-  // This is a server component
-  // We'll pass any server-side data to the client component
+  redirect("/coin/KRW-EOS");
+
   return <ClientPage />;
 }
