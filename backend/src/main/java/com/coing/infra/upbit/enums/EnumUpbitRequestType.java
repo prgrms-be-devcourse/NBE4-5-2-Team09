@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @Getter
 public enum EnumUpbitRequestType {
-	TICKER("ticker", List.of("KRW-EOS")),
+	TICKER("ticker", List.of("KRW-BTC", "BTC-1INCH", "USDT-ADA")),
 	TRADE("trade", List.of("KRW-BTC", "KRW-ETH")),
 	ORDERBOOK("orderbook", List.of("KRW-ADA")),
 	CANDLE("candle", List.of("KRW-ADA"));

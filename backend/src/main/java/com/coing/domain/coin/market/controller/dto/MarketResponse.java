@@ -3,7 +3,7 @@ package com.coing.domain.coin.market.controller.dto;
 import com.coing.domain.coin.market.entity.Market;
 
 public record MarketResponse(
-	String market,
+	String code,
 	String koreanName,
 	String englishName
 ) {

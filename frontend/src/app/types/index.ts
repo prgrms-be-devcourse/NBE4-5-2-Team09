@@ -148,3 +148,9 @@ export type CandleChartDto = {
   candle_acc_trade_volume: number;
   timestamp: number;
 };
+
+export type MarketDto = {
+    code: string;
+    koreanName: string;
+    englishName: string;
+}
