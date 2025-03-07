@@ -1,9 +1,11 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/auth-context";
 import { useState, useMemo } from "react";
-import { parseJwt } from "../utils/parse-token"; // JWT 파싱 유틸 (한글 깨짐 방지)
+import { parseJwt } from "../utils/parse-token";
 
 export default function Header() {
   const router = useRouter();
@@ -12,9 +14,7 @@ export default function Header() {
 
   // JWT 토큰에서 사용자 이름 추출 (토큰이 없으면 빈 문자열)
   const tokenPayload = useMemo(() => parseJwt(accessToken), [accessToken]);
-  // 백엔드에서 반환한 토큰의 name 필드는 이미 일반 문자열이어야 함
   const userName = tokenPayload?.name ?? "";
-
   const isLoggedIn = !!accessToken;
 
   const handleLogout = async () => {
@@ -25,7 +25,6 @@ export default function Header() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // 로그인 시 헤더로 전달된 액세스 토큰 사용
           Authorization: `Bearer ${accessToken}`,
         },
         credentials: "include",
@@ -45,15 +44,41 @@ export default function Header() {
     }
   };
 
-  // 로딩 상태일 때: 새로고침 후 토큰 재발급(리프레시)이 진행 중이면 일정한 헤더 레이아웃을 유지
+  // 로딩 상태일 때: 간단한 플레이스홀더 표시
   if (isAuthLoading) {
     return (
         <header className="bg-white border-b border-gray-200">
           <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div className="text-gray-700 font-medium">COING</div>
+            <div className="flex items-center space-x-8">
+              <nav className="hidden md:flex space-x-8">
+                <Link
+                    href="/"
+                    className="text-gray-900 font-medium border-b-2 border-blue-500 pb-1"
+                >
+                  코인 대시보드
+                </Link>
+                <Link
+                    href="/market"
+                    className="text-gray-500 hover:text-gray-900"
+                >
+                  북마크 대시보드
+                </Link>
+                <Link href="/etc" className="text-gray-500 hover:text-gray-900">
+                  기타 메뉴
+                </Link>
+              </nav>
+            </div>
             <div className="flex items-center space-x-4">
-              {/* 로딩 플레이스홀더 (버튼과 같은 크기) */}
-              <div className="w-32 h-10 bg-gray-300 rounded animate-pulse"></div>
+              <span className="text-sm text-gray-500">최근 업데이트: 5초 전</span>
+              <div className="flex items-center">
+                <span className="ml-2 text-sm font-medium">로딩중...</span>
+              </div>
+              <button
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
+                  disabled
+              >
+                로그아웃
+              </button>
             </div>
           </div>
         </header>
@@ -62,28 +87,51 @@ export default function Header() {
 
   return (
       <header className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="text-gray-700 font-medium">COING</div>
-          <div className="flex items-center space-x-4">
-            {isLoggedIn ? (
-                <>
-                  <span className="text-gray-700 font-semibold">{userName}</span>
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-8">
+              <nav className="hidden md:flex space-x-8">
+                <Link
+                    href="/"
+                    className="text-gray-900 font-medium border-b-2 border-blue-500 pb-1"
+                >
+                  코인 대시보드
+                </Link>
+                <Link
+                    href="/market"
+                    className="text-gray-500 hover:text-gray-900"
+                >
+                  북마크 대시보드
+                </Link>
+                <Link href="/etc" className="text-gray-500 hover:text-gray-900">
+                  기타 메뉴
+                </Link>
+              </nav>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-500">최근 업데이트: 5초 전</span>
+              <div className="flex items-center">
+              <span className="ml-2 text-sm font-medium">
+                {isLoggedIn ? userName : "게스트"}
+              </span>
+              </div>
+              {isLoggedIn ? (
                   <button
                       onClick={handleLogout}
                       disabled={isLoggingOut}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
                   >
                     {isLoggingOut ? "로그아웃 중..." : "로그아웃"}
                   </button>
-                </>
-            ) : (
-                <button
-                    onClick={() => router.push("/user/login")}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
-                >
-                  로그인
-                </button>
-            )}
+              ) : (
+                  <button
+                      onClick={() => router.push("/user/login")}
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
+                  >
+                    로그인
+                  </button>
+              )}
+            </div>
           </div>
         </div>
       </header>
