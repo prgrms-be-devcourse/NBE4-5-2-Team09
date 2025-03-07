@@ -7,6 +7,7 @@ import { parseJwt } from "../utils/parse-token"; // JWT 파싱 유틸
 interface AuthContextType {
     accessToken: string | null;
     setAccessToken: (token: string | null) => void;
+    isAuthLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,6 +20,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
         return null;
     });
+
+    const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
 
     // 쿠키와 상태를 동시에 업데이트하는 함수
     const setAccessToken = (token: string | null) => {
@@ -55,6 +58,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 }
             } catch (error) {
                 console.error("리프레시 요청 중 오류 발생:", error);
+            } finally {
+                setIsAuthLoading(false);
             }
         }
 
@@ -66,6 +71,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             if (payload && payload.exp && payload.exp < currentTime) {
                 // 토큰 만료됨 → 리프레시 시도
                 refreshAccessToken();
+            } else {
+                setIsAuthLoading(false);
             }
         } else {
             // 토큰이 없으면 리프레시 엔드포인트에 요청 (리프레시 토큰이 있다면 새 토큰 발급 가능)
@@ -74,7 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ accessToken, setAccessToken }}>
+        <AuthContext.Provider value={{ accessToken, setAccessToken, isAuthLoading }}>
             {children}
         </AuthContext.Provider>
     );

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/auth-context";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { parseJwt } from "../utils/parse-token"; // JWT 파싱 유틸 (한글 깨짐 방지)
 
 export default function Header() {
