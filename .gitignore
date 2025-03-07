@@ -2,3 +2,6 @@
 mysql_logs/
 .env*
 api_schema.json
+
+**/.turbo
+**/node_modules

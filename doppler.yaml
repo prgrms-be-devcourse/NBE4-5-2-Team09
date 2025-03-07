@@ -1,0 +1,7 @@
+setup:
+  - project: coing-backend
+    config: dev
+    path: backend
+  - project: coing-frontend
+    config: dev
+    path: frontend

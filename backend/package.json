@@ -1,0 +1,8 @@
+{
+  "name": "@coing/backend",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "doppler": "doppler secrets download --no-file --format env > .env"
+  }
+}
