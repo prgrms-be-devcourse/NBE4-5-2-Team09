@@ -1,17 +1,17 @@
 import {
-  type OrderBook,
-  type OrderBookItem,
+  type Orderbook,
+  type OrderbookItem,
   type TradeItem,
   type CandleItem,
   type NewsItem,
   AskBid,
-} from "../types";
+} from "@/app/types";
 
-// 모의 호가(OrderBook) 생성 함수
-export function generateMockOrderBook(): OrderBook {
+// 모의 호가(Orderbook) 생성 함수
+export function generateMockOrderbook(): Orderbook {
   const basePrice = 799; // 현재 EOS 가격
-  const asks: OrderBookItem[] = []; // 매도 주문 리스트
-  const bids: OrderBookItem[] = []; // 매수 주문 리스트
+  const asks: OrderbookItem[] = []; // 매도 주문 리스트
+  const bids: OrderbookItem[] = []; // 매수 주문 리스트
 
   // 매도 주문 생성 (기준 가격보다 높은 가격)
   for (let i = 0; i < 5; i++) {
