@@ -15,7 +15,8 @@ import { useWebSocket } from "@/app/context/WebSocketContext";
 
 export default function ClientPage() {
   const { market } = useParams() as { market: string };
-  const { ticker } = useWebSocket();
+  const { tickers } = useWebSocket();
+  const ticker = tickers?.[market] ?? null;
 
   // Mock data
   const orderbook = generateMockOrderbook();
