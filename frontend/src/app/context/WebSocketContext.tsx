@@ -43,8 +43,7 @@ export const WebSocketProvider = ({
 }) => {
   const { market } = useParams();
   const pathname = usePathname();
-  const { connect, disconnect, isConnected, subscribe, unsubscribe } =
-    useWebSocketStore();
+  const { connect, isConnected, subscribe, unsubscribe } = useWebSocketStore();
 
   const [ticker, setTicker] = useState<TickerDto | null>(null);
   const [orderbook, setOrderbook] = useState<OrderbookDto | null>(null);
@@ -54,7 +53,6 @@ export const WebSocketProvider = ({
   // WebSocket 연결
   useEffect(() => {
     connect();
-    return () => disconnect();
   }, []);
 
   // 페이지에서 받은 subscriptions에 맞춰 동적으로 구독 수행

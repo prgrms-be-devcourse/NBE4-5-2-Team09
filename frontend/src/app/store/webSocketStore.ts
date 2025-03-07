@@ -5,7 +5,6 @@ interface WebSocketState {
   client: Client | null;
   isConnected: boolean;
   connect: () => void;
-  disconnect: () => void;
   subscribe: (
     destination: string,
     callback: (message: IMessage) => void
@@ -41,15 +40,6 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => ({
 
     client.activate();
     set({ client });
-  },
-
-  // 웹소켓 연결 해제 함수
-  disconnect: () => {
-    const client = get().client;
-    if (client) {
-      client.deactivate();
-      set({ client: null, isConnected: false });
-    }
   },
 
   // 구독 함수
