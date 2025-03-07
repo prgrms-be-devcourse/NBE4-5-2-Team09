@@ -1,4 +1,18 @@
-export type TickerDto = {
+export type MarketList = {
+  totalPages: number;
+  totalElements: number;
+  content: Market[];
+  first: boolean;
+  last: boolean;
+};
+
+export type Market = {
+  market: string;
+  koreanName: string;
+  englishName: string;
+};
+
+export type Ticker = {
   type: string; // 데이터 타입 (예: "ticker")
   code: string; // 마켓 코드 (예: "KRW-BTC")
   openingPrice: number; // 시가
@@ -54,14 +68,25 @@ export enum AskBid {
 }
 
 export type OrderBookItem = {
-  price: number;
-  quantity: number;
-  total: number;
+  askPrice: number;
+  bidPrice: number;
+  askSize: number;
+  bidSize: number;
 };
 
 export type OrderBook = {
-  asks: OrderBookItem[];
-  bids: OrderBookItem[];
+  type: string;
+  code: string;
+  totalAskSize: number;
+  totalBidSize: number;
+  orderbookUnits: OrderBookItem[];
+  timestamp: number;
+  level: number;
+  midPrice: number;
+  spread: number;
+  imbalance: number;
+  liquidityDepth: number;
+  volatility: number;
 };
 
 export type TradeItem = {

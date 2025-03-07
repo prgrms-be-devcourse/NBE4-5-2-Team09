@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type TradeItem, AskBid } from "../types";
+import { type TradeItem, AskBid } from "@/components/types";
 
 interface TradeListProps {
   trades: TradeItem[];

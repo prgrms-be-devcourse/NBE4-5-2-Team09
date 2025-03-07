@@ -2,20 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { Client } from "@stomp/stompjs";
-import OrderBookList from "./components/OrderBookList";
-import CandleChart from "./components/CandleChart";
-import TradeList from "./components/TradeList";
-import NewsList from "./components/NewsList";
-import type { TickerDto } from "./types";
+import type { Ticker } from "../components/types";
 import {
   generateMockOrderBook,
   generateMockTrades,
   generateMockCandles,
   generateMockNews,
-} from "./utils/mockData";
+} from "../lib/utils/mockData";
+import CandleChart from "@/components/candle-chart";
+import TradeList from "@/components/trade-list";
+import OrderBookList from "@/components/orderbook-list";
+import NewsList from "@/components/news-list";
+import { useMultiValue } from "@/components/providers/multivalue-provider";
 
 export default function ClientPage() {
-  const [ticker, setTicker] = useState<TickerDto | undefined>(undefined);
+  const [ticker, setTicker] = useState<Ticker | undefined>(undefined);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState<string | undefined>(
     undefined
@@ -144,10 +145,7 @@ export default function ClientPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <TradeList trades={trades} />
-          <OrderBookList
-            orderBook={orderBook}
-            currentPrice={ticker?.tradePrice || 0}
-          />
+          <OrderBookList market={"KRW-ADA"} />
         </div>
 
         <div className="w-full">

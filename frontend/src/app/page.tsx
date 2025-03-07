@@ -1,4 +1,4 @@
-import ClientPage from "./ClientPage";
+import ClientPage from "./client-page";
 
 export default function Page() {
   // This is a server component

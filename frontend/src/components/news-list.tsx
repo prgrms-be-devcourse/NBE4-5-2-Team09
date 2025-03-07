@@ -1,6 +1,6 @@
 "use client";
 
-import type { NewsItem } from "../types";
+import type { NewsItem } from "@/components/types";
 
 interface NewsListProps {
   news: NewsItem[];

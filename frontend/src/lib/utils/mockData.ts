@@ -5,7 +5,7 @@ import {
   type CandleItem,
   type NewsItem,
   AskBid,
-} from "../types";
+} from "../../components/types";
 
 // 모의 호가(OrderBook) 생성 함수
 export function generateMockOrderBook(): OrderBook {

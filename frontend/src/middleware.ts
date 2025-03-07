@@ -5,7 +5,7 @@ import {
   setMultipleCookies,
 } from "@/lib/auth-helpers";
 
-const protectedRoutes = ["/dashboard"];
+const protectedRoutes = ["/user"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -24,9 +24,7 @@ export async function middleware(request: NextRequest) {
   // AccessToken이 유효하면 => Authorization 헤더 추가 후 통과
   if (isValid) {
     const response = NextResponse.next();
-    if (accessToken) {
-      response.headers.set("Authorization", `Bearer ${accessToken}`);
-    }
+    response.headers.set("Authorization", `Bearer ${accessToken}`);
     return response;
   }
 
@@ -41,8 +39,8 @@ export async function middleware(request: NextRequest) {
   }
 
   const { newAccessToken, setCookieHeaders } = refreshResponse.data;
-
   const res = NextResponse.next();
+
   setMultipleCookies(res, setCookieHeaders);
 
   res.cookies.set("accessToken", newAccessToken, {

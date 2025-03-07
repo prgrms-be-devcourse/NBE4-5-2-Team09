@@ -37,6 +37,10 @@ export async function refreshTokens(request: NextRequest) {
       console.error("JSON 파싱 오류:", error);
     }
 
+    if (!newAccessToken) {
+      return { ok: false, data: null };
+    }
+
     return {
       ok: true,
       data: {

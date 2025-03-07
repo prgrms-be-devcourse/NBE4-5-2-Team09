@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 export default function Header() {
@@ -9,7 +8,7 @@ export default function Header() {
           <div className="flex items-center space-x-8">
             <nav className="hidden md:flex space-x-8">
               <Link
-                href="/"
+                href="/dashboard"
                 className="text-gray-900 font-medium border-b-2 border-blue-500 pb-1"
               >
                 코인 대시보드

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { CandleItem } from "../types";
+import type { CandleItem } from "@/components/types";
 
 interface CandleChartProps {
   candles: CandleItem[];

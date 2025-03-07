@@ -1,5 +1,6 @@
 package com.coing.domain.coin.market.controller;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -27,7 +28,8 @@ public class MarketController {
 
 	@Operation(summary = "마켓 전체 조회")
 	@GetMapping
-	public ResponseEntity<Page<MarketResponse>> getMarkets(@PageableDefault(sort = "code") Pageable pageable) {
+	public ResponseEntity<Page<MarketResponse>> getMarkets(
+		@ParameterObject @PageableDefault(sort = "code") Pageable pageable) {
 		return ResponseEntity.ok(marketService.getAllMarkets(pageable)
 			.map(MarketResponse::from));
 	}

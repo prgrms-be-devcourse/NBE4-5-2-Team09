@@ -154,6 +154,7 @@ public class OrderbookService {
 		double volatility = getCachedVolatility(orderbook.getCode());
 		OrderbookDto dto = OrderbookDto.from(orderbook, volatility);
 		String convertedMessage = new String(Ut.Json.toString(dto).getBytes(), StandardCharsets.UTF_8);
-		simpMessageSendingOperations.convertAndSend("/sub/coin/orderbook", convertedMessage);
+		simpMessageSendingOperations.convertAndSend("/sub/coin/orderbook/%s".formatted(orderbook.getCode()),
+			convertedMessage);
 	}
 }
