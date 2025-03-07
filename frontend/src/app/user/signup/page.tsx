@@ -40,13 +40,12 @@ export default function SignUpPage() {
 
             if (response.ok) {
                 const data = await response.json();
+                // 응답은 UserSignupResponse record 형태로 아래와 같이 오게 됩니다.
+                // { message, name, email, userId }
                 alert(data.message || "회원가입 성공. 인증 이메일 전송 완료.");
 
-                // detail 문자열에서 userId 추출
-                const regex = /userId:\s*([0-9a-fA-F-]{36})/;
-                const match = data.detail?.match(regex);
-                if (match && match[1]) {
-                    router.push(`/user/email-verification?userId=${match[1]}`);
+                if (data.userId) {
+                    router.push(`/user/email-verification?userId=${data.userId}`);
                 } else {
                     alert("회원가입 응답에서 userId를 찾을 수 없습니다.");
                     setIsLoading(false);
@@ -70,7 +69,9 @@ export default function SignUpPage() {
                 <h1 className="text-2xl font-bold mb-4">회원가입</h1>
                 <form className="space-y-4" onSubmit={handleSignUp}>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            이름
+                        </label>
                         <input
                             type="text"
                             required
@@ -81,7 +82,9 @@ export default function SignUpPage() {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            이메일
+                        </label>
                         <input
                             type="email"
                             required
@@ -92,7 +95,9 @@ export default function SignUpPage() {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            비밀번호
+                        </label>
                         <input
                             type="password"
                             required
@@ -103,7 +108,9 @@ export default function SignUpPage() {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호 확인</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            비밀번호 확인
+                        </label>
                         <input
                             type="password"
                             required
@@ -117,7 +124,9 @@ export default function SignUpPage() {
                         type="submit"
                         disabled={isLoading}
                         className={`w-full flex justify-center items-center py-2 rounded transition ${
-                            isLoading ? "bg-gray-400 text-white cursor-not-allowed" : "bg-blue-600 text-white hover:bg-blue-700"
+                            isLoading
+                                ? "bg-gray-400 text-white cursor-not-allowed"
+                                : "bg-blue-600 text-white hover:bg-blue-700"
                         }`}
                     >
                         {isLoading ? (
@@ -128,8 +137,19 @@ export default function SignUpPage() {
                                     fill="none"
                                     viewBox="0 0 24 24"
                                 >
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8v8H4z"
+                                    ></path>
                                 </svg>
                                 회원가입 중...
                             </>

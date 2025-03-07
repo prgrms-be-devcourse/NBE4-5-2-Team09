@@ -47,7 +47,7 @@ public class CandleWebSocketPushService {
 			if (!snapshots.isEmpty()) {
 				for (CandleInterval interval : CandleInterval.values()) {
 					CandleChartDto dto = candleChartService.aggregateCandles(snapshots, interval);
-					String topic = "/sub/candles/" + interval.toString().toLowerCase();
+					String topic = "/sub/coin/candles/" + interval.toString().toLowerCase();
 
 					messagingTemplate.convertAndSend(topic, dto);
 					log.info("Pushed aggregated candle data for market {} (interval {}): {}",

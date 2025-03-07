@@ -21,6 +21,7 @@ import com.coing.domain.user.controller.dto.EmailVerificationResponse;
 import com.coing.domain.user.controller.dto.UserLoginRequest;
 import com.coing.domain.user.controller.dto.UserResponse;
 import com.coing.domain.user.controller.dto.UserSignUpRequest;
+import com.coing.domain.user.controller.dto.UserSignupResponse;
 import com.coing.domain.user.email.service.EmailVerificationService;
 import com.coing.domain.user.entity.User;
 import com.coing.domain.user.repository.UserRepository;
@@ -52,28 +53,19 @@ public class UserController {
 
 	@Operation(summary = "일반 유저 회원 가입")
 	@PostMapping("/signup")
-	public ResponseEntity<BasicResponse> signUp(@RequestBody @Validated UserSignUpRequest request,
+	public ResponseEntity<UserSignupResponse> signUp(@RequestBody @Validated UserSignUpRequest request,
 		HttpServletResponse response) {
 		// 회원가입 처리 및 이메일 인증 메일 전송 (UserService.join 내부에서 호출)
 		UserResponse user = userService.join(request);
 
-		// 선택 사항: 회원가입 후 즉시 로그인 처리(토큰 발급)
-		String accessToken = authTokenService.genAccessToken(user);
-		String refreshToken = authTokenService.genRefreshToken(user);
-		Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-		refreshCookie.setHttpOnly(true);
-		refreshCookie.setSecure(false);
-		refreshCookie.setPath("/");
-		refreshCookie.setMaxAge(604800);
-		response.addCookie(refreshCookie);
-		response.setHeader("Authorization", "Bearer " + accessToken);
-
-		BasicResponse basicResponse = new BasicResponse(
-			HttpStatus.CREATED,
+		// UserSignupResponse record를 이용해 응답 데이터 생성
+		UserSignupResponse signupResponse = new UserSignupResponse(
 			"회원가입 성공. 인증 이메일 전송 완료.",
-			"name: " + user.name() + ", email: " + user.email() + ", userId: " + user.id()
+			user.name(),
+			user.email(),
+			user.id()
 		);
-		return ResponseEntity.status(HttpStatus.CREATED).body(basicResponse);
+		return ResponseEntity.status(HttpStatus.CREATED).body(signupResponse);
 	}
 
 	@Operation(summary = "이메일 인증")

@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         async function refreshAccessToken() {
             try {
-                const response = await fetch("http://localhost:8080/api/auth/refresh", {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_REFRESH_URL}`, {
                     method: "POST",
                     credentials: "include",
                 });
