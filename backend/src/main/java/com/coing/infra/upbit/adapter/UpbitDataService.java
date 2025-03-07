@@ -37,8 +37,13 @@ public class UpbitDataService {
 	}
 
 	public void processTickerData(UpbitWebSocketTickerDto dto) {
-		Ticker ticker = dto.toEntity();
-		tickerService.publish(ticker);
+		try {
+			double oneMinuteRate = tickerService.calculateOneMinuteRate(dto.getCode(), dto.getTradePrice());
+			Ticker ticker = dto.toEntity(oneMinuteRate);
+			tickerService.updateTicker(ticker);
+		} catch (RuntimeException e) {
+			log.error("failed to fetch ticker data : {}", e.getMessage());
+		}
 	}
 
 	public void processTradeData(UpbitWebSocketTradeDto dto) {

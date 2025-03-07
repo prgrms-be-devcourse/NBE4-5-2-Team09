@@ -42,7 +42,13 @@ public record TickerDto(
 	LocalDate lowest52WeekDate, // 52주 최저가 달성일
 	MarketState marketState, // 거래 상태
 	MarketWarning marketWarning, // 유의 종목 여부
-	Long timestamp // 타임스탬프
+	Long timestamp, // 타임스탬프
+
+	// 계산된 지표
+	double accAskBidRate, // 매수/매도 누적 비율
+	boolean highBreakout, // 52주 최고가 갱신 여부
+	boolean lowBreakout, // 52주 최저가 갱신 여부
+	double oneMinuteRate // 단기 변동률(1분)
 ) {
 
 	public static TickerDto from(Ticker ticker) {
@@ -77,6 +83,10 @@ public record TickerDto(
 			.marketState(ticker.getMarketState())
 			.marketWarning(ticker.getMarketWarning())
 			.timestamp(ticker.getTimestamp())
+			.accAskBidRate(ticker.getAccAskBidRate())
+			.highBreakout(ticker.isHighBreakout())
+			.lowBreakout(ticker.isLowBreakout())
+			.oneMinuteRate(ticker.getOneMinuteRate())
 			.build();
 	}
 }
