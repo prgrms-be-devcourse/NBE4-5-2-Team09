@@ -1,10 +1,12 @@
 package com.coing.domain.user.controller;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,10 +17,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.coing.domain.user.CustomUserPrincipal;
+import com.coing.domain.user.controller.dto.EmailVerificationResponse;
 import com.coing.domain.user.controller.dto.UserLoginRequest;
 import com.coing.domain.user.controller.dto.UserResponse;
 import com.coing.domain.user.controller.dto.UserSignUpRequest;
 import com.coing.domain.user.email.service.EmailVerificationService;
+import com.coing.domain.user.entity.User;
+import com.coing.domain.user.repository.UserRepository;
 import com.coing.domain.user.service.AuthTokenService;
 import com.coing.domain.user.service.UserService;
 import com.coing.global.exception.BusinessException;
@@ -40,6 +45,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
 	private final UserService userService;
+	private final UserRepository userRepository;
 	private final AuthTokenService authTokenService;
 	private final EmailVerificationService emailVerificationService;
 	private final MessageUtil messageUtil;
@@ -65,7 +71,7 @@ public class UserController {
 		BasicResponse basicResponse = new BasicResponse(
 			HttpStatus.CREATED,
 			"회원가입 성공. 인증 이메일 전송 완료.",
-			"name: " + user.name() + ", email: " + user.email()
+			"name: " + user.name() + ", email: " + user.email() + ", userId: " + user.id()
 		);
 		return ResponseEntity.status(HttpStatus.CREATED).body(basicResponse);
 	}
@@ -83,6 +89,20 @@ public class UserController {
 		var verifiedUser = emailVerificationService.verifyEmail(userId);
 		return ResponseEntity.ok(
 			new BasicResponse(HttpStatus.OK, "이메일 인증 성공", "User " + verifiedUser.getName() + " verified."));
+	}
+
+	@Operation(summary = "이메일 인증 상태 확인", description = "회원가입을 요청한 사용자의 UUID(userId)를 기준으로 이메일 인증 여부를 확인합니다.")
+	@GetMapping("/is-verified")
+	public ResponseEntity<EmailVerificationResponse> isVerified(@RequestParam(name = "userId") UUID userId) {
+		Optional<User> userOpt = userRepository.findById(userId);
+		if (userOpt.isEmpty()) {
+			throw new BusinessException(messageUtil.resolveMessage("member.not.found"), HttpStatus.BAD_REQUEST, "");
+		}
+		User user = userOpt.get();
+		boolean verified = user.isVerified();
+
+		EmailVerificationResponse response = new EmailVerificationResponse(verified);
+		return ResponseEntity.ok(response);
 	}
 
 	@Operation(summary = "일반 유저 로그인")
@@ -149,14 +169,19 @@ public class UserController {
 	@Operation(summary = "회원 로그아웃", security = @SecurityRequirement(name = "bearerAuth"))
 	@PostMapping("/logout")
 	public ResponseEntity<BasicResponse> logout(HttpServletResponse response,
-		@Validated UserLoginRequest request) {
+		@AuthenticationPrincipal CustomUserPrincipal principal) {
+		if (principal == null) {
+			throw new BusinessException(messageUtil.resolveMessage("empty.token.provided"),
+				HttpStatus.UNAUTHORIZED, "");
+		}
+		// 액세스 토큰 혹은 리프레시 토큰 기반으로 사용자 식별이 이미 되었으므로, 요청 바디에 이메일을 받을 필요가 없습니다.
 		Cookie cookie = new Cookie("refreshToken", null);
 		cookie.setHttpOnly(true);
 		cookie.setSecure(false);
 		cookie.setPath("/");
 		cookie.setMaxAge(0);
 		response.addCookie(cookie);
-		return ResponseEntity.ok(new BasicResponse(HttpStatus.OK, "로그아웃 성공", "userEmail: " + request.email()));
+		return ResponseEntity.ok(new BasicResponse(HttpStatus.OK, "로그아웃 성공", "userEmail: " + principal.email()));
 	}
 
 	@Operation(summary = "회원 탈퇴", security = @SecurityRequirement(name = "bearerAuth"))

@@ -13,7 +13,8 @@
   "dependencies": {
     "@stomp/stompjs": "^7.0.0",
     "jose": "^6.0.8",
-    "next": "15.2.1",
+    "js-cookie": "^3.0.5",
+    "next": "^15.2.1",
     "openapi-fetch": "^0.13.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -22,15 +23,18 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.20",
     "eslint": "^9",
     "eslint-config-next": "15.2.1",
     "nodemon": "^3.1.9",
     "openapi-typescript": "^7.6.1",
+    "postcss": "^8.5.3",
     "shadcn-ui": "^0.9.5",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.0.11",
     "typescript": "^5"
   }
 }
