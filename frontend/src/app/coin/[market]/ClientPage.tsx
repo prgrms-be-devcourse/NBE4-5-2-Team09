@@ -19,52 +19,46 @@ export default function ClientPage() {
   const { market } = useParams() as { market: string };
   const { ticker } = useWebSocket();
 
-  // 모의 데이터 (호가, 체결, 뉴스)
-  const orderbook = generateMockOrderbook();
-  const trades = generateMockTrades();
-  const news = generateMockNews();
-
-  // 캔들 데이터: 웹소켓을 통해 백엔드에서 받아옴
+  // 보정된 1초봉 데이터를 저장합니다.
   const [candles, setCandles] = useState<CandleItem[]>([]);
 
   useEffect(() => {
     const client = new Client({
       brokerURL: "ws://localhost:8080/websocket", // 백엔드 웹소켓 엔드포인트
-      reconnectDelay: 5000,
+      reconnectDelay: 500,
       debug: (str) => console.log("[STOMP DEBUG]:", str),
     });
 
     client.onConnect = () => {
       console.log("STOMP 연결 성공");
-      // 백엔드에서 "/sub/coin/candles/{market}" 토픽으로 캔들 데이터를 전송한다고 가정합니다.
-      const topic = `/sub/coin/candles/${market}/${"day"}`;
+      // 서버는 "/sub/coin/candles/{market}/candle.1s" 토픽으로 보정된 1초봉 데이터를 전송합니다.
+      const topic = `/sub/coin/candles/${market}/candle.1s`;
       console.log("구독할 토픽:", topic);
       const subscription = client.subscribe(topic, (message) => {
         try {
+          // 보정된 CandleDto를 파싱합니다.
           const dto: CandleChartDto = JSON.parse(message.body);
-          console.log("수신한 DTO:", dto);
-          // 변환: CandleChartDto → CandleItem
+          console.log("수신한 보정된 DTO:", dto);
+          // 이제 서버가 보정한 DTO의 필드는 다음과 같이 가정합니다:
+          // { code, timestamp, open, high, low, close, volume }
           const newCandle: CandleItem = {
-            time: new Date(dto.candleDateTime).getTime(),
-            open: dto.openingPrice,
-            high: dto.highPrice,
-            low: dto.lowPrice,
-            close: dto.closingPrice,
+            // timestamp가 string이면 new Date(dto.timestamp).getTime() 사용, 아니면 그대로 사용
+            time: typeof dto.timestamp === "string" ? new Date(dto.timestamp).getTime() : dto.timestamp,
+            open: dto.open,
+            high: dto.high,
+            low: dto.low,
+            close: dto.close,
             volume: dto.volume,
           };
-          console.log("변환된 candleItem:", newCandle);
+          // 새로운 캔들을 상태에 추가합니다. (최대 50건 유지)
           setCandles((prev) => {
             const updated = [...prev, newCandle];
-            // 최대 50건 유지
-            const limited = updated.length > 50 ? updated.slice(updated.length - 50) : updated;
-            console.log("현재 candles 상태:", limited);
-            return limited;
+            return updated.length > 50 ? updated.slice(updated.length - 50) : updated;
           });
         } catch (error) {
-          console.error("캔들 데이터 파싱 오류:", error);
+          console.error("보정된 캔들 DTO 파싱 오류:", error);
         }
       });
-
       return () => subscription.unsubscribe();
     };
 
@@ -78,9 +72,6 @@ export default function ClientPage() {
       client.deactivate();
     };
   }, [market]);
-
-  // 임시로 캔들 데이터 상태를 화면에 JSON으로 출력 (디버깅용)
-  // <pre>{JSON.stringify(candles, null, 2)}</pre>
 
   return (
       <div>
@@ -113,9 +104,7 @@ export default function ClientPage() {
               <div className="bg-white p-4 rounded-lg shadow-sm">
                 <div className="text-sm text-gray-500">24시간 거래량</div>
                 <div className="text-xl font-bold text-blue-600">
-                  {ticker
-                      ? Math.floor(ticker.accTradeVolume24h).toLocaleString()
-                      : "-"}
+                  {ticker ? Math.floor(ticker.accTradeVolume24h).toLocaleString() : "-"}
                   <span className="text-sm">{market.split("-")[1]}</span>
                 </div>
               </div>
@@ -133,9 +122,7 @@ export default function ClientPage() {
               <div className="bg-white p-4 rounded-lg shadow-sm">
                 <div className="text-sm text-gray-500">전일대비</div>
                 <div className="text-xl font-bold text-blue-600">
-                  {ticker
-                      ? (ticker.signedChangeRate * 100).toFixed(2) + "%"
-                      : "-"}
+                  {ticker ? (ticker.signedChangeRate * 100).toFixed(2) + "%" : "-"}
                 </div>
               </div>
             </div>
@@ -145,16 +132,11 @@ export default function ClientPage() {
         <div className="space-y-4">
           <div className="w-full">
             <CandleChart candles={candles} />
-            {/* 디버그용: 수신한 캔들 데이터 JSON 출력 */}
-            {/* <pre>{JSON.stringify(candles, null, 2)}</pre> */}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <TradeList trades={generateMockTrades()} />
-            <OrderbookList
-                orderbook={generateMockOrderbook()}
-                currentPrice={ticker?.tradePrice || 0}
-            />
+            <OrderbookList orderbook={generateMockOrderbook()} currentPrice={ticker?.tradePrice || 0} />
           </div>
 
           <div className="w-full">
