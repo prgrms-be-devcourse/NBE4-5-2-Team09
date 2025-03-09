@@ -3,8 +3,15 @@ import WebSocketProvider from "@/app/context/WebSocketContext";
 
 export default function Page() {
   return (
-    <WebSocketProvider subscriptions={[{ type: "ticker", markets: [] }]}>
-      <ClientPage />
-    </WebSocketProvider>
+    <>
+      <WebSocketProvider subscriptions={
+        [
+          { type: "ticker", markets: [] },
+          { type: "trade", markets: [] }
+        ]
+      }>
+        <ClientPage />
+      </WebSocketProvider>
+    </>
   );
 }

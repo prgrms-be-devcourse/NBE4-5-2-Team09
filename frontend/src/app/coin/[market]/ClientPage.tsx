@@ -17,10 +17,10 @@ export default function ClientPage() {
   const { market } = useParams() as { market: string };
   const { tickers } = useWebSocket();
   const ticker = tickers?.[market] ?? null;
+  const { trades } = useWebSocket();
 
   // Mock data
   const orderbook = generateMockOrderbook();
-  const trades = generateMockTrades();
   const candles = generateMockCandles();
   const news = generateMockNews();
 

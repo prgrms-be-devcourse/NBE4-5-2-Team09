@@ -51,13 +51,13 @@ export function generateMockTrades(): TradeItem[] {
   for (let i = 0; i < 20; i++) {
     const priceChange = Math.floor(Math.random() * 50) - 25;
     const price = basePrice + priceChange;
-    const quantity = Number.parseFloat((Math.random() * 10 + 0.01).toFixed(5));
+    const volume = Number.parseFloat((Math.random() * 10 + 0.01).toFixed(5));
     const side = Math.random() > 0.5 ? AskBid.ASK : AskBid.BID; // 매도/매수 랜덤 지정
 
     trades.push({
       id: `trade-${i}`,
       price,
-      quantity,
+      volume,
       side,
       timestamp: now - i * 10000, // 10초 간격으로 시간 설정
     });

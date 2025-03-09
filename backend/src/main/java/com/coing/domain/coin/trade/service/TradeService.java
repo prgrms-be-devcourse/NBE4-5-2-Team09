@@ -39,7 +39,7 @@ public class TradeService {
 
 		TradeDto dto = TradeDto.of(trade, vwap, averageTradeSize, tradeImpact);
 
-		simpMessageSendingOperations.convertAndSend("/sub/coin/trade", dto);
+		simpMessageSendingOperations.convertAndSend("/sub/coin/trade/" + market, dto);
 	}
 
 	@Scheduled(cron = "0 0 0 * * *")

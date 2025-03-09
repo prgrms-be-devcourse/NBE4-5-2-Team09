@@ -28,7 +28,7 @@ interface Subscription {
 interface WebSocketContextProps {
   tickers: Record<string, TickerDto | null>;
   orderbooks: Record<string, OrderbookDto | null>;
-  trades: Record<string, TradeDto[] | null>;
+  trades: Record<string, TradeDto | null>;
   candleCharts: Record<string, CandleChartDto[] | null>;
 }
 
@@ -54,7 +54,7 @@ export const WebSocketProvider = ({
   const [orderbooks, setOrderbook] = useState<
     Record<string, OrderbookDto | null>
   >({});
-  const [trades, setTrades] = useState<Record<string, TradeDto[] | null>>({});
+  const [trades, setTrades] = useState<Record<string, TradeDto | null>>({});
   const [candles, setCandles] = useState<
     Record<string, CandleChartDto[] | null>
   >({});

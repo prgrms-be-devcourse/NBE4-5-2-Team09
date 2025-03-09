@@ -69,7 +69,7 @@ export type Orderbook = {
 export type TradeItem = {
   id: string;
   price: number;
-  quantity: number;
+  volume: number;
   side: AskBid;
   timestamp: number;
 };
