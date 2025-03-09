@@ -13,65 +13,45 @@ import {
 } from "@/app/utils/mockData";
 import { useWebSocket } from "@/app/context/WebSocketContext";
 import type { CandleItem, CandleChartDto } from "@/app/types";
-import { Client } from "@stomp/stompjs";
+import axios from "axios";
 
 export default function ClientPage() {
   const { market } = useParams() as { market: string };
   const { ticker } = useWebSocket();
 
-  // 보정된 1초봉 데이터를 저장합니다.
+  // 보정된 캔들 데이터를 저장
   const [candles, setCandles] = useState<CandleItem[]>([]);
+  // 선택한 봉 단위: seconds, minutes, days, weeks, months, years
+  const [candleType, setCandleType] = useState<"seconds" | "minutes" | "days" | "weeks" | "months" | "years">("seconds");
+  // 분봉인 경우 단위 선택 (예: 1,3,5,10,15,30,60,240)
+  const [minuteUnit, setMinuteUnit] = useState(1);
 
   useEffect(() => {
-    const client = new Client({
-      brokerURL: "ws://localhost:8080/websocket", // 백엔드 웹소켓 엔드포인트
-      reconnectDelay: 500,
-      debug: (str) => console.log("[STOMP DEBUG]:", str),
-    });
-
-    client.onConnect = () => {
-      console.log("STOMP 연결 성공");
-      // 서버는 "/sub/coin/candles/{market}/candle.1s" 토픽으로 보정된 1초봉 데이터를 전송합니다.
-      const topic = `/sub/coin/candles/${market}/candle.1s`;
-      console.log("구독할 토픽:", topic);
-      const subscription = client.subscribe(topic, (message) => {
-        try {
-          // 보정된 CandleDto를 파싱합니다.
-          const dto: CandleChartDto = JSON.parse(message.body);
-          console.log("수신한 보정된 DTO:", dto);
-          // 이제 서버가 보정한 DTO의 필드는 다음과 같이 가정합니다:
-          // { code, timestamp, open, high, low, close, volume }
-          const newCandle: CandleItem = {
-            // timestamp가 string이면 new Date(dto.timestamp).getTime() 사용, 아니면 그대로 사용
-            time: typeof dto.timestamp === "string" ? new Date(dto.timestamp).getTime() : dto.timestamp,
-            open: dto.open,
-            high: dto.high,
-            low: dto.low,
-            close: dto.close,
-            volume: dto.volume,
-          };
-          // 새로운 캔들을 상태에 추가합니다. (최대 50건 유지)
-          setCandles((prev) => {
-            const updated = [...prev, newCandle];
-            return updated.length > 50 ? updated.slice(updated.length - 50) : updated;
-          });
-        } catch (error) {
-          console.error("보정된 캔들 DTO 파싱 오류:", error);
-        }
-      });
-      return () => subscription.unsubscribe();
+    const fetchCandles = async () => {
+      try {
+        const unitQuery = candleType === "minutes" ? `?unit=${minuteUnit}` : "";
+        const url = `http://localhost:8080/api/candles/${market}/${candleType}${unitQuery}`;
+        const response = await axios.get(url);
+        const data: CandleChartDto[] = response.data;
+        console.log("REST로 수신한 DTO:", data);
+        const mapped: CandleItem[] = data.map((dto) => ({
+          time: new Date(dto.candle_date_time_utc).getTime(),
+          open: dto.opening_price,
+          high: dto.high_price,
+          low: dto.low_price,
+          close: dto.trade_price,
+          volume: dto.candle_acc_trade_volume,
+        }));
+        setCandles(mapped);
+      } catch (error) {
+        console.error("캔들 데이터 호출 오류:", error);
+      }
     };
 
-    client.onStompError = (frame) => {
-      console.error("STOMP 에러:", frame);
-    };
-
-    client.activate();
-
-    return () => {
-      client.deactivate();
-    };
-  }, [market]);
+    fetchCandles();
+    const interval = setInterval(fetchCandles, 1000);
+    return () => clearInterval(interval);
+  }, [market, candleType, minuteUnit]);
 
   return (
       <div>
@@ -79,15 +59,7 @@ export default function ClientPage() {
           <h1 className="text-2xl font-bold flex items-center">
             <span className="mr-2">{market.split("-")[1]}</span>
             {ticker && (
-                <span
-                    className={`text-xl ${
-                        ticker.change === "RISE"
-                            ? "text-green-500"
-                            : ticker.change === "FALL"
-                                ? "text-red-500"
-                                : "text-gray-500"
-                    }`}
-                >
+                <span className={`text-xl ${ticker.change === "RISE" ? "text-green-500" : ticker.change === "FALL" ? "text-red-500" : "text-gray-500"}`}>
               ₩{ticker.tradePrice.toLocaleString()}
                   <span className="ml-2 text-sm">
                 {ticker.signedChangeRate > 0 ? "+" : ""}
@@ -129,16 +101,31 @@ export default function ClientPage() {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="w-full">
-            <CandleChart candles={candles} />
-          </div>
 
+        {/* 분봉일 경우 단위 선택 */}
+        {candleType === "minutes" && (
+            <div className="mb-4">
+              <label className="mr-2">분봉 단위:</label>
+              <select value={minuteUnit} onChange={e => setMinuteUnit(parseInt(e.target.value))}>
+                <option value={1}>1분</option>
+                <option value={3}>3분</option>
+                <option value={5}>5분</option>
+                <option value={10}>10분</option>
+                <option value={15}>15분</option>
+                <option value={30}>30분</option>
+                <option value={60}>60분</option>
+                <option value={240}>240분</option>
+              </select>
+            </div>
+        )}
+
+
+        <div className="space-y-4">
+          <CandleChart candles={candles} candleType={candleType} setCandleType={setCandleType} />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <TradeList trades={generateMockTrades()} />
             <OrderbookList orderbook={generateMockOrderbook()} currentPrice={ticker?.tradePrice || 0} />
           </div>
-
           <div className="w-full">
             <NewsList news={generateMockNews()} />
           </div>

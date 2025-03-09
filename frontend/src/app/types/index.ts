@@ -139,11 +139,12 @@ export type OrderbookUnit = {
 };
 
 export type CandleChartDto = {
-  code: string; // 마켓 코드 (ex. KRW-BTC)
-  timestamp: string; // 해당 캔들 기준 시간 (ISO 8601 문자열)
-  open: number; // 시가
-  high: number; // 고가
-  low: number; // 저가
-  close: number; // 종가
-  volume: number; // 누적 거래량 (또는 거래 금액)
+  market: string;
+  candle_date_time_utc: string; // ISO8601 형식 문자열
+  opening_price: number;
+  high_price: number;
+  low_price: number;
+  trade_price: number;
+  candle_acc_trade_volume: number;
+  timestamp: number;
 };
