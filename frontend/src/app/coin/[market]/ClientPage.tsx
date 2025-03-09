@@ -23,14 +23,32 @@ export default function ClientPage() {
   const [candles, setCandles] = useState<CandleItem[]>([]);
   // 선택한 봉 단위: seconds, minutes, days, weeks, months, years
   const [candleType, setCandleType] = useState<"seconds" | "minutes" | "days" | "weeks" | "months" | "years">("seconds");
-  // 분봉인 경우 단위 선택 (예: 1,3,5,10,15,30,60,240)
+  // 분봉일 경우 단위 선택 (예: 1, 3, 5, 10, 15, 30, 60, 240)
   const [minuteUnit, setMinuteUnit] = useState(1);
+
+  // 봉 단위에 따른 폴링 간격(ms)을 결정하는 함수
+  const getPollingInterval = (type: string): number => {
+    switch (type) {
+      case "seconds":
+        return 1000; // 초봉은 1초
+      case "minutes":
+        return 30000; // 분봉은 30초
+      case "days":
+        return 3600000; // 일봉은 1시간
+      case "weeks":
+      case "months":
+      case "years":
+        return 86400000; // 주, 월, 연봉은 하루 주기 업데이트
+      default:
+        return 1000;
+    }
+  };
 
   useEffect(() => {
     const fetchCandles = async () => {
       try {
         const unitQuery = candleType === "minutes" ? `?unit=${minuteUnit}` : "";
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/candles/${market}/${candleType}${unitQuery}`;
+        const url = `http://localhost:8080/api/candles/${market}/${candleType}${unitQuery}`;
         const response = await axios.get(url);
         const data: CandleChartDto[] = response.data;
         console.log("REST로 수신한 DTO:", data);
@@ -48,8 +66,10 @@ export default function ClientPage() {
       }
     };
 
+    // 폴링 간격을 봉 단위에 따라 동적으로 결정
+    const pollingInterval = getPollingInterval(candleType);
     fetchCandles();
-    const interval = setInterval(fetchCandles, 1000);
+    const interval = setInterval(fetchCandles, pollingInterval);
     return () => clearInterval(interval);
   }, [market, candleType, minuteUnit]);
 
@@ -69,6 +89,7 @@ export default function ClientPage() {
             )}
           </h1>
         </div>
+
 
         <div className="bg-blue-50 py-4 mb-4 rounded-lg">
           <div className="container mx-auto px-4">
@@ -101,12 +122,15 @@ export default function ClientPage() {
           </div>
         </div>
 
-
-        {/* 분봉일 경우 단위 선택 */}
+        {/* 분봉일 경우 분봉 단위 선택 드롭다운 (차트 바로 위에 오버레이) */}
         {candleType === "minutes" && (
-            <div className="mb-4">
-              <label className="mr-2">분봉 단위:</label>
-              <select value={minuteUnit} onChange={e => setMinuteUnit(parseInt(e.target.value))}>
+            <div className="flex items-center mb-4 space-x-2">
+              <label className="text-sm font-medium">분봉 단위:</label>
+              <select
+                  value={minuteUnit}
+                  onChange={e => setMinuteUnit(parseInt(e.target.value))}
+                  className="text-sm p-1 border rounded"
+              >
                 <option value={1}>1분</option>
                 <option value={3}>3분</option>
                 <option value={5}>5분</option>
@@ -119,9 +143,15 @@ export default function ClientPage() {
             </div>
         )}
 
-
         <div className="space-y-4">
-          <CandleChart candles={candles} candleType={candleType} setCandleType={setCandleType} />
+          {/* CandleChart 컴포넌트에 setCandleType, minuteUnit, setMinuteUnit 전달 */}
+          <CandleChart
+              candles={candles}
+              candleType={candleType}
+              setCandleType={setCandleType}
+              minuteUnit={minuteUnit}
+              setMinuteUnit={setMinuteUnit}
+          />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <TradeList trades={generateMockTrades()} />
             <OrderbookList orderbook={generateMockOrderbook()} currentPrice={ticker?.tradePrice || 0} />

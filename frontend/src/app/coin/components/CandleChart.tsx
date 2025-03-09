@@ -7,6 +7,8 @@ interface CandleChartProps {
     candles: CandleItem[];
     candleType: "seconds" | "minutes" | "days" | "weeks" | "months" | "years";
     setCandleType: (type: "seconds" | "minutes" | "days" | "weeks" | "months" | "years") => void;
+    minuteUnit: number;
+    setMinuteUnit: (unit: number) => void;
 }
 
 export default function CandleChart({ candles, candleType, setCandleType }: CandleChartProps) {
