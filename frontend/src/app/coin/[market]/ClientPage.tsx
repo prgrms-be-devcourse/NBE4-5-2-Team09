@@ -122,27 +122,6 @@ export default function ClientPage() {
           </div>
         </div>
 
-        {/* 분봉일 경우 분봉 단위 선택 드롭다운 (차트 바로 위에 오버레이) */}
-        {candleType === "minutes" && (
-            <div className="flex items-center mb-4 space-x-2">
-              <label className="text-sm font-medium">분봉 단위:</label>
-              <select
-                  value={minuteUnit}
-                  onChange={e => setMinuteUnit(parseInt(e.target.value))}
-                  className="text-sm p-1 border rounded"
-              >
-                <option value={1}>1분</option>
-                <option value={3}>3분</option>
-                <option value={5}>5분</option>
-                <option value={10}>10분</option>
-                <option value={15}>15분</option>
-                <option value={30}>30분</option>
-                <option value={60}>60분</option>
-                <option value={240}>240분</option>
-              </select>
-            </div>
-        )}
-
         <div className="space-y-4">
           {/* CandleChart 컴포넌트에 setCandleType, minuteUnit, setMinuteUnit 전달 */}
           <CandleChart

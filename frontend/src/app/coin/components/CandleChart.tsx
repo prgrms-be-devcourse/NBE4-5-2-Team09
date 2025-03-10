@@ -11,9 +11,16 @@ interface CandleChartProps {
     setMinuteUnit: (unit: number) => void;
 }
 
-export default function CandleChart({ candles, candleType, setCandleType }: CandleChartProps) {
+export default function CandleChart({
+                                        candles,
+                                        candleType,
+                                        setCandleType,
+                                        minuteUnit,
+                                        setMinuteUnit,
+                                    }: CandleChartProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [zoom, setZoom] = useState(1); // 캔들 그리기에만 적용되는 줌
+    // 초기 zoom을 5로 설정 (최대 확대 상태)
+    const [zoom, setZoom] = useState(5);
     const [crosshair, setCrosshair] = useState<{ x: number; y: number } | null>(null);
 
     useEffect(() => {
@@ -198,7 +205,7 @@ export default function CandleChart({ candles, candleType, setCandleType }: Cand
             drawChart();
         };
 
-        const handleMouseLeave = (e: MouseEvent) => {
+        const handleMouseLeave = () => {
             setCrosshair(null);
             drawChart();
         };
@@ -216,7 +223,7 @@ export default function CandleChart({ candles, candleType, setCandleType }: Cand
 
     return (
         <div className="bg-white rounded-lg shadow-sm p-6 h-[500px] relative">
-            {/* 오버레이: 캔들 단위 버튼 (우측 상단) */}
+            {/* 오버레이: 봉 단위 버튼 (우측 상단) */}
             <div className="absolute top-2 right-2 z-10 flex space-x-2 bg-white bg-opacity-80 p-1 rounded">
                 <button
                     className={`px-2 py-1 text-xs rounded ${candleType === "seconds" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"}`}
@@ -255,6 +262,27 @@ export default function CandleChart({ candles, candleType, setCandleType }: Cand
                     연봉
                 </button>
             </div>
+
+            {/* 오버레이: 분봉 단위 선택 드롭다운 (좌측 상단, 분봉일 때만 표시) */}
+            {candleType === "minutes" && (
+                <div className="absolute top-2 left-2 z-10 bg-white bg-opacity-80 p-1 rounded text-xs">
+                    <label className="mr-1">분봉 단위:</label>
+                    <select
+                        value={minuteUnit}
+                        onChange={e => setMinuteUnit(parseInt(e.target.value))}
+                        className="text-xs"
+                    >
+                        <option value={1}>1분</option>
+                        <option value={3}>3분</option>
+                        <option value={5}>5분</option>
+                        <option value={10}>10분</option>
+                        <option value={15}>15분</option>
+                        <option value={30}>30분</option>
+                        <option value={60}>60분</option>
+                        <option value={240}>240분</option>
+                    </select>
+                </div>
+            )}
 
             <div className="h-[calc(100%-2rem)]">
                 <canvas
