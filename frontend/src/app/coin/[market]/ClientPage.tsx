@@ -17,7 +17,9 @@ import axios from "axios";
 
 export default function ClientPage() {
   const { market } = useParams() as { market: string };
-  const { ticker } = useWebSocket();
+  const { tickers } = useWebSocket();
+  const ticker = tickers?.[market] ?? null;
+  const { trades } = useWebSocket();
 
   // 보정된 캔들 데이터를 저장
   const [candles, setCandles] = useState<CandleItem[]>([]);
@@ -72,6 +74,10 @@ export default function ClientPage() {
     const interval = setInterval(fetchCandles, pollingInterval);
     return () => clearInterval(interval);
   }, [market, candleType, minuteUnit]);
+
+  // Mock data
+  const orderbook = generateMockOrderbook();
+  const news = generateMockNews();
 
   return (
       <div>

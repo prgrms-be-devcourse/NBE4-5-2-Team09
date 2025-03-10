@@ -29,7 +29,7 @@ public class TradeServiceTest {
 		// 테스트용 Trade 객체 생성
 		trade = Trade.builder()
 			.type("trade")
-			.code("BTC-USD")
+			.code("KRW-BTC")
 			.tradePrice(1000.0)
 			.tradeVolume(0.5)
 			.build(); // 예시 값
@@ -43,6 +43,6 @@ public class TradeServiceTest {
 		// Then
 		// SimpMessageSendingOperations가 호출됐는지 확인
 		verify(simpMessageSendingOperations, times(1))
-			.convertAndSend(eq("/sub/coin/trade"), any(TradeDto.class));
+			.convertAndSend(eq("/sub/coin/trade/KRW-BTC"), any(TradeDto.class));
 	}
 }

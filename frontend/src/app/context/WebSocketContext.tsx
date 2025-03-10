@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useWebSocketStore } from "@/app/store/webSocketStore";
 import { IMessage } from "@stomp/stompjs";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import type {
   TickerDto,
   OrderbookDto,
@@ -17,21 +17,26 @@ import type {
   CandleChartDto,
 } from "@/app/types";
 
-// 1. 가능한 구독 키들을 타입으로 정의
-type SubscriptionKey = "ticker" | "orderbook" | "trade" | "candle";
+// 구독 가능한 타입 정의
+type SubscriptionType = "ticker" | "orderbook" | "trade" | "candle";
+
+interface Subscription {
+  type: SubscriptionType;
+  markets?: string[]; // markets가 비어있을 수도 있음
+}
 
 interface WebSocketContextProps {
-  ticker: TickerDto | null;
-  orderbook: OrderbookDto | null;
-  trades: TradeDto[] | null;
-  candleCharts: CandleChartDto[] | null;
+  tickers: Record<string, TickerDto | null>;
+  orderbooks: Record<string, OrderbookDto | null>;
+  trades: Record<string, TradeDto | null>;
+  candleCharts: Record<string, CandleChartDto[] | null>;
 }
 
 const WebSocketContext = createContext<WebSocketContextProps>({
-  ticker: null,
-  orderbook: null,
-  trades: null,
-  candleCharts: null,
+  tickers: {},
+  orderbooks: {},
+  trades: {},
+  candleCharts: {},
 });
 
 export const WebSocketProvider = ({
@@ -39,55 +44,65 @@ export const WebSocketProvider = ({
   subscriptions = [],
 }: {
   children: ReactNode;
-  subscriptions: SubscriptionKey[]; // 2. 구독 키를 제한된 타입으로 설정
+  subscriptions: Subscription[];
 }) => {
-  const { market } = useParams();
+  const { market } = useParams() as { market: string }; // URL에서 market 가져오기
   const pathname = usePathname();
-  const { connect, disconnect, isConnected, subscribe, unsubscribe } =
-    useWebSocketStore();
+  const { connect, isConnected, subscribe, unsubscribe } = useWebSocketStore();
 
-  const [ticker, setTicker] = useState<TickerDto | null>(null);
-  const [orderbook, setOrderbook] = useState<OrderbookDto | null>(null);
-  const [trades, setTrades] = useState<TradeDto[] | null>(null);
-  const [candles, setCandles] = useState<CandleChartDto[] | null>(null);
+  const [tickers, setTicker] = useState<Record<string, TickerDto | null>>({});
+  const [orderbooks, setOrderbook] = useState<
+    Record<string, OrderbookDto | null>
+  >({});
+  const [trades, setTrades] = useState<Record<string, TradeDto | null>>({});
+  const [candles, setCandles] = useState<
+    Record<string, CandleChartDto[] | null>
+  >({});
 
   // WebSocket 연결
   useEffect(() => {
     connect();
-    return () => disconnect();
   }, []);
 
-  // 페이지에서 받은 subscriptions에 맞춰 동적으로 구독 수행
   useEffect(() => {
-    if (!market || !isConnected || subscriptions.length === 0) return;
+    if (!isConnected || subscriptions.length === 0) return;
 
-    // 3. availableSubscriptions의 타입을 명시적으로 정의
     const availableSubscriptions: Record<
-      SubscriptionKey,
-      { dest: string; callback: (msg: IMessage) => void }
+      SubscriptionType,
+      (market: string) => { dest: string; callback: (msg: IMessage) => void }
     > = {
-      ticker: {
+      ticker: (market) => ({
         dest: `/sub/coin/ticker/${market}`,
-        callback: (msg: IMessage) => setTicker(JSON.parse(msg.body)),
-      },
-      orderbook: {
+        callback: (msg: IMessage) =>
+          setTicker((prev) => ({ ...prev, [market]: JSON.parse(msg.body) })),
+      }),
+      orderbook: (market) => ({
         dest: `/sub/coin/orderbook/${market}`,
-        callback: (msg: IMessage) => setOrderbook(JSON.parse(msg.body)),
-      },
-      trade: {
+        callback: (msg: IMessage) =>
+          setOrderbook((prev) => ({ ...prev, [market]: JSON.parse(msg.body) })),
+      }),
+      trade: (market) => ({
         dest: `/sub/coin/trade/${market}`,
-        callback: (msg: IMessage) => setTrades(JSON.parse(msg.body)),
-      },
-      candle: {
+        callback: (msg: IMessage) =>
+          setTrades((prev) => ({ ...prev, [market]: JSON.parse(msg.body) })),
+      }),
+      candle: (market) => ({
         dest: `/sub/coin/candle/${market}`,
-        callback: (msg: IMessage) => setCandles(JSON.parse(msg.body)),
-      },
+        callback: (msg: IMessage) =>
+          setCandles((prev) => ({ ...prev, [market]: JSON.parse(msg.body) })),
+      }),
     };
 
-    // 4. 올바른 키로 접근할 수 있도록 TypeScript가 인식할 수 있게 처리
-    const activeSubscriptions = subscriptions
-      .map((key) => availableSubscriptions[key as SubscriptionKey]) // 타입 캐스팅 추가
-      .filter(Boolean); // 존재하는 값만 필터링
+    // `markets`가 없거나 빈 배열이면 `useParams()`에서 market을 가져와 사용
+    const updatedSubscriptions = subscriptions.map(({ type, markets }) => ({
+      type,
+      markets: markets && markets.length > 0 ? markets : [market],
+    }));
+
+    const activeSubscriptions = updatedSubscriptions.flatMap(
+      ({ type, markets }) =>
+        markets!.map((market) => availableSubscriptions[type](market))
+    );
 
     activeSubscriptions.forEach(({ dest, callback }) => {
       subscribe(dest, callback);
@@ -102,7 +117,7 @@ export const WebSocketProvider = ({
 
   return (
     <WebSocketContext.Provider
-      value={{ ticker, orderbook, trades, candleCharts: candles }}
+      value={{ tickers, orderbooks, trades, candleCharts: candles }}
     >
       {children}
     </WebSocketContext.Provider>
