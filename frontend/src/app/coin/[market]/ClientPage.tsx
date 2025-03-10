@@ -12,7 +12,7 @@ import {
   generateMockNews,
 } from "@/app/utils/mockData";
 import { useWebSocket } from "@/app/context/WebSocketContext";
-import type { CandleItem, CandleChartDto } from "@/app/types";
+import type {CandleItem, CandleChartDto, TradeDto} from "@/app/types";
 import axios from "axios";
 
 export default function ClientPage() {
@@ -76,8 +76,18 @@ export default function ClientPage() {
   }, [market, candleType, minuteUnit]);
 
   // Mock data
-  const orderbook = generateMockOrderbook();
-  const news = generateMockNews();
+  const rawTrades = generateMockTrades();
+  const processedTrades = Object.keys(rawTrades).reduce((acc, key) => {
+    const trade = rawTrades[key];
+    acc[key] = {
+      ...trade,
+      tradePrice: typeof trade.tradePrice === "number" ? trade.tradePrice : 0,
+      tradeVolume: typeof trade.tradeVolume === "number" ? trade.tradeVolume : 0,
+      timestamp: trade.timestamp ?? Date.now(),
+      sequentialId: trade.sequentialId ?? key,
+    };
+    return acc;
+  }, {} as Record<string, TradeDto>);
 
   return (
       <div>
@@ -138,7 +148,7 @@ export default function ClientPage() {
               setMinuteUnit={setMinuteUnit}
           />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <TradeList trades={generateMockTrades()} />
+            <TradeList trades={processedTrades} />
             <OrderbookList orderbook={generateMockOrderbook()} currentPrice={ticker?.tradePrice || 0} />
           </div>
           <div className="w-full">
