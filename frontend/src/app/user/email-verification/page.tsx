@@ -21,7 +21,7 @@ export default function EmailVerificationWaitingScreen() {
             console.log("폴링 호출됨");
             try {
                 const response = await fetch(
-                    `http://localhost:8080/api/auth/is-verified?userId=${encodeURIComponent(userId)}`,
+                    process.env.NEXT_PUBLIC_API_URL+`/api/auth/is-verified?userId=${encodeURIComponent(userId)}`,
                     {
                         method: "GET",
                         credentials: "include",

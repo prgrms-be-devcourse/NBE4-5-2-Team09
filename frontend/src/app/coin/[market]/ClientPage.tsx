@@ -50,7 +50,7 @@ export default function ClientPage() {
     const fetchCandles = async () => {
       try {
         const unitQuery = candleType === "minutes" ? `?unit=${minuteUnit}` : "";
-        const url = `http://localhost:8080/api/candles/${market}/${candleType}${unitQuery}`;
+        const url = process.env.NEXT_PUBLIC_API_URL+`/api/candles/${market}/${candleType}${unitQuery}`;
         const response = await axios.get(url);
         const data: CandleChartDto[] = response.data;
         const mapped: CandleItem[] = data.map((dto) => ({
