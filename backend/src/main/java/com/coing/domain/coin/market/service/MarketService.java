@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import com.coing.domain.coin.market.dto.MarketDto;
 import com.coing.domain.coin.market.entity.Market;
 import com.coing.domain.coin.market.repository.MarketRepository;
+import com.coing.global.exception.BusinessException;
 import com.coing.util.PageUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -75,5 +77,13 @@ public class MarketService {
 		log.info("[Market] Refresh market list");
 		List<Market> markets = fetchAndUpdateCoins();
 		marketCacheService.updateMarketCache(markets);
+	}
+
+	public Market getMarketByCode(String code) {
+		List<Market> cachedMarkets = marketCacheService.getCachedMarketList();
+		return cachedMarkets.stream()
+			.filter(market -> market.getCode().equals(code))
+			.findFirst()
+			.orElseThrow(() -> new BusinessException("Market not found", HttpStatus.NOT_FOUND));
 	}
 }
