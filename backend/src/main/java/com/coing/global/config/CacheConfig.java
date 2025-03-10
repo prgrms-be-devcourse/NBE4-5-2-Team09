@@ -1,10 +1,12 @@
 package com.coing.global.config;
 
 import java.time.Duration;
+import java.util.Arrays;
 
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
+import org.springframework.cache.caffeine.CaffeineCache;
+import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,12 +18,20 @@ public class CacheConfig {
 
 	@Bean
 	public CacheManager cacheManager() {
-		CaffeineCacheManager cacheManager = new CaffeineCacheManager("candles");
-		cacheManager.setCaffeine(
+		CaffeineCache candlesCache = new CaffeineCache("candles",
 			Caffeine.newBuilder()
-				.expireAfterWrite(Duration.ofHours(24)) // 최대 필요 시간 기준 설정 (가장 긴 60분봉)
-				.maximumSize(230_000) // 최대 캐시 저장 개수 (여유 있게 설정)
-		);
-		return cacheManager;
+				.expireAfterWrite(Duration.ofHours(24))
+				.maximumSize(230_000)
+				.build());
+
+		CaffeineCache marketsCache = new CaffeineCache("markets",
+			Caffeine.newBuilder()
+				.expireAfterWrite(Duration.ofHours(6))
+				.maximumSize(1_000)
+				.build());
+
+		SimpleCacheManager manager = new SimpleCacheManager();
+		manager.setCaches(Arrays.asList(candlesCache, marketsCache));
+		return manager;
 	}
 }

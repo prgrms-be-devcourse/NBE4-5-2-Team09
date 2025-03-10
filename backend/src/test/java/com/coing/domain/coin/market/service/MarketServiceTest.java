@@ -1,7 +1,6 @@
 package com.coing.domain.coin.market.service;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -17,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +24,6 @@ import org.springframework.web.client.RestTemplate;
 import com.coing.domain.coin.market.dto.MarketDto;
 import com.coing.domain.coin.market.entity.Market;
 import com.coing.domain.coin.market.repository.MarketRepository;
-import com.coing.global.exception.BusinessException;
 
 @ExtendWith(MockitoExtension.class)
 public class MarketServiceTest {
@@ -36,6 +33,9 @@ public class MarketServiceTest {
 
 	@Mock
 	private RestTemplate restTemplate;
+
+	@Mock
+	private MarketCacheService marketCacheService;
 
 	@InjectMocks
 	private MarketService marketService;
@@ -56,30 +56,36 @@ public class MarketServiceTest {
 
 	@Test
 	@DisplayName("t1: 코인 목록 자동 갱신 - 정상 동작 테스트")
-	void testUpdateCoinList_Success() {
+	void testUpdateMarketList_Success() {
 		// Given
 		ResponseEntity<MarketDto[]> responseEntity = ResponseEntity.ok(mockMarketDtos);
 		when(restTemplate.getForEntity(UPBIT_MARKET_URI, MarketDto[].class)).thenReturn(responseEntity);
 
 		// When
-		marketService.updateCoinList();
+		marketService.updateMarketList();
 
 		// Then
 		verify(marketRepository, times(1)).saveAll(anyList());
 	}
 
 	@Test
-	@DisplayName("t2: 코인 목록 자동 갱신 - 외부 api error 테스트")
-	void testUpdateCoinList_Exception() {
+	@DisplayName("t2: 코인 목록 자동 갱신 - 외부 API 에러 시 DB fallback 테스트")
+	void testUpdateMarketList_Exception() {
 		// Given
 		when(restTemplate.getForEntity(UPBIT_MARKET_URI, MarketDto[].class)).thenThrow(
 			new RuntimeException("Rest API Error"));
 
-		// When & Then
-		BusinessException exception = assertThrows(BusinessException.class, () -> marketService.updateCoinList());
+		List<Market> dbMarkets = Arrays.asList(
+			new Market("KRW-BTC", "비트코인", "BTC"),
+			new Market("KRW-ETH", "이더리움", "ETH")
+		);
+		when(marketRepository.findAll()).thenReturn(dbMarkets);
 
-		assertEquals("[Market] Failed to fetch market data", exception.getMessage());
+		// When & Then
+		marketService.updateMarketList();
+
 		verify(marketRepository, times(0)).saveAll(anyList());
+		verify(marketCacheService, times(1)).updateMarketCache(dbMarkets);
 	}
 
 	@Test
@@ -98,23 +104,21 @@ public class MarketServiceTest {
 
 	@Test
 	@DisplayName("t4: 코인 목록 전체 조회 - 정상 동작 테스트")
-	void testGetAllMarkets() {
+	void testGetMarkets() {
 		// Given
 		List<Market> mockMarkets = Arrays.asList(
 			new Market("KRW-BTC", "비트코인", "Bitcoin"),
 			new Market("KRW-ETH", "이더리움", "Ethereum")
 		);
+		when(marketCacheService.getCachedMarketList()).thenReturn(mockMarkets);
 		Pageable pageable = PageRequest.of(0, 10);
-		Page<Market> mockPage = new PageImpl<>(mockMarkets, pageable, mockMarkets.size());
-
-		when(marketRepository.findAll(pageable)).thenReturn(mockPage);
 
 		// When
-		Page<Market> markets = marketService.getAllMarkets(pageable);
+		Page<Market> markets = marketService.getMarkets(pageable);
 
 		// Then
-		assertNotNull(markets);
-		assertEquals(2, markets.getContent().size());
+		assertThat(markets.getContent()).hasSize(2);
+		assertThat(markets.getTotalElements()).isEqualTo(2);
 	}
 
 	@Test
@@ -126,10 +130,8 @@ public class MarketServiceTest {
 			new Market("KRW-BTC", "비트코인", "Bitcoin"),
 			new Market("KRW-ETH", "이더리움", "Ethereum")
 		);
+		when(marketCacheService.getCachedMarketList()).thenReturn(mockMarkets);
 		Pageable pageable = PageRequest.of(0, 10);
-		Page<Market> mockPage = new PageImpl<>(mockMarkets, pageable, mockMarkets.size());
-
-		when(marketRepository.findByCodeStartingWith(type, pageable)).thenReturn(mockPage);
 
 		// when
 		Page<Market> result = marketService.getAllMarketsByQuote(type, pageable);
@@ -146,9 +148,7 @@ public class MarketServiceTest {
 		// given
 		String type = "USD";
 		Pageable pageable = PageRequest.of(0, 10);
-		Page<Market> emptyPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
-
-		when(marketRepository.findByCodeStartingWith(type, pageable)).thenReturn(emptyPage);
+		when(marketCacheService.getCachedMarketList()).thenReturn(Collections.emptyList());
 
 		// when
 		Page<Market> result = marketService.getAllMarketsByQuote(type, pageable);
