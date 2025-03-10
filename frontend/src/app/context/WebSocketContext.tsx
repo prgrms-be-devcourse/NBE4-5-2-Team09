@@ -22,7 +22,7 @@ type SubscriptionType = "ticker" | "orderbook" | "trade" | "candle";
 
 interface Subscription {
   type: SubscriptionType;
-  markets?: string[]; // markets가 비어있을 수도 있음
+  markets?: string[];
 }
 
 interface WebSocketContextProps {
@@ -30,6 +30,7 @@ interface WebSocketContextProps {
   orderbooks: Record<string, OrderbookDto | null>;
   trades: Record<string, TradeDto | null>;
   candleCharts: Record<string, CandleChartDto[] | null>;
+  updateSubscriptions: (newSubscriptions: Subscription[]) => void; // ✅ 구독 변경 함수 추가
 }
 
 const WebSocketContext = createContext<WebSocketContextProps>({
@@ -37,6 +38,7 @@ const WebSocketContext = createContext<WebSocketContextProps>({
   orderbooks: {},
   trades: {},
   candleCharts: {},
+  updateSubscriptions: () => {}, // 기본적으로 빈 함수
 });
 
 export const WebSocketProvider = ({
@@ -46,7 +48,7 @@ export const WebSocketProvider = ({
   children: ReactNode;
   subscriptions: Subscription[];
 }) => {
-  const { market } = useParams() as { market: string }; // URL에서 market 가져오기
+  const { market } = useParams() as { market: string };
   const pathname = usePathname();
   const { connect, isConnected, subscribe, unsubscribe } = useWebSocketStore();
 
@@ -59,13 +61,22 @@ export const WebSocketProvider = ({
     Record<string, CandleChartDto[] | null>
   >({});
 
+  // ✅ 현재 구독 상태를 state로 관리
+  const [currentSubscriptions, setCurrentSubscriptions] =
+    useState<Subscription[]>(subscriptions);
+
+  // ✅ WebSocket 구독 변경 함수
+  const updateSubscriptions = (newSubscriptions: Subscription[]) => {
+    setCurrentSubscriptions(newSubscriptions);
+  };
+
   // WebSocket 연결
   useEffect(() => {
     connect();
   }, []);
 
   useEffect(() => {
-    if (!isConnected || subscriptions.length === 0) return;
+    if (!isConnected || currentSubscriptions.length === 0) return;
 
     const availableSubscriptions: Record<
       SubscriptionType,
@@ -94,10 +105,12 @@ export const WebSocketProvider = ({
     };
 
     // `markets`가 없거나 빈 배열이면 `useParams()`에서 market을 가져와 사용
-    const updatedSubscriptions = subscriptions.map(({ type, markets }) => ({
-      type,
-      markets: markets && markets.length > 0 ? markets : [market],
-    }));
+    const updatedSubscriptions = currentSubscriptions.map(
+      ({ type, markets }) => ({
+        type,
+        markets: markets && markets.length > 0 ? markets : [market],
+      })
+    );
 
     const activeSubscriptions = updatedSubscriptions.flatMap(
       ({ type, markets }) =>
@@ -113,11 +126,17 @@ export const WebSocketProvider = ({
         unsubscribe(dest);
       });
     };
-  }, [market, pathname, isConnected, subscriptions]);
+  }, [market, pathname, isConnected, currentSubscriptions]);
 
   return (
     <WebSocketContext.Provider
-      value={{ tickers, orderbooks, trades, candleCharts: candles }}
+      value={{
+        tickers,
+        orderbooks,
+        trades,
+        candleCharts: candles,
+        updateSubscriptions, // ✅ 구독 변경 함수 제공
+      }}
     >
       {children}
     </WebSocketContext.Provider>
