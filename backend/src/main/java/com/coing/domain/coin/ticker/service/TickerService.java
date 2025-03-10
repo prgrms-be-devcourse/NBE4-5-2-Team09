@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -31,13 +30,16 @@ public class TickerService {
 	private String UPBIT_TRADE_URI;
 
 	private final MessageUtil messageUtil;
-	private final SimpMessageSendingOperations simpMessageSendingOperations;
+	private final SimpMessageSendingOperations messagingTemplate;
 	private final RestTemplate restTemplate;
 	private final Map<String, TickerDto> tickerCache = new ConcurrentHashMap<>();
+	private final Map<String, Long> lastSentTime = new ConcurrentHashMap<>();
+	private static final long THROTTLE_INTERVAL_MS = 500;
 
 	public void updateTicker(Ticker ticker) {
 		TickerDto dto = TickerDto.from(ticker);
 		tickerCache.put(ticker.getCode(), dto);
+		publish(dto);
 	}
 
 	/**
@@ -76,14 +78,16 @@ public class TickerService {
 	}
 
 	/**
-	 * WebSocket을 통해 실시간 5초에 한번 Ticker 데이터 publish
+	 * WebSocket을 통해 실시간 Ticker 데이터 publish
 	 */
-	@Scheduled(fixedRate = 5000)
-	public void publish() {
-		for (Map.Entry<String, TickerDto> entry : tickerCache.entrySet()) {
-			String market = entry.getKey();
-			TickerDto dto = entry.getValue();
-			simpMessageSendingOperations.convertAndSend("/sub/coin/ticker/" + market, dto);
+	public void publish(TickerDto dto) {
+		String market = dto.code();
+		long now = System.currentTimeMillis();
+		long lastSent = lastSentTime.getOrDefault(market, 0L);
+
+		if (now - lastSent >= THROTTLE_INTERVAL_MS) {
+			messagingTemplate.convertAndSend("/sub/coin/ticker/" + market, dto);
+			lastSentTime.put(market, now);
 		}
 	}
 }
