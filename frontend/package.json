@@ -9,7 +9,7 @@
     "lint": "next lint",
     "codegen": "openapi-typescript ../api_schema.json -o ./src/lib/api/generated/schema.d.ts",
     "codegen:watch": "nodemon --watch ../api_schema.json --exec \"npm run codegen\"",
-    "doppler": "doppler secrets download --no-file --format env > .env"
+    "doppler": "doppler secrets download --no-file --format env-no-quotes > .env"
   },
   "dependencies": {
     "@stomp/stompjs": "^7.0.0",
