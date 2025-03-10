@@ -100,6 +100,28 @@ public class UserController {
 		return ResponseEntity.ok(response);
 	}
 
+	@Operation(summary = "이메일 인증 메일 재전송")
+	@PostMapping("/resend-email")
+	public ResponseEntity<?> resendEmail(@RequestParam(name = "userId") UUID userId) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new BusinessException(
+				messageUtil.resolveMessage("member.not.found"), HttpStatus.BAD_REQUEST, ""
+			));
+
+		if (user.isVerified()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(Map.of("status", "already_verified", "message", "이미 인증된 사용자입니다."));
+		}
+
+		try {
+			emailVerificationService.resendVerificationEmail(userId);
+			return ResponseEntity.ok(Map.of("status", "success", "message", "이메일이 재전송되었습니다."));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.body(Map.of("status", "error", "message", "이메일 재전송에 실패했습니다."));
+		}
+	}
+
 	@Operation(summary = "일반 유저 로그인")
 	@PostMapping("/login")
 	public ResponseEntity<BasicResponse> login(@RequestBody @Validated UserLoginRequest request,

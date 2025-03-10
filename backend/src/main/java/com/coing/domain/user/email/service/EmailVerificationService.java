@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,7 @@ public class EmailVerificationService {
 	public void sendVerificationEmail(User user) {
 		// 이메일 인증 토큰 생성 (JWT 기반, 만료 10분)
 		String token = Ut.AuthTokenUtil.createEmailVerificationToken(jwtSecretKey, user.getId());
-	
+
 		try {
 			emailSenderService.sendEmailVerificationMessage(user.getEmail(), token);
 			log.info("인증 이메일 전송 성공: {}", user.getEmail());
@@ -60,5 +61,22 @@ public class EmailVerificationService {
 		// 불변 엔티티 업데이트 (setter 대신 with 메서드 또는 커스텀 변경 메서드 사용)
 		User verifiedUser = user.verifyEmail();
 		return userRepository.save(verifiedUser);
+	}
+
+	// 이메일 재전송
+	@Transactional
+	public void resendVerificationEmail(UUID userId) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new BusinessException(
+				messageUtil.resolveMessage("user.not.found"), HttpStatus.BAD_REQUEST, ""
+			));
+
+		if (user.isVerified()) {
+			throw new BusinessException(
+				"이미 인증된 사용자입니다.", HttpStatus.BAD_REQUEST, ""
+			);
+		}
+
+		sendVerificationEmail(user);
 	}
 }
