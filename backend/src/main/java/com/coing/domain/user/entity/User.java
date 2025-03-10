@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -56,7 +57,12 @@ public class User {
 	// 이메일 인증 여부
 	@Column(name = "verified", nullable = false, columnDefinition = "boolean default false")
 	private boolean verified;
-	
+
+	// 버전 필드 추가 (낙관적 락용)
+	@Version
+	@Column(name = "version")
+	private int version;
+
 	/**
 	 * 이메일 인증이 완료되었음을 업데이트합니다.
 	 */
