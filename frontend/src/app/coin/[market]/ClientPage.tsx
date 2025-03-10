@@ -6,14 +6,10 @@ import OrderbookList from "@/app/coin/components/OrderbookList";
 import CandleChart from "@/app/coin/components/CandleChart";
 import TradeList from "@/app/coin/components/TradeList";
 import NewsList from "@/app/coin/components/NewsList";
-import {
-  generateMockOrderbook,
-  generateMockTrades,
-  generateMockNews,
-} from "@/app/utils/mockData";
-import { useWebSocket } from "@/app/context/WebSocketContext";
-import type { CandleItem, CandleChartDto } from "@/app/types";
+import { useWebSocket } from "@/context/WebSocketContext";
+import type { CandleItem, CandleChartDto } from "@/types";
 import axios from "axios";
+import { generateMockNews, generateMockOrderbook } from "@/lib/utils";
 
 export default function ClientPage() {
   const { market } = useParams() as { market: string };
@@ -24,7 +20,9 @@ export default function ClientPage() {
   // 보정된 캔들 데이터를 저장
   const [candles, setCandles] = useState<CandleItem[]>([]);
   // 선택한 봉 단위: seconds, minutes, days, weeks, months, years
-  const [candleType, setCandleType] = useState<"seconds" | "minutes" | "days" | "weeks" | "months" | "years">("seconds");
+  const [candleType, setCandleType] = useState<
+    "seconds" | "minutes" | "days" | "weeks" | "months" | "years"
+  >("seconds");
   // 분봉일 경우 단위 선택 (예: 1, 3, 5, 10, 15, 30, 60, 240)
   const [minuteUnit, setMinuteUnit] = useState(1);
 
@@ -84,7 +82,15 @@ export default function ClientPage() {
         <h1 className="text-2xl font-bold flex items-center">
           <span className="mr-2">{market.split("-")[1]}</span>
           {ticker && (
-            <span className={`text-xl ${ticker.change === "RISE" ? "text-green-500" : ticker.change === "FALL" ? "text-red-500" : "text-gray-500"}`}>
+            <span
+              className={`text-xl ${
+                ticker.change === "RISE"
+                  ? "text-green-500"
+                  : ticker.change === "FALL"
+                  ? "text-red-500"
+                  : "text-gray-500"
+              }`}
+            >
               ₩{ticker.tradePrice.toLocaleString()}
               <span className="ml-2 text-sm">
                 {ticker.signedChangeRate > 0 ? "+" : ""}
@@ -95,14 +101,15 @@ export default function ClientPage() {
         </h1>
       </div>
 
-
       <div className="bg-blue-50 py-4 mb-4 rounded-lg">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded-lg shadow-sm">
               <div className="text-sm text-gray-500">24시간 거래량</div>
               <div className="text-xl font-bold text-blue-600">
-                {ticker ? Math.floor(ticker.accTradeVolume24h).toLocaleString() : "-"}
+                {ticker
+                  ? Math.floor(ticker.accTradeVolume24h).toLocaleString()
+                  : "-"}
                 <span className="text-sm">{market.split("-")[1]}</span>
               </div>
             </div>
@@ -120,7 +127,9 @@ export default function ClientPage() {
             <div className="bg-white p-4 rounded-lg shadow-sm">
               <div className="text-sm text-gray-500">전일대비</div>
               <div className="text-xl font-bold text-blue-600">
-                {ticker ? (ticker.signedChangeRate * 100).toFixed(2) + "%" : "-"}
+                {ticker
+                  ? (ticker.signedChangeRate * 100).toFixed(2) + "%"
+                  : "-"}
               </div>
             </div>
           </div>
@@ -138,7 +147,7 @@ export default function ClientPage() {
         />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <TradeList trades={trades} />
-          <OrderbookList orderbook={generateMockOrderbook()} currentPrice={ticker?.tradePrice || 0} />
+          <OrderbookList market={market} />
         </div>
         <div className="w-full">
           <NewsList news={generateMockNews()} />

@@ -21,7 +21,9 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => ({
     if (get().client) return; // 이미 연결되어 있으면 중복 연결 방지
 
     const client = new Client({
-      brokerURL: process.env.NEXT_PUBLIC_WEBSOCKET_URL,
+      brokerURL:
+        process.env.NEXT_PUBLIC_WEBSOCKET_URL ??
+        "http://localhost:8080/websocket",
       reconnectDelay: 5000, // 연결이 완전히 끊어지면 5초 후 재연결 시도
       heartbeatIncoming: 4000, // 서버 → 클라이언트 연결 유지 확인 (4초)
       heartbeatOutgoing: 4000, // 클라이언트 → 서버 연결 유지 확인 (4초)

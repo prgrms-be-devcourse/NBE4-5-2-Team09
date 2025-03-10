@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type TradeItem, AskBid, TradeDto } from "@/app/types";
+import { type TradeItem, AskBid, TradeDto } from "@/types";
 
 interface TradeListProps {
   trades: Record<string, TradeDto | null>;
@@ -11,12 +11,15 @@ export default function TradeList({ trades }: TradeListProps) {
   const [clientTrades, setClientTrades] = useState<TradeDto[]>([]);
 
   useEffect(() => {
-    const tradeArray = Object.values(trades).filter((trade) => trade !== null) as TradeDto[];
+    const tradeArray = Object.values(trades).filter(
+      (trade) => trade !== null
+    ) as TradeDto[];
 
     if (tradeArray.length > 0) {
       setClientTrades((prevTrades) => {
         const newTrades = tradeArray.filter(
-          (trade) => !prevTrades.some((t) => t.sequentialId === trade.sequentialId)
+          (trade) =>
+            !prevTrades.some((t) => t.sequentialId === trade.sequentialId)
         );
 
         const updatedTrades = [...newTrades, ...prevTrades];
@@ -50,21 +53,35 @@ export default function TradeList({ trades }: TradeListProps) {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-2 text-xs text-gray-500 text-left">시간</th>
-                <th className="px-4 py-2 text-xs text-gray-500 text-right">가격(KRW)</th>
-                <th className="px-4 py-2 text-xs text-gray-500 text-right">수량(BTC)</th>
-                <th className="px-4 py-2 text-xs text-gray-500 text-center">구분</th>
+                <th className="px-4 py-2 text-xs text-gray-500 text-left">
+                  시간
+                </th>
+                <th className="px-4 py-2 text-xs text-gray-500 text-right">
+                  가격(KRW)
+                </th>
+                <th className="px-4 py-2 text-xs text-gray-500 text-right">
+                  수량(BTC)
+                </th>
+                <th className="px-4 py-2 text-xs text-gray-500 text-center">
+                  구분
+                </th>
               </tr>
             </thead>
             <tbody>
               {clientTrades.map((trade) => (
-                <tr key={trade.sequentialId} className="border-b border-gray-100">
+                <tr
+                  key={trade.sequentialId}
+                  className="border-b border-gray-100"
+                >
                   <td className="px-4 py-2 text-sm text-gray-600">
                     {formatTime(trade.timestamp)}
                   </td>
                   <td
-                    className={`px-4 py-2 text-sm text-right ${trade.askBid === AskBid.ASK ? "text-red-500" : "text-green-500"
-                      }`}
+                    className={`px-4 py-2 text-sm text-right ${
+                      trade.askBid === AskBid.ASK
+                        ? "text-red-500"
+                        : "text-green-500"
+                    }`}
                   >
                     {formatPrice(trade.tradePrice)}
                   </td>
@@ -73,8 +90,11 @@ export default function TradeList({ trades }: TradeListProps) {
                   </td>
                   <td className="px-4 py-2 text-sm text-center">
                     <span
-                      className={`inline-block px-2 py-1 rounded-full text-xs ${trade.askBid === AskBid.ASK ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
-                        }`}
+                      className={`inline-block px-2 py-1 rounded-full text-xs ${
+                        trade.askBid === AskBid.ASK
+                          ? "bg-red-100 text-red-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
                     >
                       {trade.askBid === AskBid.ASK ? "매도" : "매수"}
                     </span>

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyAccessToken, refreshTokens, setMultipleCookies } from "@/lib/auth-helpers";
+import {
+  verifyAccessToken,
+  refreshTokens,
+  setMultipleCookies,
+} from "@/lib/helpers";
 
 // 보호할 경로 목록
 const protectedRoutes = ["/dashboard"];
@@ -7,7 +11,7 @@ const protectedRoutes = ["/dashboard"];
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isProtected = protectedRoutes.some((route) =>
-      pathname.startsWith(route)
+    pathname.startsWith(route)
   );
 
   // 보호되지 않은 경로는 그냥 통과
@@ -31,9 +35,9 @@ export async function middleware(request: NextRequest) {
   // 액세스 토큰이 유효하지 않으면 refreshTokens()로 리프레시 시도
   const refreshResponse = await refreshTokens(request);
   if (
-      !refreshResponse.ok ||
-      !refreshResponse.data ||
-      !refreshResponse.data.newAccessToken
+    !refreshResponse.ok ||
+    !refreshResponse.data ||
+    !refreshResponse.data.newAccessToken
   ) {
     // 리프레시 실패 시 로그인 페이지로 리다이렉트
     return NextResponse.redirect(new URL("/user/login", request.url));

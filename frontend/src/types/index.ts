@@ -55,17 +55,6 @@ export enum AskBid {
 
 /** MockData 전용 타입 (추후 삭제 예정) **/
 // OrderbookItem, Orderbook, TradeItem, CandleItem, NewsItem
-export type OrderbookItem = {
-  price: number;
-  quantity: number;
-  total: number;
-};
-
-export type Orderbook = {
-  asks: OrderbookItem[];
-  bids: OrderbookItem[];
-};
-
 export type TradeItem = {
   id: string;
   price: number;
@@ -128,7 +117,6 @@ export type OrderbookDto = {
   spread: number; // 매도/매수 호가 차이
   imbalance: number; // 잔량 불균형
   liquidityDepth: number; // 중간 가격 기준 ±X% 유동성 비율
-  volatility: number; // 변동성
 };
 
 export type OrderbookUnit = {
@@ -150,7 +138,15 @@ export type CandleChartDto = {
 };
 
 export type MarketDto = {
-    code: string;
-    koreanName: string;
-    englishName: string;
-}
+  code: string;
+  koreanName: string;
+  englishName: string;
+};
+
+export type MarketsDto = {
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  content: MarketDto[];
+};

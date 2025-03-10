@@ -7,7 +7,6 @@ import {
   useState,
   ReactNode,
 } from "react";
-import { useWebSocketStore } from "@/app/store/webSocketStore";
 import { IMessage } from "@stomp/stompjs";
 import { usePathname, useParams } from "next/navigation";
 import type {
@@ -15,7 +14,8 @@ import type {
   OrderbookDto,
   TradeDto,
   CandleChartDto,
-} from "@/app/types";
+} from "@/types";
+import { useWebSocketStore } from "@/store/web-socket.store";
 
 // 구독 가능한 타입 정의
 type SubscriptionType = "ticker" | "orderbook" | "trade" | "candle";

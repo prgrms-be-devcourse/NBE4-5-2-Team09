@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
-import WebSocketProvider from "@/app/context/WebSocketContext";
+import WebSocketProvider from "@/context/WebSocketContext";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { MarketDto } from "@/app/types";
+import { MarketDto } from "@/types";
 import ClientPage from "./MarketList";
 
 export default function Page() {
@@ -50,17 +50,17 @@ export default function Page() {
   const handleQuoteChange = (newQuote: string) => {
     setQuote(newQuote);
     setPage(0);
-  }
+  };
 
   if (loading) {
     return <div>Loading...</div>; // 로딩 중일 때 메시지 표시
   }
 
   return (
-    <WebSocketProvider subscriptions={[{ type: "ticker", markets: marketCodes }]}>
-
+    <WebSocketProvider
+      subscriptions={[{ type: "ticker", markets: marketCodes }]}
+    >
       <div className="p-6">
-
         {/* 기준 통화 필터 탭 */}
         <Tabs value={quote} onValueChange={handleQuoteChange}>
           <TabsList className="grid w-full grid-cols-3 bg-gray-100">
@@ -75,16 +75,23 @@ export default function Page() {
 
         {/* 페이지네이션 */}
         <div className="flex justify-center items-center mt-6 space-x-2">
-          <Button onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0}>
+          <Button
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+          >
             이전
           </Button>
-          <span>{page + 1} / {totalPages + 1}</span>
-          <Button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
+          <span>
+            {page + 1} / {totalPages + 1}
+          </span>
+          <Button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
             다음
           </Button>
         </div>
-
       </div>
     </WebSocketProvider>
   );
-};
+}

@@ -1,5 +1,5 @@
 import createClient from "openapi-fetch";
-import { paths } from "@/lib/api/generated/schema";
+import { paths } from "./generated/schema";
 
 const client = createClient<paths>({
   baseUrl: process.env.NEXT_PUBLIC_WEBSOCKET_URL, // NEXT_PUBLIC_ 접두사 사용

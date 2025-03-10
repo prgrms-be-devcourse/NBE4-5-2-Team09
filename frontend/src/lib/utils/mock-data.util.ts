@@ -5,7 +5,7 @@ import {
   type CandleItem,
   type NewsItem,
   AskBid,
-} from "@/app/types";
+} from "@/types";
 
 // 모의 호가(Orderbook) 생성 함수
 export function generateMockOrderbook(): Orderbook {
