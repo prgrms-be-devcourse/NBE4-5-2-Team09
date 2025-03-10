@@ -10,7 +10,7 @@ import ClientPage from "./MarketList";
 export default function Page() {
   const [markets, setMarkets] = useState<MarketDto[]>([]);
   const [marketCodes, setMarketCodes] = useState<string[]>([]);
-  const [quote, setQuote] = useState("all");
+  const [quote, setQuote] = useState("KRW");
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true); // 로딩 상태 추가
   const [totalPages, setTotalPages] = useState(0);
@@ -22,12 +22,7 @@ export default function Page() {
       try {
         setLoading(true); // 데이터 요청 시작 시 로딩 상태를 true로 설정
         let api = process.env.NEXT_PUBLIC_API_URL + "/api/market";
-
-        if (quote !== "all") {
-          api += `/quote?type=${quote}&page=${page}&size=${pageSize}`;
-        } else {
-          api += `?page=${page}&size=${pageSize}`;
-        }
+        api += `?type=${quote}&page=${page}&size=${pageSize}`;
 
         const res = await fetch(api);
         if (!res.ok) return;
@@ -68,8 +63,7 @@ export default function Page() {
 
         {/* 기준 통화 필터 탭 */}
         <Tabs value={quote} onValueChange={handleQuoteChange}>
-          <TabsList className="grid w-full grid-cols-4 bg-gray-100">
-            <TabsTrigger value="all">전체</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 bg-gray-100">
             <TabsTrigger value="KRW">KRW</TabsTrigger>
             <TabsTrigger value="BTC">BTC</TabsTrigger>
             <TabsTrigger value="USDT">USDT</TabsTrigger>

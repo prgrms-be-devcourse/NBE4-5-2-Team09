@@ -25,15 +25,15 @@ public class MarketController {
 
 	private final MarketService marketService;
 
-	@Operation(summary = "마켓 전체 조회")
+	/*@Operation(summary = "마켓 전체 조회")
 	@GetMapping
 	public ResponseEntity<Page<MarketResponse>> getMarkets(@PageableDefault(sort = "code") Pageable pageable) {
 		return ResponseEntity.ok(marketService.getAllMarkets(pageable)
 			.map(MarketResponse::from));
-	}
+	}*/
 
 	@Operation(summary = "기준 통화별 마켓 전체 조회")
-	@GetMapping("/quote")
+	@GetMapping
 	public ResponseEntity<Page<MarketResponse>> getMarketsByQuote(@RequestParam("type") String type,
 		@PageableDefault(sort = "code") Pageable pageable) {
 		return ResponseEntity.ok(marketService.getAllMarketsByQuote(type, pageable)

@@ -53,7 +53,6 @@ export default function ClientPage() {
         const url = `http://localhost:8080/api/candles/${market}/${candleType}${unitQuery}`;
         const response = await axios.get(url);
         const data: CandleChartDto[] = response.data;
-        console.log("REST로 수신한 DTO:", data);
         const mapped: CandleItem[] = data.map((dto) => ({
           time: new Date(dto.candle_date_time_utc).getTime(),
           open: dto.opening_price,
@@ -80,71 +79,71 @@ export default function ClientPage() {
   const news = generateMockNews();
 
   return (
-      <div>
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold flex items-center">
-            <span className="mr-2">{market.split("-")[1]}</span>
-            {ticker && (
-                <span className={`text-xl ${ticker.change === "RISE" ? "text-green-500" : ticker.change === "FALL" ? "text-red-500" : "text-gray-500"}`}>
+    <div>
+      <div className="mb-4">
+        <h1 className="text-2xl font-bold flex items-center">
+          <span className="mr-2">{market.split("-")[1]}</span>
+          {ticker && (
+            <span className={`text-xl ${ticker.change === "RISE" ? "text-green-500" : ticker.change === "FALL" ? "text-red-500" : "text-gray-500"}`}>
               ₩{ticker.tradePrice.toLocaleString()}
-                  <span className="ml-2 text-sm">
+              <span className="ml-2 text-sm">
                 {ticker.signedChangeRate > 0 ? "+" : ""}
-                    {(ticker.signedChangeRate * 100).toFixed(2)}%
+                {(ticker.signedChangeRate * 100).toFixed(2)}%
               </span>
             </span>
-            )}
-          </h1>
-        </div>
+          )}
+        </h1>
+      </div>
 
 
-        <div className="bg-blue-50 py-4 mb-4 rounded-lg">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-4 gap-4">
-              <div className="bg-white p-4 rounded-lg shadow-sm">
-                <div className="text-sm text-gray-500">24시간 거래량</div>
-                <div className="text-xl font-bold text-blue-600">
-                  {ticker ? Math.floor(ticker.accTradeVolume24h).toLocaleString() : "-"}
-                  <span className="text-sm">{market.split("-")[1]}</span>
-                </div>
+      <div className="bg-blue-50 py-4 mb-4 rounded-lg">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-4 gap-4">
+            <div className="bg-white p-4 rounded-lg shadow-sm">
+              <div className="text-sm text-gray-500">24시간 거래량</div>
+              <div className="text-xl font-bold text-blue-600">
+                {ticker ? Math.floor(ticker.accTradeVolume24h).toLocaleString() : "-"}
+                <span className="text-sm">{market.split("-")[1]}</span>
               </div>
-              <div className="bg-white p-4 rounded-lg shadow-sm">
-                <div className="text-sm text-gray-500">전일 종가</div>
-                <div className="text-xl font-bold text-blue-600">
-                  {ticker ? ticker.prevClosingPrice.toLocaleString() : "-"}
-                  <span className="text-sm">{market.split("-")[0]}</span>
-                </div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm">
+              <div className="text-sm text-gray-500">전일 종가</div>
+              <div className="text-xl font-bold text-blue-600">
+                {ticker ? ticker.prevClosingPrice.toLocaleString() : "-"}
+                <span className="text-sm">{market.split("-")[0]}</span>
               </div>
-              <div className="bg-white p-4 rounded-lg shadow-sm">
-                <div className="text-sm text-gray-500">도미넌스</div>
-                <div className="text-xl font-bold text-blue-600">52.1%</div>
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow-sm">
-                <div className="text-sm text-gray-500">전일대비</div>
-                <div className="text-xl font-bold text-blue-600">
-                  {ticker ? (ticker.signedChangeRate * 100).toFixed(2) + "%" : "-"}
-                </div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm">
+              <div className="text-sm text-gray-500">도미넌스</div>
+              <div className="text-xl font-bold text-blue-600">52.1%</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm">
+              <div className="text-sm text-gray-500">전일대비</div>
+              <div className="text-xl font-bold text-blue-600">
+                {ticker ? (ticker.signedChangeRate * 100).toFixed(2) + "%" : "-"}
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="space-y-4">
-          {/* CandleChart 컴포넌트에 setCandleType, minuteUnit, setMinuteUnit 전달 */}
-          <CandleChart
-              candles={candles}
-              candleType={candleType}
-              setCandleType={setCandleType}
-              minuteUnit={minuteUnit}
-              setMinuteUnit={setMinuteUnit}
-          />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <TradeList trades={generateMockTrades()} />
-            <OrderbookList orderbook={generateMockOrderbook()} currentPrice={ticker?.tradePrice || 0} />
-          </div>
-          <div className="w-full">
-            <NewsList news={generateMockNews()} />
-          </div>
+      <div className="space-y-4">
+        {/* CandleChart 컴포넌트에 setCandleType, minuteUnit, setMinuteUnit 전달 */}
+        <CandleChart
+          candles={candles}
+          candleType={candleType}
+          setCandleType={setCandleType}
+          minuteUnit={minuteUnit}
+          setMinuteUnit={setMinuteUnit}
+        />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <TradeList trades={trades} />
+          <OrderbookList orderbook={generateMockOrderbook()} currentPrice={ticker?.tradePrice || 0} />
+        </div>
+        <div className="w-full">
+          <NewsList news={generateMockNews()} />
         </div>
       </div>
+    </div>
   );
 }
