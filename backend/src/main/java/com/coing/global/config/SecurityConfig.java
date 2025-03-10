@@ -14,7 +14,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.coing.global.filter.JwtAuthenticationFilter;
+import com.coing.global.security.CustomAuthenticationEntryPoint;
+import com.coing.global.security.filter.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,22 +24,23 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 			// CORS 설정 추가
 			.cors().and()
-			// CSRF 보호 비활성화 (개발 단계에서는 H2 콘솔 접근 용이)
+			// CSRF 보호 비활성화
 			.csrf(csrf -> csrf.disable())
 			// H2 콘솔 접근을 허용하기 위해 frameOptions 비활성화
 			.headers(headers -> headers.frameOptions(frame -> frame.disable()))
 			// 세션을 사용하지 않는 stateless 설정
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			// 모든 요청에 대해 permitAll()
-			.authorizeHttpRequests(authz -> authz
-				.anyRequest().permitAll()
-			)
+			.authorizeHttpRequests(authz -> authz.anyRequest().permitAll())
+			// 커스텀 AuthenticationEntryPoint 및 JwtAuthenticationFilter 추가
+			.exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint))
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
@@ -47,7 +49,7 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		// 허용할 출처를 명시합니다.
+		// 모든 출처 허용 (운영 환경 배포 시 수정 필요)
 		configuration.setAllowedOriginPatterns(Arrays.asList("*"));
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(Arrays.asList("*"));

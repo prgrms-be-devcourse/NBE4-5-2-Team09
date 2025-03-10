@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.coing.util.BasicResponse;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,8 +26,17 @@ public class RestExceptionHandler {
 	@ExceptionHandler(BusinessException.class)
 	public ResponseEntity<BasicResponse> handleBusinessException(BusinessException exception) {
 		log.warn("[ExceptionHandler] Message: {}, Detail: {}", exception.getMessage(), exception.getDetail());
-
+		if (exception.getMessage() != null && exception.getMessage().contains("인증 토큰")) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(BasicResponse.of(exception));
+		}
 		return BasicResponse.to(exception);
+	}
+
+	@ExceptionHandler(ExpiredJwtException.class)
+	public ResponseEntity<BasicResponse> handleExpiredJwtException(ExpiredJwtException ex) {
+		log.warn("[ExceptionHandler] ExpiredJwtException: {}", ex.getMessage());
+		BusinessException businessException = new BusinessException("토큰 만료", HttpStatus.FORBIDDEN, ex.getMessage());
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(BasicResponse.of(businessException));
 	}
 
 	@ExceptionHandler(RuntimeException.class)

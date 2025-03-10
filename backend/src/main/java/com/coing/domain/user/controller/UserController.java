@@ -55,10 +55,7 @@ public class UserController {
 	@PostMapping("/signup")
 	public ResponseEntity<UserSignupResponse> signUp(@RequestBody @Validated UserSignUpRequest request,
 		HttpServletResponse response) {
-		// 회원가입 처리 및 이메일 인증 메일 전송 (UserService.join 내부에서 호출)
 		UserResponse user = userService.join(request);
-
-		// UserSignupResponse record를 이용해 응답 데이터 생성
 		UserSignupResponse signupResponse = new UserSignupResponse(
 			"회원가입 성공. 인증 이메일 전송 완료.",
 			user.name(),
@@ -71,16 +68,17 @@ public class UserController {
 	@Operation(summary = "이메일 인증")
 	@GetMapping("/verify-email")
 	public ResponseEntity<BasicResponse> verifyEmail(@RequestParam(name = "token") String token) {
-		// 토큰 검증 로직
 		Map<String, Object> claims = authTokenService.verifyToken(token);
 		if (claims == null || claims.get("id") == null) {
+			// 이메일 인증 토큰은 BAD_REQUEST로 처리 (토큰 포맷 문제 등)
 			throw new BusinessException(messageUtil.resolveMessage("invalid.email.verification.token"),
 				HttpStatus.BAD_REQUEST, "");
 		}
 		UUID userId = UUID.fromString(claims.get("id").toString());
 		var verifiedUser = emailVerificationService.verifyEmail(userId);
 		return ResponseEntity.ok(
-			new BasicResponse(HttpStatus.OK, "이메일 인증 성공", "User " + verifiedUser.getName() + " verified."));
+			new BasicResponse(HttpStatus.OK, "이메일 인증 성공", "User " + verifiedUser.getName() + " verified.")
+		);
 	}
 
 	@Operation(summary = "이메일 인증 상태 확인", description = "회원가입을 요청한 사용자의 UUID(userId)를 기준으로 이메일 인증 여부를 확인합니다.")
@@ -92,7 +90,6 @@ public class UserController {
 		}
 		User user = userOpt.get();
 		boolean verified = user.isVerified();
-
 		EmailVerificationResponse response = new EmailVerificationResponse(verified);
 		return ResponseEntity.ok(response);
 	}
@@ -121,8 +118,8 @@ public class UserController {
 		HttpServletResponse response) {
 		Cookie[] cookies = request.getCookies();
 		if (cookies == null || cookies.length == 0) {
-			throw new BusinessException(messageUtil.resolveMessage("refresh.token.required"),
-				HttpStatus.BAD_REQUEST, "");
+			// 토큰이 없는 경우 403 처리
+			throw new BusinessException(messageUtil.resolveMessage("refresh.token.required"), HttpStatus.FORBIDDEN, "");
 		}
 		String refreshToken = null;
 		for (Cookie cookie : cookies) {
@@ -132,19 +129,16 @@ public class UserController {
 			}
 		}
 		if (refreshToken == null || refreshToken.trim().isEmpty()) {
-			throw new BusinessException(messageUtil.resolveMessage("invalid.refresh.token"),
-				HttpStatus.BAD_REQUEST, "");
+			throw new BusinessException(messageUtil.resolveMessage("invalid.refresh.token"), HttpStatus.FORBIDDEN, "");
 		}
 		Map<String, Object> claims = authTokenService.verifyToken(refreshToken);
 		if (claims == null || claims.get("id") == null) {
-			throw new BusinessException(messageUtil.resolveMessage("invalid.refresh.token"),
-				HttpStatus.BAD_REQUEST, "");
+			throw new BusinessException(messageUtil.resolveMessage("invalid.refresh.token"), HttpStatus.FORBIDDEN, "");
 		}
 		UUID id = UUID.fromString(claims.get("id").toString());
 		UserResponse user = userService.findById(id);
 		if (user == null) {
-			throw new BusinessException(messageUtil.resolveMessage("member.not.found"),
-				HttpStatus.BAD_REQUEST, "");
+			throw new BusinessException(messageUtil.resolveMessage("member.not.found"), HttpStatus.BAD_REQUEST, "");
 		}
 		String newAccessToken = authTokenService.genAccessToken(user);
 		String newRefreshToken = authTokenService.genRefreshToken(user);
@@ -163,10 +157,8 @@ public class UserController {
 	public ResponseEntity<BasicResponse> logout(HttpServletResponse response,
 		@AuthenticationPrincipal CustomUserPrincipal principal) {
 		if (principal == null) {
-			throw new BusinessException(messageUtil.resolveMessage("empty.token.provided"),
-				HttpStatus.UNAUTHORIZED, "");
+			throw new BusinessException(messageUtil.resolveMessage("empty.token.provided"), HttpStatus.FORBIDDEN, "");
 		}
-		// 액세스 토큰 혹은 리프레시 토큰 기반으로 사용자 식별이 이미 되었으므로, 요청 바디에 이메일을 받을 필요가 없습니다.
 		Cookie cookie = new Cookie("refreshToken", null);
 		cookie.setHttpOnly(true);
 		cookie.setSecure(false);
@@ -181,12 +173,10 @@ public class UserController {
 	public ResponseEntity<?> signOut(@Validated UserLoginRequest request,
 		@org.springframework.security.core.annotation.AuthenticationPrincipal CustomUserPrincipal principal) {
 		if (principal == null) {
-			throw new BusinessException(messageUtil.resolveMessage("empty.token.provided"),
-				HttpStatus.UNAUTHORIZED, "");
+			throw new BusinessException(messageUtil.resolveMessage("empty.token.provided"), HttpStatus.FORBIDDEN, "");
 		}
 		if (!principal.email().equals(request.email())) {
-			throw new BusinessException(messageUtil.resolveMessage("token.email.mismatch"),
-				HttpStatus.UNAUTHORIZED, "");
+			throw new BusinessException(messageUtil.resolveMessage("token.email.mismatch"), HttpStatus.FORBIDDEN, "");
 		}
 		userService.quit(request.email(), request.password());
 		return ResponseEntity.ok("회원 탈퇴 성공");

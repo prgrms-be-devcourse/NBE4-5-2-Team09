@@ -1,4 +1,4 @@
-package com.coing.global.filter;
+package com.coing.global.security.filter;
 
 import static com.coing.util.Ut.Jwt.*;
 
