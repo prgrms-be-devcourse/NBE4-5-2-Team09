@@ -20,17 +20,22 @@ public class TradeService {
 
 	private final SimpMessageSendingOperations simpMessageSendingOperations;
 
+	private final Map<String, TradeDto> tradeCache = new ConcurrentHashMap<>();
+
 	private final Map<String, Double> vwapCache = new ConcurrentHashMap<>();
 	private final Map<String, Double> totalTradeVolumeCache = new ConcurrentHashMap<>();
 	private final Map<String, Double> totalTradeNumberCache = new ConcurrentHashMap<>();
 	private final Map<String, Double> prevTradePriceCache = new ConcurrentHashMap<>();
 
-	public void publish(Trade trade) {
-		// 부가 지표 계산
-		//double buySellRatio = calculateBuySellRatio(trade);
+	private final Map<String, Long> lastSentTime = new ConcurrentHashMap<>();
+	private static final long THROTTLE_INTERVAL_MS = 200;
+
+	public void updateTrade(Trade trade) {
 		String market = trade.getCode();
 		double price = trade.getTradePrice();
 		double volume = trade.getTradeVolume();
+
+		// 부가 지표 캐시 업데이트
 		cacheValues(market, volume);
 
 		double vwap = calculateVWAP(market, price, volume);
@@ -39,7 +44,20 @@ public class TradeService {
 
 		TradeDto dto = TradeDto.of(trade, vwap, averageTradeSize, tradeImpact);
 
-		simpMessageSendingOperations.convertAndSend("/sub/coin/trade/" + market, dto);
+		tradeCache.put(market, dto);
+
+		publish(dto);
+	}
+
+	public void publish(TradeDto dto) {
+		String market = dto.code();
+		long now = System.currentTimeMillis();
+		long lastSent = lastSentTime.getOrDefault(market, 0L);
+
+		if (now - lastSent >= THROTTLE_INTERVAL_MS) {
+			simpMessageSendingOperations.convertAndSend("/sub/coin/trade/%s".formatted(market), dto);
+			lastSentTime.put(market, now);
+		}
 	}
 
 	@Scheduled(cron = "0 0 0 * * *")

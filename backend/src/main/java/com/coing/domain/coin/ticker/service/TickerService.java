@@ -33,10 +33,11 @@ public class TickerService {
 	private final MessageUtil messageUtil;
 	private final SimpMessageSendingOperations simpMessageSendingOperations;
 	private final RestTemplate restTemplate;
-	private final Map<String, Ticker> tickerCache = new ConcurrentHashMap<>();
+	private final Map<String, TickerDto> tickerCache = new ConcurrentHashMap<>();
 
 	public void updateTicker(Ticker ticker) {
-		tickerCache.put(ticker.getCode(), ticker);
+		TickerDto dto = TickerDto.from(ticker);
+		tickerCache.put(ticker.getCode(), dto);
 	}
 
 	/**
@@ -78,11 +79,10 @@ public class TickerService {
 	 * WebSocket을 통해 실시간 5초에 한번 Ticker 데이터 publish
 	 */
 	@Scheduled(fixedRate = 5000)
-	public void publishCachedTickers() {
-		for (Map.Entry<String, Ticker> entry : tickerCache.entrySet()) {
+	public void publish() {
+		for (Map.Entry<String, TickerDto> entry : tickerCache.entrySet()) {
 			String market = entry.getKey();
-			Ticker ticker = entry.getValue();
-			TickerDto dto = TickerDto.from(ticker);
+			TickerDto dto = entry.getValue();
 			simpMessageSendingOperations.convertAndSend("/sub/coin/ticker/" + market, dto);
 		}
 	}

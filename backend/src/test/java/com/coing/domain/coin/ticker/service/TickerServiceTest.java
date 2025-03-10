@@ -51,7 +51,7 @@ public class TickerServiceTest {
 
 	@Autowired
 	private ObjectMapper mapper;
-	
+
 	private Ticker testTicker;
 
 	@BeforeEach
@@ -99,16 +99,16 @@ public class TickerServiceTest {
 		tickerService.updateTicker(testTicker);
 
 		// then
-		Ticker cachedTicker = getTickerCache().get(testTicker.getCode());
+		TickerDto cachedTicker = getTickerCache().get(testTicker.getCode());
 		assertNotNull(cachedTicker);
-		assertEquals(testTicker.getCode(), cachedTicker.getCode());
+		assertEquals(testTicker.getCode(), cachedTicker.code());
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map<String, Ticker> getTickerCache() throws Exception {
+	private Map<String, TickerDto> getTickerCache() throws Exception {
 		Field field = TickerService.class.getDeclaredField("tickerCache");
 		field.setAccessible(true);
-		return (Map<String, Ticker>)field.get(tickerService);
+		return (Map<String, TickerDto>)field.get(tickerService);
 	}
 
 	@Test
@@ -157,7 +157,7 @@ public class TickerServiceTest {
 		tickerService.updateTicker(testTicker);
 
 		// when
-		tickerService.publishCachedTickers();
+		tickerService.publish();
 
 		// then
 		ArgumentCaptor<TickerDto> captor = ArgumentCaptor.forClass(TickerDto.class);

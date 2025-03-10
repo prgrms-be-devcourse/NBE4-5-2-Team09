@@ -1,7 +1,5 @@
 package com.coing.infra.upbit.handler;
 
-import static com.coing.util.Ut.Upbit.*;
-
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.stereotype.Component;
@@ -13,6 +11,7 @@ import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 import com.coing.infra.upbit.adapter.UpbitDataService;
 import com.coing.infra.upbit.dto.UpbitWebSocketTickerDto;
 import com.coing.infra.upbit.enums.EnumUpbitRequestType;
+import com.coing.infra.upbit.util.UpbitRequestBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -24,11 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 public class UpbitWebSocketTickerHandler extends BinaryWebSocketHandler {
 	private final ObjectMapper objectMapper;
 	private final UpbitDataService upbitDataService;
+	private final UpbitRequestBuilder upbitRequestBuilder;
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		log.info("Upbit WebSocket Ticker connection established.");
-		String subscribeMessage = makeRequest(EnumUpbitRequestType.TICKER);
+		String subscribeMessage = upbitRequestBuilder.makeRequest(EnumUpbitRequestType.TICKER);
 		session.sendMessage(new TextMessage(subscribeMessage));
 	}
 

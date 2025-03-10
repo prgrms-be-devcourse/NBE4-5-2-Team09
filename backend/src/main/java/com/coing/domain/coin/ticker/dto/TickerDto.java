@@ -47,8 +47,8 @@ public record TickerDto(
 	// 계산된 지표
 	double accAskBidRate, // 매수/매도 누적 비율
 	boolean highBreakout, // 52주 최고가 갱신 여부
-	boolean lowBreakout, // 52주 최저가 갱신 여부
-	double oneMinuteRate // 단기 변동률(1분)
+	boolean lowBreakout // 52주 최저가 갱신 여부
+	// double oneMinuteRate // 단기 변동률(1분)
 ) {
 
 	public static TickerDto from(Ticker ticker) {
@@ -86,7 +86,7 @@ public record TickerDto(
 			.accAskBidRate(ticker.getAccAskBidRate())
 			.highBreakout(ticker.isHighBreakout())
 			.lowBreakout(ticker.isLowBreakout())
-			.oneMinuteRate(ticker.getOneMinuteRate())
+			// .oneMinuteRate(ticker.getOneMinuteRate())
 			.build();
 	}
 }

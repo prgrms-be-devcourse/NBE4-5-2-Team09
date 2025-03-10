@@ -3,8 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "workspaces": [
-    "backend",
-    "frontend"
+    "@coing/backend",
+    "@coing/frontend"
   ],
   "scripts": {
     "doppler": "npm run doppler:setup && turbo run doppler",

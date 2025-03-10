@@ -38,7 +38,8 @@ public class TradeServiceTest {
 	@Test
 	public void testPublish() {
 		// When
-		tradeService.publish(trade);
+		TradeDto dto = TradeDto.of(trade, 0.0, 0.0, 0.0);
+		tradeService.publish(dto);
 
 		// Then
 		// SimpMessageSendingOperations가 호출됐는지 확인

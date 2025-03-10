@@ -19,6 +19,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import com.coing.infra.upbit.adapter.UpbitDataService;
 import com.coing.infra.upbit.dto.UpbitWebSocketOrderbookDto;
+import com.coing.infra.upbit.util.UpbitRequestBuilder;
 
 @ExtendWith(MockitoExtension.class)
 public class UpbitWebSocketOrderbookHandlerTest {
@@ -29,12 +30,18 @@ public class UpbitWebSocketOrderbookHandlerTest {
 	@Mock
 	private WebSocketSession session;
 
+	@Mock
+	private UpbitRequestBuilder upbitRequestBuilder;
+
 	@InjectMocks
 	private UpbitWebSocketOrderbookHandler handler;
 
 	@Test
 	@DisplayName("afterConnectionEstablished() 성공")
 	public void successAfterConnectionEstablished() throws Exception {
+		// given
+		when(upbitRequestBuilder.makeRequest(any())).thenReturn("[{\"ticket\":\"orderbook\"}]");
+
 		// when
 		handler.afterConnectionEstablished(session);
 

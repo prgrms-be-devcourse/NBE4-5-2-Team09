@@ -120,7 +120,7 @@ public class UpbitWebSocketTickerDto {
 	@JsonProperty("st")
 	private String streamType;
 
-	public Ticker toEntity(double oneMinuteRate) {
+	public Ticker toEntity() {
 		return Ticker.builder()
 			.type(type)
 			.code(code)
@@ -155,7 +155,7 @@ public class UpbitWebSocketTickerDto {
 			.accAskBidRate(calcAccAskBidRate())
 			.highBreakout(calcHighBreakout())
 			.lowBreakout(calcLowBreakout())
-			.oneMinuteRate(oneMinuteRate)
+			// .oneMinuteRate(oneMinuteRate)
 			.build();
 	}
 

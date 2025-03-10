@@ -30,16 +30,13 @@ public class UpbitDataService {
 
 	public void processOrderbookData(UpbitWebSocketOrderbookDto dto) {
 		Orderbook orderbook = dto.toEntity();
-
-		orderbookService.updateLatestOrderbook(orderbook);
-
-		orderbookService.publish(orderbook);
+		orderbookService.updateOrderbook(orderbook);
 	}
 
 	public void processTickerData(UpbitWebSocketTickerDto dto) {
 		try {
-			double oneMinuteRate = tickerService.calculateOneMinuteRate(dto.getCode(), dto.getTradePrice());
-			Ticker ticker = dto.toEntity(oneMinuteRate);
+			// double oneMinuteRate = tickerService.calculateOneMinuteRate(dto.getCode(), dto.getTradePrice());
+			Ticker ticker = dto.toEntity();
 			tickerService.updateTicker(ticker);
 		} catch (RuntimeException e) {
 			log.error("failed to fetch ticker data : {}", e.getMessage());
@@ -48,6 +45,6 @@ public class UpbitDataService {
 
 	public void processTradeData(UpbitWebSocketTradeDto dto) {
 		Trade trade = dto.toEntity();
-		tradeService.publish(trade);
+		tradeService.updateTrade(trade);
 	}
 }

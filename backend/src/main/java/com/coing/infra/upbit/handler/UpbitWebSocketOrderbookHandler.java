@@ -11,7 +11,7 @@ import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 import com.coing.infra.upbit.adapter.UpbitDataService;
 import com.coing.infra.upbit.dto.UpbitWebSocketOrderbookDto;
 import com.coing.infra.upbit.enums.EnumUpbitRequestType;
-import com.coing.util.Ut;
+import com.coing.infra.upbit.util.UpbitRequestBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UpbitWebSocketOrderbookHandler extends BinaryWebSocketHandler {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final UpbitDataService upbitDataService;
+	private final UpbitRequestBuilder upbitRequestBuilder;
 
 	/**
 	 * 연결 수립 후 초기 구독 메시지 전송
@@ -38,7 +39,7 @@ public class UpbitWebSocketOrderbookHandler extends BinaryWebSocketHandler {
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		log.info("Upbit WebSocket Orderbook connection established.");
-		String subscribeMessage = Ut.Upbit.makeRequest(EnumUpbitRequestType.ORDERBOOK);
+		String subscribeMessage = upbitRequestBuilder.makeRequest(EnumUpbitRequestType.ORDERBOOK);
 		log.info("Sending subscription message: {}", subscribeMessage);
 		session.sendMessage(new TextMessage(subscribeMessage));
 	}
