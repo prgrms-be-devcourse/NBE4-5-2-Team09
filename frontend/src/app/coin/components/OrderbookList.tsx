@@ -101,7 +101,7 @@ export default function OrderbookList({ market }: OrderBookListProps) {
                 <tr key={`ask-${index}`} className="border-b border-gray-100">
                   <td className="px-4 py-2 text-sm">
                     <div
-                      className="h-6 flex items-center justify-end text-right pr-2 ml-auto "
+                      className="h-6 flex items-center justify-end pr-2 ml-auto text-xs"
                       style={{
                         width: `${
                           maxAskValue
@@ -219,7 +219,7 @@ export default function OrderbookList({ market }: OrderBookListProps) {
                   </td>
                   <td className="px-4 py-2 text-sm">
                     <div
-                      className="h-6 flex items-center text-right px-2 mr-2"
+                      className="h-6 flex items-center text-xs px-2 mr-2"
                       style={{
                         width: `${
                           maxBidValue
