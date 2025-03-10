@@ -63,7 +63,7 @@ public class UserService {
 		// 이메일 인증 메일 전송 실패 시 예외 전파 (회원가입 전체 롤백)
 		emailVerificationService.sendVerificationEmail(savedUser);
 
-		return new UserResponse(savedUser.getId(), savedUser.getName(), savedUser.getEmail());
+		return new UserResponse(savedUser.getId(), savedUser.getName(), savedUser.getEmail(), savedUser.isVerified());
 	}
 
 	@Transactional(readOnly = true)
@@ -79,7 +79,7 @@ public class UserService {
 			throw new BusinessException(messageUtil.resolveMessage("password.mismatch"),
 				HttpStatus.BAD_REQUEST, "");
 		}
-		return new UserResponse(user.getId(), user.getName(), user.getEmail());
+		return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.isVerified());
 	}
 
 	@Transactional
@@ -101,7 +101,7 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public UserResponse findById(UUID id) {
 		return userRepository.findById(id)
-			.map(u -> new UserResponse(u.getId(), u.getName(), u.getEmail()))
+			.map(u -> new UserResponse(u.getId(), u.getName(), u.getEmail(), u.isVerified()))
 			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("member.not.found"),
 				HttpStatus.BAD_REQUEST, ""));
 	}

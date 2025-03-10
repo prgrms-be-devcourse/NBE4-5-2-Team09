@@ -35,8 +35,7 @@ public class EmailVerificationService {
 	public void sendVerificationEmail(User user) {
 		// 이메일 인증 토큰 생성 (JWT 기반, 만료 10분)
 		String token = Ut.AuthTokenUtil.createEmailVerificationToken(jwtSecretKey, user.getId());
-		// 회원가입 시, 기존 인증 코드 관련 필드를 업데이트할 필요가 있으면 여기서 수행
-		// 예를 들어, 토큰 자체를 DB에 저장할 수도 있으나, 여기서는 링크 기반이므로 별도 저장 없이 처리
+	
 		try {
 			emailSenderService.sendEmailVerificationMessage(user.getEmail(), token);
 			log.info("인증 이메일 전송 성공: {}", user.getEmail());

@@ -61,7 +61,7 @@ custom:
     secret-key: ${JWT_SECRET_KEY}
     expire-seconds: ${JWT_EXPIRE_SECONDS}
     refresh-expire-seconds: ${JWT_REFRESH_EXPIRE_SECONDS}
-    mail-verification-url: ${EMAIL_VERIFICATION_URL:http://localhost:8080/api/auth/verify-email?token=}
+    mail-verification-url: ${EMAIL_VERIFICATION_URL:http://localhost:3000/api/auth/verify-email-?token=}
 
 upbit:
   websocket:

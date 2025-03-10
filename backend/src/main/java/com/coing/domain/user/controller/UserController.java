@@ -67,18 +67,24 @@ public class UserController {
 
 	@Operation(summary = "이메일 인증")
 	@GetMapping("/verify-email")
-	public ResponseEntity<BasicResponse> verifyEmail(@RequestParam(name = "token") String token) {
+	public ResponseEntity<?> verifyEmail(@RequestParam(name = "token") String token) {
 		Map<String, Object> claims = authTokenService.verifyToken(token);
 		if (claims == null || claims.get("id") == null) {
-			// 이메일 인증 토큰은 BAD_REQUEST로 처리 (토큰 포맷 문제 등)
-			throw new BusinessException(messageUtil.resolveMessage("invalid.email.verification.token"),
-				HttpStatus.BAD_REQUEST, "");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(Map.of("status", "error", "message", "유효하지 않은 토큰입니다."));
 		}
 		UUID userId = UUID.fromString(claims.get("id").toString());
-		var verifiedUser = emailVerificationService.verifyEmail(userId);
-		return ResponseEntity.ok(
-			new BasicResponse(HttpStatus.OK, "이메일 인증 성공", "User " + verifiedUser.getName() + " verified.")
-		);
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("member.not.found"),
+				HttpStatus.BAD_REQUEST, ""));
+
+		if (user.isVerified()) {
+			return ResponseEntity.status(HttpStatus.OK)
+				.body(Map.of("status", "already", "message", "이미 인증되었습니다."));
+		}
+
+		emailVerificationService.verifyEmail(userId);
+		return ResponseEntity.ok(Map.of("status", "success", "message", "이메일 인증이 완료되었습니다."));
 	}
 
 	@Operation(summary = "이메일 인증 상태 확인", description = "회원가입을 요청한 사용자의 UUID(userId)를 기준으로 이메일 인증 여부를 확인합니다.")
@@ -99,6 +105,9 @@ public class UserController {
 	public ResponseEntity<BasicResponse> login(@RequestBody @Validated UserLoginRequest request,
 		HttpServletResponse response) {
 		UserResponse user = userService.login(request.email(), request.password());
+		if (!user.verified()) {
+			throw new BusinessException("이메일 인증이 완료되지 않았습니다.", HttpStatus.UNAUTHORIZED, "");
+		}
 		String accessToken = authTokenService.genAccessToken(user);
 		String refreshToken = authTokenService.genRefreshToken(user);
 		Cookie refreshCookie = new Cookie("refreshToken", refreshToken);

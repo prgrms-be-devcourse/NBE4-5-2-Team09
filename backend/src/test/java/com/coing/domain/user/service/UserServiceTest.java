@@ -51,8 +51,8 @@ public class UserServiceTest {
 	void t1() {
 		String name = "테스트";
 		String email = "test@test.com";
-		String password = "test";
-		String passwordConfirm = "test";
+		String password = "testtest1!";
+		String passwordConfirm = "testtest1!";
 
 		when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 		when(passwordEncoder.encode(password)).thenReturn("encodedPassword");
@@ -78,8 +78,8 @@ public class UserServiceTest {
 	void t2() {
 		String name = "테스트";
 		String email = "test@test.com";
-		String password = "test";
-		String passwordConfirm = "test2";
+		String password = "testtest!1";
+		String passwordConfirm = "testtest!2";
 
 		UserSignUpRequest request = new UserSignUpRequest(name, email, password, passwordConfirm);
 		Exception exception = assertThrows(BusinessException.class, () -> {
@@ -93,8 +93,8 @@ public class UserServiceTest {
 	void t3() {
 		String name = "테스트";
 		String email = "test@test.com";
-		String password = "test";
-		String passwordConfirm = "test";
+		String password = "testtest1!";
+		String passwordConfirm = "testtest1!";
 
 		UserSignUpRequest request = new UserSignUpRequest(name, email, password, passwordConfirm);
 

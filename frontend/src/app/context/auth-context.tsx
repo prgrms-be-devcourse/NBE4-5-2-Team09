@@ -46,10 +46,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     async function refreshAccessToken(): Promise<string | null> {
         console.log("[AuthProvider] refreshAccessToken 호출");
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL + "/api/auth/refresh"}`, {
-                method: "POST",
-                credentials: "include",
-            });
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL + "/api/auth/refresh"}`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                }
+            );
             console.log("[AuthProvider] refresh 응답 상태:", response.status);
             if (response.ok) {
                 const authHeader = response.headers.get("Authorization");
@@ -71,7 +74,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     // 모든 API 요청에 대해 사용할 커스텀 fetch 함수
-    const customFetch = async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
+    const customFetch = async (
+        input: RequestInfo,
+        init?: RequestInit
+    ): Promise<Response> => {
         console.log("[customFetch] 요청 시작:", input);
         // 현재 accessToken을 헤더에 추가
         const token = accessToken;
@@ -81,12 +87,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         };
 
         console.log("[customFetch] 사용되는 헤더:", headers);
-        let response = await fetch(input, { ...init, headers, credentials: "include" });
+        let response = await fetch(input, {
+            ...init,
+            headers,
+            credentials: "include",
+        });
         console.log("[customFetch] 초기 응답 상태:", response.status);
 
         // 만약 403 응답이면, refresh token으로 새 액세스 토큰 발급 후 재요청
         if (response.status === 403) {
-            console.warn("[customFetch] 403 응답 감지됨. refresh token으로 재발급 시도합니다.");
+            console.warn(
+                "[customFetch] 403 응답 감지됨. refresh token으로 재발급 시도합니다."
+            );
             const newToken = await refreshAccessToken();
             if (newToken) {
                 headers = {
@@ -94,10 +106,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     Authorization: `Bearer ${newToken}`,
                 };
                 console.log("[customFetch] 새 토큰으로 재요청 헤더:", headers);
-                response = await fetch(input, { ...init, headers, credentials: "include" });
+                response = await fetch(input, {
+                    ...init,
+                    headers,
+                    credentials: "include",
+                });
                 console.log("[customFetch] 재요청 응답 상태:", response.status);
             } else {
-                console.error("[customFetch] refresh token 재발급 실패. 로그인 페이지로 리다이렉트합니다.");
+                console.error(
+                    "[customFetch] refresh token 재발급 실패. 로그인 페이지로 리다이렉트합니다."
+                );
                 window.location.href = "/login";
             }
         }
@@ -105,7 +123,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return response;
     };
 
-    // 컴포넌트 마운트 시 액세스 토큰의 유효성을 체크하고 만료되었으면 리프레시 시도
+    // 컴포넌트 마운트 시 액세스 토큰의 유효성을 체크하고, 로그인 상태일 때만 refresh 시도
     useEffect(() => {
         async function validateToken() {
             console.log("[AuthProvider] validateToken 시작");
@@ -113,14 +131,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             if (token) {
                 const payload = parseJwt(token);
                 const currentTime = Date.now() / 1000; // 초 단위
-                console.log("[AuthProvider] 토큰 만료 시간:", payload?.exp, "현재 시간:", currentTime);
+                console.log(
+                    "[AuthProvider] 토큰 만료 시간:",
+                    payload?.exp,
+                    "현재 시간:",
+                    currentTime
+                );
                 if (payload && payload.exp && payload.exp < currentTime) {
                     console.warn("[AuthProvider] 토큰 만료됨 → refreshAccessToken 호출");
                     await refreshAccessToken();
                 }
             } else {
-                console.warn("[AuthProvider] 쿠키에 토큰 없음 → refreshAccessToken 호출");
-                await refreshAccessToken();
+                console.warn("[AuthProvider] 쿠키에 토큰 없음 → 로그인 상태 아님");
+                // 로그인 상태가 아니라면 refresh를 시도하지 않습니다.
             }
             setIsAuthLoading(false);
             console.log("[AuthProvider] validateToken 완료, isAuthLoading false");
@@ -129,7 +152,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ accessToken, setAccessToken, isAuthLoading, customFetch }}>
+        <AuthContext.Provider
+            value={{ accessToken, setAccessToken, isAuthLoading, customFetch }}
+        >
             {children}
         </AuthContext.Provider>
     );
