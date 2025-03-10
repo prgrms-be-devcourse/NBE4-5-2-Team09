@@ -1,6 +1,6 @@
-import { useWebSocket } from "@/context/WebSocketContext";
-import { MarketDto, TickerDto } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
+import { useWebSocket } from "@/context/WebSocketContext";
+import { MarketDto } from "@/types";
 import Link from "next/link";
 
 export default function ClientPage({ markets }: { markets: MarketDto[] }) {
@@ -89,7 +89,7 @@ export default function ClientPage({ markets }: { markets: MarketDto[] }) {
                   </p>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  거래량:{" "}
+                  거래량:
                   {new Intl.NumberFormat().format(
                     parseFloat(ticker.accTradeVolume?.toFixed(3) || "0")
                   )}
