@@ -2,10 +2,8 @@ package com.coing.domain.coin.market.service;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +46,7 @@ public class MarketService {
 
 			List<Market> markets = Arrays.stream(response.getBody())
 				.map(MarketDto::toEntity)
-				.collect(Collectors.toList());
+				.toList();
 
 			marketRepository.saveAll(markets);
 			log.info("[Market] Market list updated from Upbit API.");
