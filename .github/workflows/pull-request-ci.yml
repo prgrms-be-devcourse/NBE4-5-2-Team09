@@ -8,8 +8,6 @@ on:
   pull_request:
     branches: ["main", "develop"]
     types: [opened, reopened, ready_for_review, synchronize]
-    paths:
-      - "backend/**"
 
 jobs:
   springboot-test:
@@ -17,10 +15,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Check for changes in backend folder
+        id: check_changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend-changed:
+              - 'backend/**'
+
       - name: Navigate to backend directory
         run: cd backend
-    
+
       - name: Gradle Caching
+        if: steps.check_changes.outputs.backend-changed == 'true'
         uses: actions/cache@v3
         with:
           path: |
@@ -31,16 +38,19 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Set up JDK 23
+        if: steps.check_changes.outputs.backend-changed == 'true'
         uses: actions/setup-java@v3
         with:
           java-version: 23
-          distribution: 'temurin'
+          distribution: "temurin"
 
       - name: Grant execute permission for gradlew
+        if: steps.check_changes.outputs.backend-changed == 'true'
         run: chmod +x gradlew
         working-directory: backend
 
       - name: Test with Gradle
+        if: steps.check_changes.outputs.backend-changed == 'true'
         run: ./gradlew test
         working-directory: backend
         env:
@@ -54,3 +64,7 @@ jobs:
         if: always()
         with:
           files: "backend/**/build/test-results/test/TEST-*.xml"
+
+      - name: Skip backend tests (no changes)
+        if: steps.check_changes.outputs.backend-changed == 'false'
+        run: echo "No backend changes, skipping tests."
