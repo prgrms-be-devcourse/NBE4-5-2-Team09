@@ -37,7 +37,6 @@ export default [
       '**/*.min.js',
       '**/*.test.js',
       '*.json',
-      'tailwind.config.js',
     ],
   },
   pluginJs.configs.recommended,

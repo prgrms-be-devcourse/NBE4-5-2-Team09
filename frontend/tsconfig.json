@@ -31,6 +31,13 @@
       "@/context/*": ["src/context/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "*.mjs"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "*.mjs",
+    "tailwind.config.js"
+  ],
   "exclude": ["node_modules", "tsconfig.json"]
 }
