@@ -10,9 +10,10 @@ public record MarketResponse(
 	@NotNull
 	String koreanName,
 	@NotNull
-	String englishName
+	String englishName,
+	Boolean isBookmarked
 ) {
 	public static MarketResponse from(Market market) {
-		return new MarketResponse(market.getCode(), market.getKoreanName(), market.getEnglishName());
+		return new MarketResponse(market.getCode(), market.getKoreanName(), market.getEnglishName(), false);
 	}
 }

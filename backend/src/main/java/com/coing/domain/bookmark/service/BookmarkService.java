@@ -1,6 +1,5 @@
 package com.coing.domain.bookmark.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -57,17 +56,10 @@ public class BookmarkService {
 		Bookmark bookmark = Bookmark.builder()
 			.user(user)
 			.market(market)
-			.createAt(LocalDateTime.now())
 			.build();
 
-		Bookmark savedBookmark = bookmarkRepository.save(bookmark);
-		return new BookmarkResponse(
-			savedBookmark.getId(),
-			savedBookmark.getMarket().getCode(),
-			savedBookmark.getMarket().getKoreanName(),
-			savedBookmark.getMarket().getEnglishName(),
-			savedBookmark.getCreateAt()
-		);
+		bookmarkRepository.save(bookmark);
+		return BookmarkResponse.of(bookmark);
 	}
 
 	@Transactional(readOnly = true)
@@ -75,13 +67,7 @@ public class BookmarkService {
 		Page<Bookmark> bookmarks = bookmarkRepository.findByUserIdAndQuote(userId, quote, pageable);
 
 		List<BookmarkResponse> responses = bookmarks.stream()
-			.map(b -> new BookmarkResponse(
-				b.getId(),
-				b.getMarket().getCode(),
-				b.getMarket().getKoreanName(),
-				b.getMarket().getEnglishName(),
-				b.getCreateAt()
-			))
+			.map(BookmarkResponse::of)
 			.collect(Collectors.toList());
 
 		return new PageImpl<>(responses, pageable, bookmarks.getTotalElements());
