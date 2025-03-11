@@ -1,15 +1,15 @@
 'use client';
 
+import { generateMockNews } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import OrderbookList from '../components/orderbook/OrderbookList';
-import CandleChart from '@/app/coin/components/CandleChart';
-import TradeList from '@/app/coin/components/TradeList';
-import NewsList from '@/app/coin/components/NewsList';
 import { useWebSocket } from '@/context/WebSocketContext';
-import type { CandleItem, CandleChartDto } from '@/types';
 import axios from 'axios';
-import { generateMockNews } from '@/lib/utils';
+import CandleChart from '../components/CandleChart';
+import NewsList from '../components/NewsList';
+import OrderbookList from '../components/orderbook/OrderbookList';
+import TradeList from '../components/TradeList';
+import type { CandleItem, CandleChartDto } from '@/types';
 
 export default function ClientPage() {
   const { market } = useParams() as { market: string };
