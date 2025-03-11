@@ -10,7 +10,7 @@ export default function EmailVerificationWaitingScreen() {
 
     // 메시지 & 타이머 상태
     const [message, setMessage] = useState(
-        "인증 메일을 보내고 있습니다. \n 메일 수신까지 시간이 걸릴 수 있습니다."
+        "인증 메일을 보내고 있습니다. 메일 수신까지 몇 분 정도 걸릴 수 있으니 잠시 후 이메일과 스팸함을 확인해 주세요."
     );
     const [isPolling, setIsPolling] = useState(true);
     const [timeLeft, setTimeLeft] = useState(600); // 10분 (600초)
@@ -29,7 +29,7 @@ export default function EmailVerificationWaitingScreen() {
             try {
                 const response = await fetch(
                     process.env.NEXT_PUBLIC_API_URL +
-                    `/api/auth/is-verified?userId=${encodeURIComponent(userId)}`,
+                        `/api/auth/is-verified?userId=${encodeURIComponent(userId)}`,
                     {
                         method: "GET",
                         credentials: "include",
@@ -75,7 +75,7 @@ export default function EmailVerificationWaitingScreen() {
         try {
             const response = await fetch(
                 process.env.NEXT_PUBLIC_API_URL +
-                `/api/auth/resend-email?userId=${encodeURIComponent(userId)}`,
+                    `/api/auth/resend-email?userId=${encodeURIComponent(userId)}`,
                 {
                     method: "POST",
                     credentials: "include",

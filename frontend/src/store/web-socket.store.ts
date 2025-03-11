@@ -1,14 +1,11 @@
-import { create } from "zustand";
-import { Client, IMessage } from "@stomp/stompjs";
+import { create } from 'zustand';
+import { Client, IMessage } from '@stomp/stompjs';
 
 interface WebSocketState {
   client: Client | null;
   isConnected: boolean;
   connect: () => void;
-  subscribe: (
-    destination: string,
-    callback: (message: IMessage) => void
-  ) => void;
+  subscribe: (destination: string, callback: (message: IMessage) => void) => void;
   unsubscribe: (destination: string) => void;
 }
 
@@ -21,22 +18,20 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => ({
     if (get().client) return; // 이미 연결되어 있으면 중복 연결 방지
 
     const client = new Client({
-      brokerURL:
-        process.env.NEXT_PUBLIC_WEBSOCKET_URL ??
-        "http://localhost:8080/websocket",
+      brokerURL: process.env.NEXT_PUBLIC_WEBSOCKET_URL ?? 'http://localhost:8080/websocket',
       reconnectDelay: 5000, // 연결이 완전히 끊어지면 5초 후 재연결 시도
       heartbeatIncoming: 4000, // 서버 → 클라이언트 연결 유지 확인 (4초)
       heartbeatOutgoing: 4000, // 클라이언트 → 서버 연결 유지 확인 (4초)
       onConnect: () => {
-        console.log("Connected to WebSocket Server");
+        console.log('Connected to WebSocket Server');
         set({ isConnected: true });
       },
       onDisconnect: () => {
-        console.log("Disconnected from WebSocket Server");
+        console.log('Disconnected from WebSocket Server');
         set({ isConnected: false, client: null });
       },
       onStompError: (frame) => {
-        console.error("STOMP Error:", frame.headers["message"]);
+        console.error('STOMP Error:', frame.headers['message']);
       },
     });
 
@@ -48,9 +43,7 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => ({
   subscribe: (destination, callback) => {
     const client = get().client;
     if (!client || !client.connected) {
-      console.error(
-        `Cannot subscribe to ${destination} - WebSocket not connected`
-      );
+      console.error(`Cannot subscribe to ${destination} - WebSocket not connected`);
       return;
     }
 

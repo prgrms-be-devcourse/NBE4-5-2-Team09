@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
   const { accessToken, setAccessToken } = useAuth(); // AuthContext에서 토큰 가져오기
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   // 로그인 상태라면 자동 리다이렉트
   useEffect(() => {
     if (accessToken) {
-      router.push("/");
+      router.push('/');
     }
   }, [accessToken, router]);
 
@@ -21,33 +21,30 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + "/api/auth/login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-          credentials: "include",
-        }
-      );
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include',
+      });
 
       if (response.ok) {
-        const authHeader = response.headers.get("Authorization");
-        if (authHeader?.startsWith("Bearer ")) {
+        const authHeader = response.headers.get('Authorization');
+        if (authHeader?.startsWith('Bearer ')) {
           const token = authHeader.slice(7);
           setAccessToken(token); // 인메모리에 저장
-          console.log("Access Token 저장됨:", token);
+          console.log('Access Token 저장됨:', token);
         }
 
-        alert("로그인 성공!");
-        router.push("/");
+        alert('로그인 성공!');
+        router.push('/');
       } else {
         const errorData = await response.json();
         alert(`로그인 실패: ${errorData.message}`);
       }
     } catch (error) {
-      console.error("Login error:", error);
-      alert("로그인 중 오류가 발생했습니다.");
+      console.error('Login error:', error);
+      alert('로그인 중 오류가 발생했습니다.');
     }
   };
 
@@ -58,9 +55,7 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold mb-4">환영합니다</h1>
         <form className="space-y-4" onSubmit={handleLogin}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              이메일 주소
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">이메일 주소</label>
             <input
               type="email"
               required
@@ -70,9 +65,7 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              비밀번호
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
             <input
               type="password"
               required
@@ -93,7 +86,7 @@ export default function LoginPage() {
         <div className="mt-4 text-center">
           <span className="text-gray-600 text-sm">계정이 없으신가요?</span>
           <button
-            onClick={() => router.push("/user/signup")}
+            onClick={() => router.push('/user/signup')}
             className="ml-2 text-blue-600 font-semibold hover:underline"
           >
             회원가입

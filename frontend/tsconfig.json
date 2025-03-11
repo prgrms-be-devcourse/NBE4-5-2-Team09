@@ -13,15 +13,31 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "baseUrl": "./",
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["src/*"],
+      "@/types": ["src/types"],
+      "@/lib": ["src/lib"],
+      "@/lib/*": ["src/lib/*"],
+      "@/utils": ["src/utils"],
+      "@/utils/*": ["src/utils/*"],
+      "@/components": ["src/components"],
+      "@/components/*": ["src/components/*"],
+      "@/context/*": ["src/context/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "*.mjs",
+    "tailwind.config.js"
+  ],
+  "exclude": ["node_modules", "tsconfig.json"]
 }

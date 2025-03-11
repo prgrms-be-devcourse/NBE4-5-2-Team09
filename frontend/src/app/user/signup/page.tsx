@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function SignUpPage() {
   const router = useRouter();
   const { accessToken } = useAuth();
 
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    passwordConfirm: "",
+    name: '',
+    email: '',
+    password: '',
+    passwordConfirm: '',
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -20,7 +20,7 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (accessToken) {
-      router.push("/");
+      router.push('/');
     }
   }, [accessToken, router]);
 
@@ -33,28 +33,25 @@ export default function SignUpPage() {
 
   // 실시간 유효성 검사 함수
   const validateField = (field: string, value: string) => {
-    let errorMsg = "";
+    let errorMsg = '';
 
-    if (field === "name") {
+    if (field === 'name') {
       if (value.trim().length < 2 || value.trim().length > 20) {
-        errorMsg = "이름은 2~20자 사이여야 합니다.";
+        errorMsg = '이름은 2~20자 사이여야 합니다.';
       }
-    } else if (field === "email") {
+    } else if (field === 'email') {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        errorMsg = "유효한 이메일을 입력하세요.";
+        errorMsg = '유효한 이메일을 입력하세요.';
       }
-    } else if (field === "password") {
-      if (
-        !/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+]).{8,20}$/.test(value)
-      ) {
-        errorMsg =
-          "비밀번호는 8~20자이며, 숫자, 영어, 특수문자를 포함해야 합니다.";
+    } else if (field === 'password') {
+      if (!/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+]).{8,20}$/.test(value)) {
+        errorMsg = '비밀번호는 8~20자이며, 숫자, 영어, 특수문자를 포함해야 합니다.';
       }
-    } else if (field === "passwordConfirm") {
+    } else if (field === 'passwordConfirm') {
       if (!value.trim()) {
-        errorMsg = "비밀번호 확인을 입력하세요.";
+        errorMsg = '비밀번호 확인을 입력하세요.';
       } else if (value !== formData.password) {
-        errorMsg = "비밀번호가 일치하지 않습니다.";
+        errorMsg = '비밀번호가 일치하지 않습니다.';
       }
     }
 
@@ -93,15 +90,12 @@ export default function SignUpPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(formData),
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -110,11 +104,11 @@ export default function SignUpPage() {
         const errorData = await response.json();
         setErrors({
           ...newErrors,
-          general: errorData.message || "회원가입 실패",
+          general: errorData.message || '회원가입 실패',
         });
       }
-    } catch (error) {
-      setErrors({ ...newErrors, general: "서버 오류가 발생했습니다." });
+    } catch {
+      setErrors({ ...newErrors, general: '서버 오류가 발생했습니다.' });
     } finally {
       setIsLoading(false);
     }
@@ -127,9 +121,7 @@ export default function SignUpPage() {
         <h1 className="text-2xl font-bold mb-4">회원가입</h1>
         <form className="space-y-4" onSubmit={handleSignUp}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              이름
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
             <input
               type="text"
               name="name"
@@ -137,14 +129,10 @@ export default function SignUpPage() {
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded px-3 py-2"
             />
-            {errors.name && (
-              <p className="text-red-500 text-sm">{errors.name}</p>
-            )}
+            {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              이메일
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
             <input
               type="email"
               name="email"
@@ -152,14 +140,10 @@ export default function SignUpPage() {
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded px-3 py-2"
             />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email}</p>
-            )}
+            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              비밀번호
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
             <input
               type="password"
               name="password"
@@ -167,14 +151,10 @@ export default function SignUpPage() {
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded px-3 py-2"
             />
-            {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password}</p>
-            )}
+            {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              비밀번호 확인
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호 확인</label>
             <input
               type="password"
               name="passwordConfirm"
@@ -187,17 +167,15 @@ export default function SignUpPage() {
             )}
           </div>
 
-          {errors.general && (
-            <p className="text-red-500 text-center">{errors.general}</p>
-          )}
+          {errors.general && <p className="text-red-500 text-center">{errors.general}</p>}
 
           <button
             type="submit"
             disabled={!isFormValid() || isLoading}
             className={`w-full flex justify-center items-center py-2 rounded transition ${
               isLoading
-                ? "bg-gray-400 text-white cursor-not-allowed"
-                : "bg-blue-600 text-white hover:bg-blue-700"
+                ? 'bg-gray-400 text-white cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
             }`}
           >
             {isLoading ? (
@@ -225,7 +203,7 @@ export default function SignUpPage() {
                 회원가입 중...
               </>
             ) : (
-              "회원가입"
+              '회원가입'
             )}
           </button>
         </form>
@@ -233,7 +211,7 @@ export default function SignUpPage() {
         <div className="mt-4 text-center">
           <span className="text-gray-600 text-sm">이미 계정이 있으신가요?</span>
           <button
-            onClick={() => router.push("/user/login")}
+            onClick={() => router.push('/user/login')}
             className="ml-2 text-blue-600 font-semibold hover:underline"
           >
             로그인

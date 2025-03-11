@@ -6,10 +6,11 @@
     "dev": "doppler run -- next dev --turbopack",
     "build": "doppler run -- next build",
     "start": "doppler run -- next start",
-    "lint": "next lint",
     "codegen": "openapi-typescript ../api_schema.json -o ./src/lib/api/generated/schema.d.ts",
     "codegen:watch": "nodemon --watch ../api_schema.json --exec \"npm run codegen\"",
-    "doppler": "doppler secrets download --no-file --format env-no-quotes > .env"
+    "doppler": "doppler secrets download --no-file --format env-no-quotes > .env",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix && prettier --write \"**/*.{js,jsx,ts,tsx,md}\""
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.2",
@@ -38,21 +39,31 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@eslint/js": "^9.22.0",
     "@tailwindcss/postcss": "^4",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.20",
-    "eslint": "^9",
+    "eslint": "^9.22.0",
     "eslint-config-next": "15.2.1",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-import-resolver-typescript": "^3.8.4",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "globals": "^16.0.0",
     "nodemon": "^3.1.9",
     "openapi-typescript": "^7.6.1",
     "postcss": "^8.5.3",
+    "prettier": "^3.5.3",
     "shadcn-ui": "^0.9.5",
-    "typescript": "^5"
+    "typescript": "^5",
+    "typescript-eslint": "^8.26.1"
   },
   "engines": {
     "node": "22.13.0"
-  }
+  },
+  "type": "module"
 }

@@ -8,9 +8,13 @@
   ],
   "scripts": {
     "doppler": "npm run doppler:setup && turbo run doppler",
-    "doppler:setup": "doppler setup --no-interactive"
+    "doppler:setup": "doppler setup --no-interactive",
+    "precommit": "lint-staged",
+    "prepare": "husky install"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
     "turbo": "1.12.4"
   }
 }

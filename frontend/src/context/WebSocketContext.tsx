@@ -1,24 +1,13 @@
-"use client";
+'use client';
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-} from "react";
-import { IMessage } from "@stomp/stompjs";
-import { usePathname, useParams } from "next/navigation";
-import type {
-  TickerDto,
-  OrderbookDto,
-  TradeDto,
-  CandleChartDto,
-} from "@/types";
-import { useWebSocketStore } from "@/store/web-socket.store";
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { IMessage } from '@stomp/stompjs';
+import { usePathname, useParams } from 'next/navigation';
+import type { TickerDto, OrderbookDto, TradeDto, CandleChartDto } from '@/types';
+import { useWebSocketStore } from '@/store/web-socket.store';
 
 // 구독 가능한 타입 정의
-type SubscriptionType = "ticker" | "orderbook" | "trade" | "candle";
+type SubscriptionType = 'ticker' | 'orderbook' | 'trade' | 'candle';
 
 interface Subscription {
   type: SubscriptionType;
@@ -53,17 +42,12 @@ export const WebSocketProvider = ({
   const { connect, isConnected, subscribe, unsubscribe } = useWebSocketStore();
 
   const [tickers, setTicker] = useState<Record<string, TickerDto | null>>({});
-  const [orderbooks, setOrderbook] = useState<
-    Record<string, OrderbookDto | null>
-  >({});
+  const [orderbooks, setOrderbook] = useState<Record<string, OrderbookDto | null>>({});
   const [trades, setTrades] = useState<Record<string, TradeDto | null>>({});
-  const [candles, setCandles] = useState<
-    Record<string, CandleChartDto[] | null>
-  >({});
+  const [candles, setCandles] = useState<Record<string, CandleChartDto[] | null>>({});
 
   // ✅ 현재 구독 상태를 state로 관리
-  const [currentSubscriptions, setCurrentSubscriptions] =
-    useState<Subscription[]>(subscriptions);
+  const [currentSubscriptions, setCurrentSubscriptions] = useState<Subscription[]>(subscriptions);
 
   // ✅ WebSocket 구독 변경 함수
   const updateSubscriptions = (newSubscriptions: Subscription[]) => {
@@ -105,16 +89,13 @@ export const WebSocketProvider = ({
     };
 
     // `markets`가 없거나 빈 배열이면 `useParams()`에서 market을 가져와 사용
-    const updatedSubscriptions = currentSubscriptions.map(
-      ({ type, markets }) => ({
-        type,
-        markets: markets && markets.length > 0 ? markets : [market],
-      })
-    );
+    const updatedSubscriptions = currentSubscriptions.map(({ type, markets }) => ({
+      type,
+      markets: markets && markets.length > 0 ? markets : [market],
+    }));
 
-    const activeSubscriptions = updatedSubscriptions.flatMap(
-      ({ type, markets }) =>
-        markets!.map((market) => availableSubscriptions[type](market))
+    const activeSubscriptions = updatedSubscriptions.flatMap(({ type, markets }) =>
+      markets!.map((market) => availableSubscriptions[type](market)),
     );
 
     activeSubscriptions.forEach(({ dest, callback }) => {
