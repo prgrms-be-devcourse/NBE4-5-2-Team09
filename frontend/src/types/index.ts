@@ -32,25 +32,25 @@ export type TickerDto = {
 };
 
 export enum Change {
-  RISE = "RISE", // 상승
-  EVEN = "EVEN", // 보합
-  FALL = "FALL", // 하락
+  RISE = 'RISE', // 상승
+  EVEN = 'EVEN', // 보합
+  FALL = 'FALL', // 하락
 }
 
 export enum MarketState {
-  PREVIEW = "PREVIEW", // 입금지원
-  ACTIVE = "ACTIVE", // 거래지원 가능
-  DELISTED = "DELISTED", // 거래지원 종료
+  PREVIEW = 'PREVIEW', // 입금지원
+  ACTIVE = 'ACTIVE', // 거래지원 가능
+  DELISTED = 'DELISTED', // 거래지원 종료
 }
 
 export enum MarketWarning {
-  NONE = "NONE", // 유의 종목 아님
-  CAUTION = "CAUTION", // 유의 종목
+  NONE = 'NONE', // 유의 종목 아님
+  CAUTION = 'CAUTION', // 유의 종목
 }
 
 export enum AskBid {
-  ASK = "ASK", // 매도
-  BID = "BID", // 매수
+  ASK = 'ASK', // 매도
+  BID = 'BID', // 매수
 }
 
 /** MockData 전용 타입 (추후 삭제 예정) **/
@@ -83,7 +83,7 @@ export type NewsItem = {
 
 /** 실제 websocket 응답 객체 타입 **/
 export type TradeDto = {
-  type: "trade"; // "trade"
+  type: 'trade'; // "trade"
   code: string; // 마켓 코드 (ex. KRW-BTC)
   tradePrice: number; // 체결 가격
   tradeVolume: number; // 체결량
@@ -106,7 +106,7 @@ export type TradeDto = {
 };
 
 export type OrderbookDto = {
-  type: "orderbook"; // "orderbook"
+  type: 'orderbook'; // "orderbook"
   code: string; // 마켓 코드 (ex. KRW-BTC)
   totalAskSize: number; // 호가 매도 총 잔량
   totalBidSize: number; // 호가 매수 총 잔량

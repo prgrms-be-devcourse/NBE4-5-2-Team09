@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import Link from "next/link";
-import { useWebSocket } from "@/context/WebSocketContext";
-import { MarketDto } from "@/types";
+import { useEffect, useMemo, useRef } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import Link from 'next/link';
+import { useWebSocket } from '@/context/WebSocketContext';
+import { MarketDto } from '@/types';
 
 interface ClientPageProps {
   markets: MarketDto[];
@@ -28,7 +28,7 @@ export default function ClientPage({ markets }: ClientPageProps) {
       const prevCodes = JSON.stringify(prevMarketCodesRef.current);
       if (newCodes !== prevCodes) {
         prevMarketCodesRef.current = marketCodes;
-        updateSubscriptions([{ type: "ticker", markets: marketCodes }]);
+        updateSubscriptions([{ type: 'ticker', markets: marketCodes }]);
       }
     }
   }, [marketCodes, updateSubscriptions]);
@@ -49,48 +49,36 @@ export default function ClientPage({ markets }: ClientPageProps) {
                   <p className="text-xl font-semibold">
                     {ticker
                       ? new Intl.NumberFormat(undefined, {
-                        minimumFractionDigits:
-                          ticker.tradePrice <= 1
-                            ? 8
-                            : ticker.tradePrice < 1000
-                              ? 1
-                              : 0,
-                        maximumFractionDigits:
-                          ticker.tradePrice <= 1
-                            ? 8
-                            : ticker.tradePrice < 1000
-                              ? 1
-                              : 0,
-                      }).format(ticker.tradePrice)
-                      : "0"}{" "}
-                    <span className="text-xs">
-                      {market.code.split("-")[0]}
-                    </span>
+                          minimumFractionDigits:
+                            ticker.tradePrice <= 1 ? 8 : ticker.tradePrice < 1000 ? 1 : 0,
+                          maximumFractionDigits:
+                            ticker.tradePrice <= 1 ? 8 : ticker.tradePrice < 1000 ? 1 : 0,
+                        }).format(ticker.tradePrice)
+                      : '0'}{' '}
+                    <span className="text-xs">{market.code.split('-')[0]}</span>
                   </p>
                   <p
                     className={
                       ticker && ticker.signedChangeRate >= 0
-                        ? "text-sm text-red-500"
-                        : "text-sm text-blue-500"
+                        ? 'text-sm text-red-500'
+                        : 'text-sm text-blue-500'
                     }
                   >
                     {ticker && ticker.signedChangeRate
-                      ? `${ticker.signedChangeRate >= 0 ? "+" : ""}${(
-                        ticker.signedChangeRate * 100
-                      ).toFixed(2)}%`
-                      : "0%"}
+                      ? `${ticker.signedChangeRate >= 0 ? '+' : ''}${(
+                          ticker.signedChangeRate * 100
+                        ).toFixed(2)}%`
+                      : '0%'}
                   </p>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  거래량{" "}
+                  거래량{' '}
                   {ticker
                     ? new Intl.NumberFormat().format(
-                      parseFloat(ticker.accTradeVolume?.toFixed(3) || "0")
-                    )
-                    : "0"}{" "}
-                  <span className="text-xs">
-                    {market.code.split("-")[1]}
-                  </span>
+                        parseFloat(ticker.accTradeVolume?.toFixed(3) || '0'),
+                      )
+                    : '0'}{' '}
+                  <span className="text-xs">{market.code.split('-')[1]}</span>
                 </p>
               </CardContent>
             </Card>

@@ -1,14 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import type { CandleItem } from "@/types";
+import { useEffect, useRef, useState } from 'react';
+import type { CandleItem } from '@/types';
 
 interface CandleChartProps {
   candles: CandleItem[];
-  candleType: "seconds" | "minutes" | "days" | "weeks" | "months" | "years";
-  setCandleType: (
-    type: "seconds" | "minutes" | "days" | "weeks" | "months" | "years"
-  ) => void;
+  candleType: 'seconds' | 'minutes' | 'days' | 'weeks' | 'months' | 'years';
+  setCandleType: (type: 'seconds' | 'minutes' | 'days' | 'weeks' | 'months' | 'years') => void;
   minuteUnit: number;
   setMinuteUnit: (unit: number) => void;
 }
@@ -23,9 +21,7 @@ export default function CandleChart({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // 초기 zoom을 5로 설정 (최대 확대 상태)
   const [zoom, setZoom] = useState(5);
-  const [crosshair, setCrosshair] = useState<{ x: number; y: number } | null>(
-    null
-  );
+  const [crosshair, setCrosshair] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     if (!canvasRef.current || candles.length === 0) return;
@@ -34,7 +30,7 @@ export default function CandleChart({
     const sortedCandles = [...candles].sort((a, b) => a.time - b.time);
 
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     // 캔버스 DPI 처리
@@ -77,7 +73,7 @@ export default function CandleChart({
       // ────────────
       // y축 그리드 및 레이블 (grid는 고정)
       ctx.beginPath();
-      ctx.strokeStyle = "#e5e7eb";
+      ctx.strokeStyle = '#e5e7eb';
       ctx.lineWidth = 1;
       const numGridLines = 5;
       for (let i = 0; i <= numGridLines; i++) {
@@ -85,16 +81,16 @@ export default function CandleChart({
         const price = minPrice + (i / numGridLines) * priceRange;
         ctx.moveTo(padding.left, y);
         ctx.lineTo(padding.left + chartWidth, y);
-        ctx.fillStyle = "#6b7280";
-        ctx.font = "10px sans-serif";
-        ctx.textAlign = "right";
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'right';
         ctx.fillText(
-          price.toLocaleString("ko-KR", {
+          price.toLocaleString('ko-KR', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           }),
           padding.left - 10,
-          y + 4
+          y + 4,
         );
       }
       ctx.stroke();
@@ -103,62 +99,58 @@ export default function CandleChart({
       const numXLabels = 10;
       let dateFormatter: Intl.DateTimeFormat;
       switch (candleType) {
-        case "seconds":
-          dateFormatter = new Intl.DateTimeFormat("ko-KR", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
+        case 'seconds':
+          dateFormatter = new Intl.DateTimeFormat('ko-KR', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
             hour12: false,
           });
           break;
-        case "minutes":
-          dateFormatter = new Intl.DateTimeFormat("ko-KR", {
-            hour: "2-digit",
-            minute: "2-digit",
+        case 'minutes':
+          dateFormatter = new Intl.DateTimeFormat('ko-KR', {
+            hour: '2-digit',
+            minute: '2-digit',
             hour12: false,
           });
           break;
-        case "days":
-          dateFormatter = new Intl.DateTimeFormat("ko-KR", {
-            month: "2-digit",
-            day: "2-digit",
+        case 'days':
+          dateFormatter = new Intl.DateTimeFormat('ko-KR', {
+            month: '2-digit',
+            day: '2-digit',
           });
           break;
-        case "weeks":
-          dateFormatter = new Intl.DateTimeFormat("ko-KR", {
-            month: "2-digit",
-            day: "2-digit",
+        case 'weeks':
+          dateFormatter = new Intl.DateTimeFormat('ko-KR', {
+            month: '2-digit',
+            day: '2-digit',
           });
           break;
-        case "months":
-          dateFormatter = new Intl.DateTimeFormat("ko-KR", {
-            year: "numeric",
-            month: "2-digit",
+        case 'months':
+          dateFormatter = new Intl.DateTimeFormat('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
           });
           break;
-        case "years":
-          dateFormatter = new Intl.DateTimeFormat("ko-KR", { year: "numeric" });
+        case 'years':
+          dateFormatter = new Intl.DateTimeFormat('ko-KR', { year: 'numeric' });
           break;
         default:
-          dateFormatter = new Intl.DateTimeFormat("ko-KR");
+          dateFormatter = new Intl.DateTimeFormat('ko-KR');
       }
       for (let i = 0; i <= numXLabels; i++) {
         const labelTime = lastTime - (timeRange * i) / numXLabels;
         const x = calcXBase(labelTime);
         ctx.beginPath();
-        ctx.strokeStyle = "#e5e7eb";
+        ctx.strokeStyle = '#e5e7eb';
         ctx.moveTo(x, padding.top);
         ctx.lineTo(x, padding.top + chartHeight);
         ctx.stroke();
-        ctx.fillStyle = "#6b7280";
-        ctx.font = "10px sans-serif";
-        ctx.textAlign = "center";
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
         const kstTime = new Date(labelTime + 9 * 3600 * 1000);
-        ctx.fillText(
-          dateFormatter.format(kstTime),
-          x,
-          padding.top + chartHeight + 20
-        );
+        ctx.fillText(dateFormatter.format(kstTime), x, padding.top + chartHeight + 20);
       }
       // ────────────
 
@@ -172,17 +164,13 @@ export default function CandleChart({
       const candleWidth = 10; // 고정 캔들 너비
       sortedCandles.forEach((candle) => {
         const x = calcXCandle(candle.time);
-        const openY =
-          padding.top + chartHeight - (candle.open - minPrice) * yScale;
-        const closeY =
-          padding.top + chartHeight - (candle.close - minPrice) * yScale;
-        const highY =
-          padding.top + chartHeight - (candle.high - minPrice) * yScale;
-        const lowY =
-          padding.top + chartHeight - (candle.low - minPrice) * yScale;
+        const openY = padding.top + chartHeight - (candle.open - minPrice) * yScale;
+        const closeY = padding.top + chartHeight - (candle.close - minPrice) * yScale;
+        const highY = padding.top + chartHeight - (candle.high - minPrice) * yScale;
+        const lowY = padding.top + chartHeight - (candle.low - minPrice) * yScale;
 
         const isUp = candle.close > candle.open;
-        const color = isUp ? "red" : "blue";
+        const color = isUp ? 'red' : 'blue';
 
         ctx.beginPath();
         ctx.strokeStyle = color;
@@ -201,7 +189,7 @@ export default function CandleChart({
       // Crosshair 그리기 (마우스가 캔버스 위에 있을 때)
       if (crosshair) {
         ctx.beginPath();
-        ctx.strokeStyle = "gray";
+        ctx.strokeStyle = 'gray';
         ctx.lineWidth = 1;
         ctx.moveTo(crosshair.x, padding.top);
         ctx.lineTo(crosshair.x, padding.top + chartHeight);
@@ -209,25 +197,24 @@ export default function CandleChart({
         ctx.lineTo(padding.left + chartWidth, crosshair.y);
         ctx.stroke();
 
-        const timeAtCross =
-          lastTime - (padding.left + chartWidth - crosshair.x) / candleXScale;
+        const timeAtCross = lastTime - (padding.left + chartWidth - crosshair.x) / candleXScale;
         const kstAtCross = new Date(timeAtCross + 9 * 3600 * 1000);
         const priceAtCross = maxPrice - (crosshair.y - padding.top) / yScale;
-        ctx.fillStyle = "black";
-        ctx.font = "12px sans-serif";
-        ctx.textAlign = "left";
+        ctx.fillStyle = 'black';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'left';
         ctx.fillText(
-          `Time: ${kstAtCross.toLocaleTimeString("ko-KR", { hour12: false })}`,
+          `Time: ${kstAtCross.toLocaleTimeString('ko-KR', { hour12: false })}`,
           crosshair.x + 5,
-          crosshair.y - 20
+          crosshair.y - 20,
         );
         ctx.fillText(
-          `Price: ${priceAtCross.toLocaleString("ko-KR", {
+          `Price: ${priceAtCross.toLocaleString('ko-KR', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}`,
           crosshair.x + 5,
-          crosshair.y - 5
+          crosshair.y - 5,
         );
       }
     };
@@ -255,14 +242,14 @@ export default function CandleChart({
       drawChart();
     };
 
-    canvas.addEventListener("wheel", handleWheel, { passive: false });
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("mouseleave", handleMouseLeave);
+    canvas.addEventListener('wheel', handleWheel, { passive: false });
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
-      canvas.removeEventListener("wheel", handleWheel);
-      canvas.removeEventListener("mousemove", handleMouseMove);
-      canvas.removeEventListener("mouseleave", handleMouseLeave);
+      canvas.removeEventListener('wheel', handleWheel);
+      canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, [candles, zoom, crosshair, candleType]);
 
@@ -272,68 +259,56 @@ export default function CandleChart({
       <div className="absolute top-2 right-2 z-10 flex space-x-2 bg-white bg-opacity-80 p-1 rounded">
         <button
           className={`px-2 py-1 text-xs rounded ${
-            candleType === "seconds"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-800"
+            candleType === 'seconds' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
-          onClick={() => setCandleType("seconds")}
+          onClick={() => setCandleType('seconds')}
         >
           초봉
         </button>
         <button
           className={`px-2 py-1 text-xs rounded ${
-            candleType === "minutes"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-800"
+            candleType === 'minutes' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
-          onClick={() => setCandleType("minutes")}
+          onClick={() => setCandleType('minutes')}
         >
           분봉
         </button>
         <button
           className={`px-2 py-1 text-xs rounded ${
-            candleType === "days"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-800"
+            candleType === 'days' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
-          onClick={() => setCandleType("days")}
+          onClick={() => setCandleType('days')}
         >
           일봉
         </button>
         <button
           className={`px-2 py-1 text-xs rounded ${
-            candleType === "weeks"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-800"
+            candleType === 'weeks' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
-          onClick={() => setCandleType("weeks")}
+          onClick={() => setCandleType('weeks')}
         >
           주봉
         </button>
         <button
           className={`px-2 py-1 text-xs rounded ${
-            candleType === "months"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-800"
+            candleType === 'months' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
-          onClick={() => setCandleType("months")}
+          onClick={() => setCandleType('months')}
         >
           월봉
         </button>
         <button
           className={`px-2 py-1 text-xs rounded ${
-            candleType === "years"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-800"
+            candleType === 'years' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
-          onClick={() => setCandleType("years")}
+          onClick={() => setCandleType('years')}
         >
           연봉
         </button>
       </div>
 
       {/* 오버레이: 분봉 단위 선택 드롭다운 (좌측 상단, 분봉일 때만 표시) */}
-      {candleType === "minutes" && (
+      {candleType === 'minutes' && (
         <div className="absolute top-2 left-2 z-10 bg-white bg-opacity-80 p-1 rounded text-xs">
           <label className="mr-1">분봉 단위:</label>
           <select
@@ -357,7 +332,7 @@ export default function CandleChart({
         <canvas
           ref={canvasRef}
           className="w-full h-full"
-          style={{ width: "100%", height: "100%" }}
+          style={{ width: '100%', height: '100%' }}
         />
       </div>
     </div>

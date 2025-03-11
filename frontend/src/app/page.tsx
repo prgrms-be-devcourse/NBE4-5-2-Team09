@@ -1,8 +1,8 @@
-import { redirect } from "next/navigation";
-import ClientPage from "@/app/ClientPage";
+import { redirect } from 'next/navigation';
+import ClientPage from '@/app/ClientPage';
 
 export default function Page() {
-  redirect("/coin/list");
+  redirect('/coin/list');
 
   return <ClientPage />;
 }

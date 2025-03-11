@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import type { NewsItem } from "@/types";
+import type { NewsItem } from '@/types';
 
 interface NewsListProps {
   news: NewsItem[];
@@ -9,12 +9,12 @@ interface NewsListProps {
 export default function NewsList({ news }: NewsListProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("ko-KR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
+    return date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 

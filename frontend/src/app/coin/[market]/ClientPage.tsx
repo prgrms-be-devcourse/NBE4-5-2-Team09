@@ -9,7 +9,7 @@ import NewsList from '@/app/coin/components/NewsList';
 import { useWebSocket } from '@/context/WebSocketContext';
 import type { CandleItem, CandleChartDto } from '@/types';
 import axios from 'axios';
-import { generateMockNews, generateMockOrderbook } from '@/lib/utils';
+import { generateMockNews } from '@/lib/utils';
 
 export default function ClientPage() {
   const { market } = useParams() as { market: string };

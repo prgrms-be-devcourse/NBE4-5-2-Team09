@@ -5,7 +5,7 @@ import {
   type CandleItem,
   type NewsItem,
   AskBid,
-} from "@/types";
+} from '@/types';
 
 // 모의 호가(Orderbook) 생성 함수
 export function generateMockOrderbook(): Orderbook {
@@ -100,49 +100,48 @@ export function generateMockCandles(): CandleItem[] {
 export function generateMockNews(): NewsItem[] {
   const news: NewsItem[] = [
     {
-      id: "1",
-      title: "비트코인, 5만달러 돌파 후 속락세",
+      id: '1',
+      title: '비트코인, 5만달러 돌파 후 속락세',
       summary:
-        "2024.03.15 14:30 - 비트코인이 5만 달러를 돌파한 후 급격한 하락세를 보이고 있습니다. 전문가들은 단기 조정 후 상승세를 예상합니다.",
-      source: "코인뉴스",
-      publishedAt: "2024-03-15T14:30:00Z",
-      url: "#",
+        '2024.03.15 14:30 - 비트코인이 5만 달러를 돌파한 후 급격한 하락세를 보이고 있습니다. 전문가들은 단기 조정 후 상승세를 예상합니다.',
+      source: '코인뉴스',
+      publishedAt: '2024-03-15T14:30:00Z',
+      url: '#',
     },
     {
-      id: "2",
-      title: "SEC, 비트코인 ETF 추가 승인 검토 중",
+      id: '2',
+      title: 'SEC, 비트코인 ETF 추가 승인 검토 중',
       summary:
-        "2024.03.15 13:45 - 미국 증권거래위원회(SEC)가 추가적인 비트코인 ETF 승인을 검토 중인 것으로 알려졌습니다.",
-      source: "글로벌경제",
-      publishedAt: "2024-03-15T13:45:00Z",
-      url: "#",
+        '2024.03.15 13:45 - 미국 증권거래위원회(SEC)가 추가적인 비트코인 ETF 승인을 검토 중인 것으로 알려졌습니다.',
+      source: '글로벌경제',
+      publishedAt: '2024-03-15T13:45:00Z',
+      url: '#',
     },
     {
-      id: "3",
-      title: "가상자산 거래소, 신규 보안 정책 도입 예정",
+      id: '3',
+      title: '가상자산 거래소, 신규 보안 정책 도입 예정',
       summary:
-        "2024.03.15 11:20 - 주요 가상자산 거래소들이 해킹 방지를 위한 새로운 보안 정책을 도입할 예정입니다.",
-      source: "테크뉴스",
-      publishedAt: "2024-03-15T11:20:00Z",
-      url: "#",
+        '2024.03.15 11:20 - 주요 가상자산 거래소들이 해킹 방지를 위한 새로운 보안 정책을 도입할 예정입니다.',
+      source: '테크뉴스',
+      publishedAt: '2024-03-15T11:20:00Z',
+      url: '#',
     },
     {
-      id: "4",
-      title: "이더리움 2.0 업그레이드, 예상보다 빠른 진행",
+      id: '4',
+      title: '이더리움 2.0 업그레이드, 예상보다 빠른 진행',
       summary:
-        "이더리움 재단은 이더리움 2.0 업그레이드가 예상보다 빠르게 진행되고 있다고 발표했습니다.",
-      source: "블록체인투데이",
-      publishedAt: "2024-03-15T10:15:00Z",
-      url: "#",
+        '이더리움 재단은 이더리움 2.0 업그레이드가 예상보다 빠르게 진행되고 있다고 발표했습니다.',
+      source: '블록체인투데이',
+      publishedAt: '2024-03-15T10:15:00Z',
+      url: '#',
     },
     {
-      id: "5",
-      title: "중앙은행들, CBDC 개발 가속화",
-      summary:
-        "전 세계 중앙은행들이 중앙은행 디지털 화폐(CBDC) 개발을 가속화하고 있습니다.",
-      source: "경제일보",
-      publishedAt: "2024-03-15T09:30:00Z",
-      url: "#",
+      id: '5',
+      title: '중앙은행들, CBDC 개발 가속화',
+      summary: '전 세계 중앙은행들이 중앙은행 디지털 화폐(CBDC) 개발을 가속화하고 있습니다.',
+      source: '경제일보',
+      publishedAt: '2024-03-15T09:30:00Z',
+      url: '#',
     },
   ];
 
