@@ -1,12 +1,11 @@
 package com.coing.domain.bookmark.entity;
 
-import java.time.LocalDateTime;
-
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.coing.domain.coin.market.entity.Market;
 import com.coing.domain.user.entity.User;
+import com.coing.util.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,7 +30,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Builder
-public class Bookmark {
+public class Bookmark extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,11 +47,5 @@ public class Bookmark {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "market_id", nullable = false)
 	private Market market;
-
-	@Column(nullable = false, name = "create_at")
-	private LocalDateTime createAt;
-
-	@Column(name = "update_at")
-	private LocalDateTime updateAt;
 
 }

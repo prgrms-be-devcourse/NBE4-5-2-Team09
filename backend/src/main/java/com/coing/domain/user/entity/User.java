@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
 
+import com.coing.util.BaseEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,7 +26,7 @@ import lombok.With;
 @AllArgsConstructor
 @Builder
 @With
-public class User {
+public class User extends BaseEntity {
 
 	@Id
 	@GeneratedValue

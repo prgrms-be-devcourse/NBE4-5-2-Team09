@@ -1,5 +1,7 @@
 package com.coing.domain.coin.market.entity;
 
+import com.coing.util.BaseEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Market {
+public class Market extends BaseEntity {
 
 	@Id
 	@Column(name = "market_id")
