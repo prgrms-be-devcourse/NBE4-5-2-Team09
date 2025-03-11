@@ -53,7 +53,7 @@ export default function PaginationComponent({
               <SelectItem
                 key={num}
                 value={String(num)}
-                className="px-4 py-2 hover:bg-accent transition rounded-md cursor-pointer"
+                className="px-4 py-2 transition rounded-md cursor-pointer"
               >
                 {num}개
               </SelectItem>
