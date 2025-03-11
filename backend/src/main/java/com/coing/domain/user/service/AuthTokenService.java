@@ -31,8 +31,6 @@ public class AuthTokenService {
 	public String genAccessToken(UserResponse userResponse) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("id", userResponse.id());
-		claims.put("email", userResponse.email());
-		claims.put("name", userResponse.name()); // 유저 이름 추가
 		// claims.put("authority", userResponse.getAuthority()); // 나중에 권한 관련 추가
 		String token = Ut.Jwt.createToken(jwtSecretKey, jwtExpireSeconds, claims);
 		log.info("JWT 액세스 토큰 생성: {}", userResponse.email());
@@ -43,8 +41,6 @@ public class AuthTokenService {
 	public String genRefreshToken(UserResponse userResponse) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("id", userResponse.id());
-		claims.put("email", userResponse.email());
-		claims.put("name", userResponse.name()); // 유저 이름 추가
 		String token = Ut.Jwt.createToken(jwtSecretKey, jwtRefreshExpireSeconds, claims);
 		log.info("JWT 리프레시 토큰 생성: {}", userResponse.email());
 		return token;
@@ -54,8 +50,6 @@ public class AuthTokenService {
 	public String genAccessToken(CustomUserPrincipal principal) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("id", principal.id());
-		claims.put("email", principal.email());
-		claims.put("name", principal.name()); // 유저 이름 추가
 		String token = Ut.Jwt.createToken(jwtSecretKey, jwtExpireSeconds, claims);
 		log.info("JWT 액세스 토큰 생성(CustomUserPrincipal): {}", principal.email());
 		return token;
@@ -65,8 +59,6 @@ public class AuthTokenService {
 	public String genRefreshToken(CustomUserPrincipal principal) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("id", principal.id());
-		claims.put("email", principal.email());
-		claims.put("name", principal.name()); // 유저 이름 추가
 		String token = Ut.Jwt.createToken(jwtSecretKey, jwtRefreshExpireSeconds, claims);
 		log.info("JWT 리프레시 토큰 생성(CustomUserPrincipal): {}", principal.email());
 		return token;

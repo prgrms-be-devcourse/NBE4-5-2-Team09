@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // ✅ 로그인 상태라면 자동 리다이렉트
+  // 로그인 상태라면 자동 리다이렉트
   useEffect(() => {
     if (accessToken) {
       router.push("/");

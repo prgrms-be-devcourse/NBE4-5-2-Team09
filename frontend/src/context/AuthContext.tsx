@@ -1,8 +1,6 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import Cookies from "js-cookie";
-import { parseJwt } from "@/lib/utils";
 
 interface AuthContextType {
   accessToken: string | null;
@@ -14,10 +12,10 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  // 초기 상태: 쿠키에서 accessToken 읽어오기
+  // 초기 상태: 세션 스토리지에서 accessToken 읽어오기
   const [accessToken, setAccessTokenState] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
-      const token = Cookies.get("accessToken") || null;
+      const token = sessionStorage.getItem("accessToken") || null;
       console.log("[AuthProvider] 초기 accessToken:", token);
       return token;
     }
@@ -25,33 +23,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
 
-  // 쿠키와 상태를 동시에 업데이트하는 함수
+  // 세션 스토리지와 상태를 동시에 업데이트하는 함수
   const setAccessToken = (token: string | null) => {
     setAccessTokenState(token);
     if (token) {
-      Cookies.set("accessToken", token, {
-        expires: 1,
-        domain: window.location.hostname, // 현재 도메인에 저장
-        secure: false, // 개발 환경 테스트
-        sameSite: "strict",
-      });
+      sessionStorage.setItem("accessToken", token);
       console.log("[AuthProvider] accessToken 저장:", token);
     } else {
-      Cookies.remove("accessToken", { domain: window.location.hostname });
+      sessionStorage.removeItem("accessToken");
       console.log("[AuthProvider] accessToken 삭제");
     }
   };
 
-  // 리프레시 토큰으로 새 액세스 토큰 발급 함수
+  // 리프레시 토큰으로 새 액세스 토큰 발급 함수 (기존 로직 유지)
   async function refreshAccessToken(): Promise<string | null> {
     console.log("[AuthProvider] refreshAccessToken 호출");
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL + "/api/auth/refresh"}`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
+          `${process.env.NEXT_PUBLIC_API_URL + "/api/auth/refresh"}`,
+          {
+            method: "POST",
+            credentials: "include",
+          }
       );
       console.log("[AuthProvider] refresh 응답 상태:", response.status);
       if (response.ok) {
@@ -66,8 +59,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } else {
         console.error(
-          "[AuthProvider] 리프레시 토큰 발급 실패:",
-          response.status
+            "[AuthProvider] 리프레시 토큰 발급 실패:",
+            response.status
         );
       }
     } catch (error) {
@@ -76,10 +69,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return null;
   }
 
-  // 모든 API 요청에 대해 사용할 커스텀 fetch 함수
+  // 모든 API 요청에 사용할 커스텀 fetch 함수
   const customFetch = async (
-    input: RequestInfo,
-    init?: RequestInit
+      input: RequestInfo,
+      init?: RequestInit
   ): Promise<Response> => {
     console.log("[customFetch] 요청 시작:", input);
     // 현재 accessToken을 헤더에 추가
@@ -97,10 +90,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
     console.log("[customFetch] 초기 응답 상태:", response.status);
 
-    // 만약 403 응답이면, refresh token으로 새 액세스 토큰 발급 후 재요청
+    // 403 응답 시, refresh token으로 새 액세스 토큰 발급 후 재요청
     if (response.status === 403) {
       console.warn(
-        "[customFetch] 403 응답 감지됨. refresh token으로 재발급 시도합니다."
+          "[customFetch] 403 응답 감지됨. refresh token으로 재발급 시도합니다."
       );
       const newToken = await refreshAccessToken();
       if (newToken) {
@@ -117,7 +110,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.log("[customFetch] 재요청 응답 상태:", response.status);
       } else {
         console.error(
-          "[customFetch] refresh token 재발급 실패. 로그인 페이지로 리다이렉트합니다."
+            "[customFetch] refresh token 재발급 실패. 로그인 페이지로 리다이렉트합니다."
         );
         window.location.href = "/login";
       }
@@ -126,27 +119,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return response;
   };
 
-  // 컴포넌트 마운트 시 액세스 토큰의 유효성을 체크하고, 로그인 상태일 때만 refresh 시도
+  // 컴포넌트 마운트 시 세션 스토리지에 토큰이 있는지만 체크 (토큰 파싱 로직 제거)
   useEffect(() => {
     async function validateToken() {
       console.log("[AuthProvider] validateToken 시작");
-      const token = Cookies.get("accessToken");
-      if (token) {
-        const payload = parseJwt(token);
-        const currentTime = Date.now() / 1000; // 초 단위
-        console.log(
-          "[AuthProvider] 토큰 만료 시간:",
-          payload?.exp,
-          "현재 시간:",
-          currentTime
-        );
-        if (payload && payload.exp && payload.exp < currentTime) {
-          console.warn("[AuthProvider] 토큰 만료됨 → refreshAccessToken 호출");
-          await refreshAccessToken();
-        }
-      } else {
-        console.warn("[AuthProvider] 쿠키에 토큰 없음 → 로그인 상태 아님");
-        // 로그인 상태가 아니라면 refresh를 시도하지 않습니다.
+      const token = sessionStorage.getItem("accessToken");
+      if (!token) {
+        console.warn("[AuthProvider] 세션 스토리지에 토큰 없음 → 로그인 상태 아님");
       }
       setIsAuthLoading(false);
       console.log("[AuthProvider] validateToken 완료, isAuthLoading false");
@@ -155,11 +134,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider
-      value={{ accessToken, setAccessToken, isAuthLoading, customFetch }}
-    >
-      {children}
-    </AuthContext.Provider>
+      <AuthContext.Provider
+          value={{ accessToken, setAccessToken, isAuthLoading, customFetch }}
+      >
+        {children}
+      </AuthContext.Provider>
   );
 };
 

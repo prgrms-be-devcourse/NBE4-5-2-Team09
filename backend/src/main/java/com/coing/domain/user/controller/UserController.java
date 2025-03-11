@@ -183,20 +183,18 @@ public class UserController {
 		return ResponseEntity.ok(new BasicResponse(HttpStatus.OK, "토큰 재발급 성공", ""));
 	}
 
-	@Operation(summary = "회원 로그아웃", security = @SecurityRequirement(name = "bearerAuth"))
+	@Operation(summary = "회원 로그아웃")
 	@PostMapping("/logout")
-	public ResponseEntity<BasicResponse> logout(HttpServletResponse response,
-		@AuthenticationPrincipal CustomUserPrincipal principal) {
-		if (principal == null) {
-			throw new BusinessException(messageUtil.resolveMessage("empty.token.provided"), HttpStatus.FORBIDDEN, "");
-		}
+	public ResponseEntity<BasicResponse> logout(HttpServletRequest request, HttpServletResponse response) {
+		// 리프레시 토큰 쿠키를 삭제하는 로직
 		Cookie cookie = new Cookie("refreshToken", null);
 		cookie.setHttpOnly(true);
 		cookie.setSecure(false);
 		cookie.setPath("/");
 		cookie.setMaxAge(0);
 		response.addCookie(cookie);
-		return ResponseEntity.ok(new BasicResponse(HttpStatus.OK, "로그아웃 성공", "userEmail: " + principal.email()));
+
+		return ResponseEntity.ok(new BasicResponse(HttpStatus.OK, "로그아웃 성공", "로그아웃 처리 완료"));
 	}
 
 	@Operation(summary = "회원 탈퇴", security = @SecurityRequirement(name = "bearerAuth"))
@@ -211,5 +209,15 @@ public class UserController {
 		}
 		userService.quit(request.email(), request.password());
 		return ResponseEntity.ok("회원 탈퇴 성공");
+	}
+
+	@Operation(summary = "회원 정보 조회", security = @SecurityRequirement(name = "bearerAuth"))
+	@GetMapping("/info")
+	public ResponseEntity<?> getUserInfo(@AuthenticationPrincipal CustomUserPrincipal principal) {
+		if (principal == null) {
+			throw new BusinessException(messageUtil.resolveMessage("empty.token.provided"), HttpStatus.FORBIDDEN, "");
+		}
+		UserResponse user = userService.findById(principal.id());
+		return ResponseEntity.ok(user);
 	}
 }
