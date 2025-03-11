@@ -2,6 +2,9 @@ package com.coing.domain.bookmark.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.coing.domain.coin.market.entity.Market;
 import com.coing.domain.user.entity.User;
 
@@ -38,6 +41,7 @@ public class Bookmark {
 	// 북마크를 등록한 회원
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private User user;
 
 	// 북마크 대상 마켓 (코인 ID와 동일한 역할을 함; 예: "KRW-BTC")
