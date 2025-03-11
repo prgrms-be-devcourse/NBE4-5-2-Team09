@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
 import type { OrderbookDto } from "@/types";
 import { useWebSocket } from "@/context/WebSocketContext";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card } from "@/components/ui/card";
-import { Textfit } from "react-textfit";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { AutoTextSize } from "auto-text-size";
 
 interface OrderBookListProps {
   market: string;
@@ -153,7 +152,10 @@ export default function OrderbookList({ market }: OrderBookListProps) {
                                 : "text-gray-500",
                           },
                         ].map((item, idx) => (
-                          <Textfit key={idx} mode="single" max={12}>
+                          <AutoTextSize
+                            key={`ask-box-${idx}`}
+                            className="w-full"
+                          >
                             <div className="flex justify-between w-full pr-2">
                               <div className="font-medium text-left">
                                 {item.label}
@@ -166,7 +168,7 @@ export default function OrderbookList({ market }: OrderBookListProps) {
                                 {item.value}
                               </div>
                             </div>
-                          </Textfit>
+                          </AutoTextSize>
                         ))}
                       </div>
                     </td>
@@ -202,14 +204,17 @@ export default function OrderbookList({ market }: OrderBookListProps) {
                             )} ${base}`,
                           },
                         ].map((item, idx) => (
-                          <Textfit key={idx} mode="single" max={12}>
+                          <AutoTextSize
+                            key={`bid-box-${idx}`}
+                            className="w-full"
+                          >
                             <div className="flex justify-between w-full pl-2">
                               <div className="font-medium text-left">
                                 {item.label}
                               </div>
                               <div className="text-right">{item.value}</div>
                             </div>
-                          </Textfit>
+                          </AutoTextSize>
                         ))}
                       </div>
                     </td>

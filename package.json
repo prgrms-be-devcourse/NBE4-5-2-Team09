@@ -1,0 +1,16 @@
+{
+  "name": "coing",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "@coing/backend",
+    "@coing/frontend"
+  ],
+  "scripts": {
+    "doppler": "npm run doppler:setup && turbo run doppler",
+    "doppler:setup": "doppler setup --no-interactive"
+  },
+  "devDependencies": {
+    "turbo": "1.12.4"
+  }
+}
