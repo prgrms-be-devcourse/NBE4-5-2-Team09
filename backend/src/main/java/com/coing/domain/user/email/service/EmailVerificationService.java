@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ public class EmailVerificationService {
 	/**
 	 * 회원가입 후, 이메일 인증 토큰을 생성하여 이메일 전송하고 DB 업데이트
 	 */
+	@Async
 	@Transactional
 	public void sendVerificationEmail(User user) {
 		// 이메일 인증 토큰 생성 (JWT 기반, 만료 10분)
@@ -64,6 +66,7 @@ public class EmailVerificationService {
 	}
 
 	// 이메일 재전송
+	@Async
 	@Transactional
 	public void resendVerificationEmail(UUID userId) {
 		User user = userRepository.findById(userId)
