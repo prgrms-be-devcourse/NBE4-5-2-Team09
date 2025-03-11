@@ -6,12 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.coing.domain.bookmark.entity.Bookmark;
 
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 	boolean existsByUserIdAndMarketCode(UUID userId, String coinCode);
 
-	@Query("SELECT b FROM Bookmark b WHERE b.market.code like CONCAT(:quote, '%')")
-	Page<Bookmark> findByUserIdAndQuote(UUID userId, String quote, Pageable pageable);
+	@Query("SELECT b FROM Bookmark b WHERE b.user.id = :userId AND b.market.code like CONCAT(:quote, '%')")
+	Page<Bookmark> findByUserIdAndQuote(@Param("userId") UUID userId, @Param("quote") String quote, Pageable pageable);
 }

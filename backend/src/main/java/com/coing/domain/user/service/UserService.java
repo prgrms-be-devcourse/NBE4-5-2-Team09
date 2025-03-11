@@ -83,8 +83,8 @@ public class UserService {
 	}
 
 	@Transactional
-	public void quit(String email, String password) {
-		Optional<User> optionalUser = userRepository.findByEmail(email);
+	public void quit(UUID id, String password) {
+		Optional<User> optionalUser = userRepository.findById(id);
 		if (optionalUser.isEmpty()) {
 			throw new BusinessException(messageUtil.resolveMessage("member.not.found"),
 				HttpStatus.BAD_REQUEST, "");
@@ -95,7 +95,7 @@ public class UserService {
 				HttpStatus.BAD_REQUEST, "");
 		}
 		userRepository.delete(user);
-		log.info("회원 탈퇴 성공: {}", email);
+		log.info("회원 탈퇴 성공: {}", id);
 	}
 
 	@Transactional(readOnly = true)

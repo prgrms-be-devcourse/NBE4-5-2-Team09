@@ -50,11 +50,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		Map<String, Object> claims = getPayload(secretKey, token);
 		UUID id = UUID.fromString(claims.get("id").toString());
-		String email = (String)claims.get("email");
-		String name = (String)claims.get("name");
 
-		// 커스텀 Principal 객체 생성 (이제 이름도 포함)
-		CustomUserPrincipal principal = new CustomUserPrincipal(id, email, name);
+		CustomUserPrincipal principal = new CustomUserPrincipal(id);
 		Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 

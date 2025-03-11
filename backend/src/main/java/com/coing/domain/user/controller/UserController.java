@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.coing.domain.user.CustomUserPrincipal;
 import com.coing.domain.user.controller.dto.EmailVerificationResponse;
+import com.coing.domain.user.controller.dto.SignOutRequest;
 import com.coing.domain.user.controller.dto.UserLoginRequest;
 import com.coing.domain.user.controller.dto.UserResponse;
 import com.coing.domain.user.controller.dto.UserSignUpRequest;
@@ -199,15 +200,12 @@ public class UserController {
 
 	@Operation(summary = "회원 탈퇴", security = @SecurityRequirement(name = "bearerAuth"))
 	@DeleteMapping("/signout")
-	public ResponseEntity<?> signOut(@Validated UserLoginRequest request,
+	public ResponseEntity<?> signOut(@RequestBody @Validated SignOutRequest request,
 		@org.springframework.security.core.annotation.AuthenticationPrincipal CustomUserPrincipal principal) {
 		if (principal == null) {
 			throw new BusinessException(messageUtil.resolveMessage("empty.token.provided"), HttpStatus.FORBIDDEN, "");
 		}
-		if (!principal.email().equals(request.email())) {
-			throw new BusinessException(messageUtil.resolveMessage("token.email.mismatch"), HttpStatus.FORBIDDEN, "");
-		}
-		userService.quit(request.email(), request.password());
+		userService.quit(principal.id(), request.password());
 		return ResponseEntity.ok("회원 탈퇴 성공");
 	}
 

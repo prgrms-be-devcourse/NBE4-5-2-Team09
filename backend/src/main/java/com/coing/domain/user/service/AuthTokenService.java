@@ -51,7 +51,7 @@ public class AuthTokenService {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("id", principal.id());
 		String token = Ut.Jwt.createToken(jwtSecretKey, jwtExpireSeconds, claims);
-		log.info("JWT 액세스 토큰 생성(CustomUserPrincipal): {}", principal.email());
+		log.info("JWT 액세스 토큰 생성(CustomUserPrincipal): {}", principal.id());
 		return token;
 	}
 
@@ -60,7 +60,7 @@ public class AuthTokenService {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("id", principal.id());
 		String token = Ut.Jwt.createToken(jwtSecretKey, jwtRefreshExpireSeconds, claims);
-		log.info("JWT 리프레시 토큰 생성(CustomUserPrincipal): {}", principal.email());
+		log.info("JWT 리프레시 토큰 생성(CustomUserPrincipal): {}", principal.id());
 		return token;
 	}
 

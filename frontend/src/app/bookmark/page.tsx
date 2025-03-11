@@ -1,81 +1,103 @@
-import { cookies } from "next/headers";
+"use client";
+
+import { useEffect, useState } from "react";
 import ClientPage from "@/app/bookmark/ClientPage";
 import WebSocketProvider from "@/context/WebSocketContext";
 import client from "@/lib/api/client";
 import { components } from "@/lib/api/generated/schema";
+import { useAuth } from "@/context/AuthContext";
 
 type BookmarkResponse = components["schemas"]["BookmarkResponse"];
 type PageBookmarkResponse =
-  components["schemas"]["PagedResponseBookmarkResponse"];
+    components["schemas"]["PagedResponseBookmarkResponse"];
 
-export default async function Page() {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("accessToken")?.value;
+export default function Page() {
+  const { accessToken } = useAuth();
+  const [bookmarksData, setBookmarksData] = useState<PageBookmarkResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const itemsPerPage = 9;
   const quote = "KRW";
 
-  try {
-    const { data, error } = await client.GET("/api/bookmarks/{quote}", {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      params: {
-        path: { quote },
-        query: {
-          page: 0,
-          size: itemsPerPage,
-        },
-      },
-    });
-
-    if (error || !data?.content) {
-      return renderError("북마크 데이터를 불러오는 중 오류가 발생했습니다.");
+  useEffect(() => {
+    if (!accessToken) {
+      setError("로그인이 필요합니다.");
+      return;
     }
+    async function fetchBookmarks() {
+      try {
+        const { data, error: fetchError } = await client.GET("/api/bookmarks/{quote}", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          params: {
+            path: { quote },
+            query: {
+              page: 0,
+              size: itemsPerPage,
+            },
+          },
+        });
 
-    // 전체 북마크 페이지 데이터
-    const pageData: PageBookmarkResponse = data;
+        if (fetchError || !data?.content) {
+          setError("북마크 데이터를 불러오는 중 오류가 발생했습니다.");
+          return;
+        }
 
-    // KRW 마켓만 필터링하여 `content` 필드 수정
-    const filteredPageData: PageBookmarkResponse = {
-      ...pageData,
-      content:
-        pageData.content?.filter(
-          (bookmark): bookmark is Required<BookmarkResponse> =>
-            Boolean(
-              bookmark.id &&
-                bookmark.code?.startsWith("KRW-") &&
-                bookmark.koreanName &&
-                bookmark.englishName &&
-                bookmark.createAt
-            )
-        ) ?? [],
-    };
+        // 전체 북마크 페이지 데이터
+        const pageData: PageBookmarkResponse = data;
 
-    // WebSocket 구독용 KRW 마켓 리스트 생성
-    const markets = filteredPageData.content!!.map(
-      (bookmark) => bookmark.code!
-    );
+        // KRW 마켓 필터링
+        const filteredPageData: PageBookmarkResponse = {
+          ...pageData,
+          content:
+              pageData.content?.filter(
+                  (bookmark): bookmark is Required<BookmarkResponse> =>
+                      Boolean(
+                          bookmark.id &&
+                          bookmark.code?.startsWith("KRW-") &&
+                          bookmark.koreanName &&
+                          bookmark.englishName &&
+                          bookmark.createAt
+                      )
+              ) ?? [],
+        };
 
+        setBookmarksData(filteredPageData);
+      } catch (err) {
+        setError(
+            err instanceof Error
+                ? err.message
+                : "북마크 데이터를 불러오는 중 오류가 발생했습니다."
+        );
+      }
+    }
+    fetchBookmarks();
+  }, [accessToken]);
+
+  if (error) {
+    return renderError(error);
+  }
+  if (!bookmarksData) {
     return (
-      <WebSocketProvider subscriptions={[{ type: "ticker", markets }]}>
-        <ClientPage bookmarks={filteredPageData} markets={markets} />
-      </WebSocketProvider>
-    );
-  } catch (error) {
-    console.error("Error fetching bookmarks:", error);
-    return renderError(
-      error instanceof Error
-        ? error.message
-        : "북마크 데이터를 불러오는 중 오류가 발생했습니다."
+        <div className="p-6 flex justify-center items-center">
+          로딩 중...
+        </div>
     );
   }
+
+  // WebSocketProvider를 감싸서 ClientPage에 데이터를 전달합니다.
+  return (
+      <WebSocketProvider>
+        <ClientPage bookmarks={bookmarksData} />
+      </WebSocketProvider>
+  );
 }
 
-// 에러 메시지를 렌더링하는 함수
+// 에러 메시지 렌더링 함수
 function renderError(message: string) {
   return (
-    <div className="p-6 flex justify-center items-center">
-      <p className="text-red-500">{message}</p>
-    </div>
+      <div className="p-6 flex justify-center items-center">
+        <p className="text-red-500">{message}</p>
+      </div>
   );
 }

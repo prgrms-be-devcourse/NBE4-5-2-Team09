@@ -46,7 +46,7 @@ public class BookmarkController {
 	@GetMapping("/bookmarks/{quote}")
 	public ResponseEntity<PagedResponse<BookmarkResponse>> getBookmarksByQuote(
 		@AuthenticationPrincipal CustomUserPrincipal principal,
-		@PathVariable String quote,
+		@PathVariable("quote") String quote,
 		@ParameterObject @PageableDefault(size = 9) Pageable pageable) {
 		Page<BookmarkResponse> result = bookmarkService.getBookmarksByQuote(principal.id(), quote, pageable);
 
