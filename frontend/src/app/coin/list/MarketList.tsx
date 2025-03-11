@@ -42,8 +42,8 @@ export default function ClientPage({ markets }: ClientPageProps) {
             <Card className="bg-white shadow-sm rounded-sm border-0">
               <CardContent className="p-4">
                 <div className="flex items-center space-x-1">
-                  <h2 className="text-base font-bold truncate">{market.koreanName}</h2>
-                  <h3 className="text-sm text-gray-500 truncate">{market.englishName}</h3>
+                  <h2 className="text-base font-bold">{market.koreanName}</h2>
+                  <h3 className="text-sm text-gray-500">{market.englishName}</h3>
                 </div>
                 <div className="flex justify-between items-end mt-1">
                   <p className="text-xl font-semibold">
