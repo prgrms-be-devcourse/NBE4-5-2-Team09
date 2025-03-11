@@ -9,6 +9,8 @@ import com.coing.domain.coin.trade.entity.Trade;
 import com.coing.util.LocalDateDeserializer;
 import com.coing.util.LocalTimeDeserializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import lombok.AllArgsConstructor;
@@ -63,18 +65,23 @@ public class UpbitWebSocketTradeDto {
 	private Long sequentialId;
 
 	@JsonProperty("bap")
+	@JsonSetter(nulls = Nulls.AS_EMPTY)
 	private Double bestAskPrice;
 
 	@JsonProperty("bas")
+	@JsonSetter(nulls = Nulls.AS_EMPTY)
 	private Double bestAskSize;
 
 	@JsonProperty("bbp")
+	@JsonSetter(nulls = Nulls.AS_EMPTY)
 	private Double bestBidPrice;
 
 	@JsonProperty("bbs")
+	@JsonSetter(nulls = Nulls.AS_EMPTY)
 	private Double bestBidSize;
 
 	@JsonProperty("st")
+	@JsonSetter(nulls = Nulls.AS_EMPTY)
 	private String streamType;
 
 	public Trade toEntity() {
