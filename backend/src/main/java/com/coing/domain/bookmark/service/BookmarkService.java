@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,20 +64,27 @@ public class BookmarkService {
 		return new BookmarkResponse(
 			savedBookmark.getId(),
 			savedBookmark.getMarket().getCode(),
+			savedBookmark.getMarket().getKoreanName(),
+			savedBookmark.getMarket().getEnglishName(),
 			savedBookmark.getCreateAt()
 		);
 	}
 
 	@Transactional(readOnly = true)
-	public List<BookmarkResponse> getBookmarksByUser(UUID userId) {
-		List<Bookmark> bookmarks = bookmarkRepository.findByUserId(userId);
-		return bookmarks.stream()
+	public Page<BookmarkResponse> getBookmarksByQuote(UUID userId, String quote, Pageable pageable) {
+		Page<Bookmark> bookmarks = bookmarkRepository.findByUserIdAndQuote(userId, quote, pageable);
+
+		List<BookmarkResponse> responses = bookmarks.stream()
 			.map(b -> new BookmarkResponse(
 				b.getId(),
 				b.getMarket().getCode(),
+				b.getMarket().getKoreanName(),
+				b.getMarket().getEnglishName(),
 				b.getCreateAt()
 			))
 			.collect(Collectors.toList());
+
+		return new PageImpl<>(responses, pageable, bookmarks.getTotalElements());
 	}
 
 	@Transactional

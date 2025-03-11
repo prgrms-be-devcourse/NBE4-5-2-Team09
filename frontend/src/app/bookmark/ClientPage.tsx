@@ -1,23 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useWebSocket } from "@/app/context/WebSocketContext";
+import { useWebSocket } from "@/context/WebSocketContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { components } from "@/lib/api/generated/schema";
-import { useAuth } from "@/app/context/auth-context";
+import { useAuth } from "@/context/AuthContext";
 import client from "@/lib/api/client";
 import Link from "next/link";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-type PageBookmarkResponse = components["schemas"]["PageBookmarkResponse"];
+type PageBookmarkResponse =
+  components["schemas"]["PagedResponseBookmarkResponse"];
 
 interface ClientPageProps {
   bookmarks: PageBookmarkResponse;
@@ -28,33 +22,30 @@ export default function ClientPage({ bookmarks, markets }: ClientPageProps) {
   const { tickers, updateSubscriptions } = useWebSocket();
   const { accessToken } = useAuth();
 
-  // ✅ 기본 필터링 "KRW"
-  const [prefix, setPrefix] = useState("KRW");
-  const [sortBy, setSortBy] = useState<"price" | "changeRate" | "volume">(
-    "price"
-  );
-  const [page, setPage] = useState(bookmarks.number ? bookmarks.number + 1 : 1);
+  // 기본 필터링 "KRW"
+  const [quote, setQuote] = useState("KRW");
+  const [page, setPage] = useState(bookmarks.page ? bookmarks.page + 1 : 1);
   const [loading, setLoading] = useState(false);
   const [bookmarksData, setBookmarksData] =
     useState<PageBookmarkResponse>(bookmarks);
 
-  // ✅ 북마크 리스트
+  // 북마크 리스트
   const bookmarkList = bookmarksData.content ?? [];
   const totalPages = bookmarksData.totalPages || 1;
   const itemsPerPage = 9;
 
-  // ✅ API 호출 및 WebSocket 구독 업데이트
+  // API 호출 및 WebSocket 구독 업데이트
   useEffect(() => {
     async function fetchBookmarks() {
       if (!accessToken) return;
       setLoading(true);
       try {
-        const { data, error } = await client.GET("/api/bookmarks/{prefix}", {
+        const { data, error } = await client.GET("/api/bookmarks/{quote}", {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
           params: {
-            path: { prefix },
+            path: { quote },
             query: {
               page: page - 1,
               size: itemsPerPage,
@@ -67,7 +58,7 @@ export default function ClientPage({ bookmarks, markets }: ClientPageProps) {
 
         setBookmarksData(data);
 
-        // ✅ WebSocket 재구독
+        // WebSocket 재구독
         if (data.content) {
           const newMarketCodes = data.content
             .map((b) => b.code!)
@@ -82,29 +73,15 @@ export default function ClientPage({ bookmarks, markets }: ClientPageProps) {
     }
 
     fetchBookmarks();
-  }, [page, prefix]); // ✅ `fetchBookmarks`를 `useEffect` 내부에 선언하여 의존성 배열에서 제외
-
-  const sortedData = [...bookmarkList].sort((a, b) => {
-    const priceA = tickers[a.code ?? ""]?.tradePrice || 0;
-    const priceB = tickers[b.code ?? ""]?.tradePrice || 0;
-    const changeRateA = tickers[a.code ?? ""]?.signedChangeRate || 0;
-    const changeRateB = tickers[b.code ?? ""]?.signedChangeRate || 0;
-    const volumeA = tickers[a.code ?? ""]?.accTradeVolume || 0;
-    const volumeB = tickers[b.code ?? ""]?.accTradeVolume || 0;
-
-    if (sortBy === "price") return priceB - priceA; // 가격 내림차순
-    if (sortBy === "changeRate") return changeRateB - changeRateA; // 변동률 내림차순
-    if (sortBy === "volume") return volumeB - volumeA; // 거래량 내림차순
-    return 0;
-  });
+  }, [page, quote]); // `fetchBookmarks`를 `useEffect` 내부에 선언하여 의존성 배열에서 제외
 
   return (
     <div className="p-6">
-      {/* ✅ 필터링 탭 */}
+      {/* 필터링 탭 */}
       <Tabs
-        value={prefix}
+        value={quote}
         onValueChange={(newQuote) => {
-          setPrefix(newQuote);
+          setQuote(newQuote);
           setPage(1);
         }}
       >
@@ -115,32 +92,14 @@ export default function ClientPage({ bookmarks, markets }: ClientPageProps) {
         </TabsList>
       </Tabs>
 
-      {/* ✅ 정렬 드롭다운 */}
-      <div className="flex justify-end space-x-2 my-4">
-        <Select
-          onValueChange={(value) =>
-            setSortBy(value as "price" | "changeRate" | "volume")
-          }
-        >
-          <SelectTrigger className="w-32">
-            <SelectValue placeholder="정렬 기준" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="price">현재가</SelectItem>
-            <SelectItem value="changeRate">변동률</SelectItem>
-            <SelectItem value="volume">거래량</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* ✅ 로딩 상태 */}
+      {/* 로딩 상태 */}
       {loading ? (
         <div className="text-center py-6">로딩 중...</div>
       ) : (
         <>
-          {/* ✅ 북마크 코인 리스트 */}
+          {/* 북마크 코인 리스트 */}
           <div className="grid grid-cols-3 gap-4 mt-5">
-            {sortedData.map((bookmark) => {
+            {bookmarkList.map((bookmark) => {
               const ticker = tickers[bookmark.code!!];
 
               if (!ticker) {
@@ -231,7 +190,7 @@ export default function ClientPage({ bookmarks, markets }: ClientPageProps) {
             })}
           </div>
 
-          {/* ✅ 페이지네이션 */}
+          {/* 페이지네이션 */}
           <div className="flex justify-center items-center mt-6 space-x-2">
             <Button
               onClick={() => setPage((p) => Math.max(1, p - 1))}

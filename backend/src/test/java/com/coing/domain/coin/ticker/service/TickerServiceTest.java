@@ -155,9 +155,10 @@ public class TickerServiceTest {
 	void publishCachedTickers() throws JsonProcessingException {
 		// given
 		tickerService.updateTicker(testTicker);
+		TickerDto dto = TickerDto.from(testTicker);
 
 		// when
-		tickerService.publish();
+		tickerService.publish(dto);
 
 		// then
 		ArgumentCaptor<TickerDto> captor = ArgumentCaptor.forClass(TickerDto.class);
