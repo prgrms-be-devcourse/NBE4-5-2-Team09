@@ -2,7 +2,7 @@ import createClient from "openapi-fetch";
 import { paths } from "./generated/schema";
 
 const client = createClient<paths>({
-  baseUrl: process.env.NEXT_PUBLIC_WEBSOCKET_URL, // NEXT_PUBLIC_ 접두사 사용
+  baseUrl: process.env.NEXT_PUBLIC_API_URL,
   headers: {
     "Content-Type": "application/json",
   },

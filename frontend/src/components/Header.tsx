@@ -97,7 +97,7 @@ export default function Header() {
                 코인 대시보드
               </Link>
               <Link
-                href="/market"
+                href="/bookmark"
                 className="text-gray-500 hover:text-gray-900"
               >
                 북마크 대시보드
