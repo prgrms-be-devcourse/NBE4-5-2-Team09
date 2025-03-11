@@ -1,46 +1,4 @@
-import {
-  type Orderbook,
-  type OrderbookItem,
-  type TradeItem,
-  type CandleItem,
-  type NewsItem,
-  AskBid,
-} from '@/types';
-
-// 모의 호가(Orderbook) 생성 함수
-export function generateMockOrderbook(): Orderbook {
-  const basePrice = 799; // 현재 EOS 가격
-  const asks: OrderbookItem[] = []; // 매도 주문 리스트
-  const bids: OrderbookItem[] = []; // 매수 주문 리스트
-
-  // 매도 주문 생성 (기준 가격보다 높은 가격)
-  for (let i = 0; i < 5; i++) {
-    const price = basePrice + (i + 1) * 10000;
-    const quantity = Number.parseFloat((Math.random() * 2 + 0.1).toFixed(4));
-    asks.push({
-      price,
-      quantity,
-      total: price * quantity,
-    });
-  }
-
-  // 매수 주문 생성 (기준 가격보다 낮은 가격)
-  for (let i = 0; i < 5; i++) {
-    const price = basePrice - (i + 1) * 10000;
-    const quantity = Number.parseFloat((Math.random() * 2 + 0.1).toFixed(4));
-    bids.push({
-      price,
-      quantity,
-      total: price * quantity,
-    });
-  }
-
-  // 매도 주문은 가격 오름차순 정렬, 매수 주문은 가격 내림차순 정렬
-  asks.sort((a, b) => a.price - b.price);
-  bids.sort((a, b) => b.price - a.price);
-
-  return { asks, bids };
-}
+import { type TradeItem, type CandleItem, type NewsItem, AskBid } from '@/types';
 
 // 모의 체결 내역(TradeItem) 생성 함수
 export function generateMockTrades(): TradeItem[] {

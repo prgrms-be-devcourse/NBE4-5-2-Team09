@@ -9,7 +9,7 @@
     "codegen": "openapi-typescript ../api_schema.json -o ./src/lib/api/generated/schema.d.ts",
     "codegen:watch": "nodemon --watch ../api_schema.json --exec \"npm run codegen\"",
     "doppler": "doppler secrets download --no-file --format env-no-quotes > .env",
-    "lint": "eslint . --fix",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix && prettier --write \"**/*.{js,jsx,ts,tsx,md}\""
   },
   "dependencies": {
@@ -49,6 +49,8 @@
     "eslint": "^9.22.0",
     "eslint-config-next": "15.2.1",
     "eslint-config-prettier": "^10.1.1",
+    "eslint-import-resolver-typescript": "^3.8.4",
+    "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-unused-imports": "^4.1.4",
     "globals": "^16.0.0",
