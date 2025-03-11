@@ -1,4 +1,4 @@
-import client from '@/lib/api/client';
+import { client } from '@/lib/api';
 import { MarketDto } from '@/types';
 import { NextRequest, NextResponse } from 'next/server';
 

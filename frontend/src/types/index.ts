@@ -144,9 +144,12 @@ export type MarketDto = {
 };
 
 export type MarketsDto = {
+  content: MarketDto[];
+} & PaginationDto;
+
+export type PaginationDto = {
   page: number;
   size: number;
   totalElements: number;
   totalPages: number;
-  content: MarketDto[];
 };

@@ -1,4 +1,4 @@
-import client from '@/lib/api/client';
+import { client } from '@/lib/api';
 import { MarketsDto } from '@/types';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -9,6 +9,7 @@ export async function GET(
   const type = searchParams.get('type') || 'KRW';
   const page = parseInt(searchParams.get('page') || '0', 10);
   const size = parseInt(searchParams.get('size') || '10', 10);
+
   const response = await client.GET('/api/market', {
     params: {
       query: {

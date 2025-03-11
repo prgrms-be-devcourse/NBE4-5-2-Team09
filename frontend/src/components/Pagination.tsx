@@ -1,48 +1,115 @@
-interface PaginationProps {
-  totalItems: number;
-  itemsPerPage: number;
+import React from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationLink,
+  PaginationNext,
+  PaginationEllipsis,
+} from '@/components/ui/pagination';
+
+interface PaginationComponentProps {
   currentPage: number;
+  totalPages: number;
+  maxPageButtons?: number;
   onPageChange: (page: number) => void;
+  size: number;
+  onSizeChange: (size: number) => void;
+  totalElements: number;
+  pageSizeList: number[];
 }
 
-export default function Pagination({
-  totalItems,
-  itemsPerPage,
+export default function PaginationComponent({
   currentPage,
+  totalPages,
+  maxPageButtons = 5,
   onPageChange,
-}: PaginationProps) {
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  size,
+  onSizeChange,
+  totalElements,
+  pageSizeList,
+}: PaginationComponentProps) {
+  const currentPageGroup = Math.floor((currentPage - 1) / maxPageButtons);
+  const startPage = currentPageGroup * maxPageButtons + 1;
+  const endPage = Math.min(startPage + maxPageButtons - 1, totalPages);
 
   return (
-    <div className="flex justify-center space-x-2 mt-4">
-      <button
-        className="px-3 py-1 border rounded disabled:opacity-50"
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-      >
-        이전
-      </button>
+    <div className="w-full flex flex-wrap items-center justify-between mt-6 gap-6">
+      <div>
+        <Select value={String(size)} onValueChange={(value) => onSizeChange(Number(value))}>
+          <SelectTrigger className="w-20 rounded-lg bg-white cursor-pointer">
+            <SelectValue>{size}개</SelectValue>
+          </SelectTrigger>
+          <SelectContent className="bg-white shadow-md rounded-lg">
+            {pageSizeList.map((num) => (
+              <SelectItem
+                key={num}
+                value={String(num)}
+                className="px-4 py-2 hover:bg-accent transition rounded-md cursor-pointer"
+              >
+                {num}개
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-      {pages.map((page) => (
-        <button
-          key={page}
-          className={`px-3 py-1 border rounded ${
-            currentPage === page ? 'bg-blue-500 text-white' : 'bg-white'
-          }`}
-          onClick={() => onPageChange(page)}
-        >
-          {page}
-        </button>
-      ))}
+      <div>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                className="cursor-pointer"
+                onClick={() => onPageChange(Math.max(1, startPage - maxPageButtons))}
+              />
+            </PaginationItem>
+            {startPage > 1 && (
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+            )}
+            {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map(
+              (pageNum) => (
+                <PaginationItem key={pageNum}>
+                  <PaginationLink
+                    className={
+                      currentPage === pageNum
+                        ? 'bg-primary text-primary-foreground px-3 py-1 rounded-md'
+                        : 'px-3 py-1 cursor-pointer'
+                    }
+                    onClick={() => onPageChange(pageNum)}
+                  >
+                    {pageNum}
+                  </PaginationLink>
+                </PaginationItem>
+              ),
+            )}
+            {endPage < totalPages && (
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+            )}
+            <PaginationItem>
+              <PaginationNext
+                className="cursor-pointer"
+                onClick={() => onPageChange(Math.min(totalPages, startPage + maxPageButtons))}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
 
-      <button
-        className="px-3 py-1 border rounded disabled:opacity-50"
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-      >
-        다음
-      </button>
+      <div>
+        <p className="text-primary text-sm">총 {totalElements}개 코인</p>
+      </div>
     </div>
   );
 }

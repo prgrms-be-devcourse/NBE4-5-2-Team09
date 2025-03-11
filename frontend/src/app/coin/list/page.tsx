@@ -3,55 +3,64 @@
 import { useEffect, useState } from 'react';
 import WebSocketProvider from '@/context/WebSocketContext';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import ClientPage from './MarketList';
-import { MarketDto } from '@/types';
+import ClientPage from './ClientPage';
+import { MarketDto, MarketsDto, PaginationDto } from '@/types';
+import { fetchApi } from '@/lib/api';
+import { Skeleton } from '@/components/ui/skeleton';
+
+import PaginationComponent from '@/components/Pagination';
 
 export default function Page() {
+  const [pagination, setPagination] = useState<PaginationDto>({
+    page: 1,
+    size: 10,
+    totalElements: 0,
+    totalPages: 0,
+  });
   const [markets, setMarkets] = useState<MarketDto[]>([]);
   const [quote, setQuote] = useState('KRW');
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(9);
   const [loading, setLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState(0);
-  const pageSize = 9;
+  const [error, setError] = useState<string | null>(null);
 
+  async function fetchMarkets() {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await fetchApi<MarketsDto>(
+        `/api/markets?type=${quote}&page=${page - 1}&size=${size}`,
+        {
+          method: 'GET',
+        },
+      );
+      setMarkets(data.content);
+      setPagination(data);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }
   // 기준 통화와 페이지 변경 시 시장 데이터를 fetch
   useEffect(() => {
-    async function fetchMarkets() {
-      try {
-        setLoading(true);
-        let api = process.env.NEXT_PUBLIC_API_URL + '/api/market';
-        api += `?type=${quote}&page=${page}&size=${pageSize}`;
-        const res = await fetch(api);
-        if (!res.ok) {
-          throw new Error('시장 데이터를 불러오는 중 오류 발생');
-        }
-        const data = await res.json();
-        setMarkets(data.content);
-        setTotalPages(data.totalPages);
-      } catch (err) {
-        console.error('Fetch markets error:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchMarkets();
-  }, [quote, page]);
+  }, [quote, page, size]);
 
   // 기준 통화 변경 시 페이지 번호 초기화
   const handleQuoteChange = (newQuote: string) => {
     setQuote(newQuote);
-    setPage(0);
+    setPage(1);
   };
 
-  if (loading) {
-    return <div className="p-6">Loading...</div>;
-  }
+  if (loading) return <Skeleton className="h-96 w-full rounded-md" />;
+  if (error) return <p className="text-destructive">{error}</p>;
+  if (!markets) return <p>No data found</p>;
 
   return (
     <WebSocketProvider subscriptions={[]}>
-      <div className="p-6">
-        {/* 기준 통화 필터 탭 */}
+      <div className="max-w-7xl mx-auto p-6">
         <Tabs value={quote} onValueChange={handleQuoteChange}>
           <TabsList className="grid w-full grid-cols-3 bg-gray-100">
             <TabsTrigger value="KRW">KRW</TabsTrigger>
@@ -59,24 +68,19 @@ export default function Page() {
             <TabsTrigger value="USDT">USDT</TabsTrigger>
           </TabsList>
         </Tabs>
+        <ClientPage markets={markets.slice(0, size)} />
 
-        {/* 시장 데이터(마켓) 카드 리스트 */}
-        <ClientPage markets={markets.slice(0, pageSize)} />
-
-        {/* 페이지네이션 */}
-        <div className="flex justify-center items-center mt-6 space-x-2">
-          <Button onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0}>
-            이전
-          </Button>
-          <span>
-            {page + 1} / {totalPages + 1}
-          </span>
-          <Button
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages}
-          >
-            다음
-          </Button>
+        <div className="flex justify-center mt-6">
+          <PaginationComponent
+            currentPage={page}
+            totalPages={pagination.totalPages ?? 1}
+            maxPageButtons={5}
+            onPageChange={(newPage) => setPage(newPage)}
+            size={size}
+            onSizeChange={(newSize) => setSize(newSize)}
+            totalElements={pagination.totalElements ?? 0}
+            pageSizeList={[9, 15, 21]}
+          />
         </div>
       </div>
     </WebSocketProvider>

@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import ClientPage from '@/app/bookmark/ClientPage';
 import WebSocketProvider from '@/context/WebSocketContext';
-import client from '@/lib/api/client';
 import { components } from '@/lib/api/generated/schema';
 import { useAuth } from '@/context/AuthContext';
+import { client } from '@/lib/api';
 
 type BookmarkResponse = components['schemas']['BookmarkResponse'];
 type PageBookmarkResponse = components['schemas']['PagedResponseBookmarkResponse'];
@@ -79,7 +79,7 @@ export default function Page() {
 
   // WebSocketProvider를 감싸서 ClientPage에 데이터를 전달합니다.
   return (
-    <WebSocketProvider>
+    <WebSocketProvider subscriptions={[]}>
       <ClientPage bookmarks={bookmarksData} />
     </WebSocketProvider>
   );

@@ -7,8 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { components } from '@/lib/api/generated/schema';
 import { useAuth } from '@/context/AuthContext';
-import client from '@/lib/api/client';
 import Link from 'next/link';
+import { client } from '@/lib/api';
 
 type PageBookmarkResponse = components['schemas']['PagedResponseBookmarkResponse'];
 

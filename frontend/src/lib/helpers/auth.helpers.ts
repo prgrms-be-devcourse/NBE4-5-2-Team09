@@ -1,6 +1,6 @@
 import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
-import client from '../api/client';
+import { client } from '../api';
 
 export async function verifyAccessToken(accessToken: string) {
   if (!accessToken) {
