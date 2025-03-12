@@ -205,7 +205,7 @@ public class UserController {
 	@Operation(summary = "회원 탈퇴", security = @SecurityRequirement(name = "bearerAuth"))
 	@DeleteMapping("/signout")
 	public ResponseEntity<?> signOut(@RequestBody @Validated SignOutRequest request,
-		@org.springframework.security.core.annotation.AuthenticationPrincipal CustomUserPrincipal principal) {
+		@AuthenticationPrincipal CustomUserPrincipal principal) {
 		if (principal == null) {
 			throw new BusinessException(messageUtil.resolveMessage("empty.token.provided"), HttpStatus.FORBIDDEN, "");
 		}
