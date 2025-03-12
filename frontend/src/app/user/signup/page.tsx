@@ -33,6 +33,13 @@ export default function SignUpPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      if (newErrors.general) {
+        delete newErrors.general;
+      }
+      return newErrors;
+    });
     validateField(name, value);
   };
 
@@ -120,19 +127,14 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center pt-20">
-      {/* 로고 */}
+    <div className="flex flex-col items-center justify-center pt-10">
       <img src="/logo.svg" alt="Coing Logo" className="h-12 mb-6" />
-
-      {/* 상단 안내 */}
       <h1 className="text-2xl font-bold mb-2">회원가입</h1>
       <p className="text-sm mb-6 text-primary">서비스 이용을 위해 회원가입을 진행해 주세요.</p>
 
-      {/* Card 영역 */}
       <Card className="w-full max-w-md">
         <CardContent>
           <form className="space-y-4" onSubmit={handleSignUp}>
-            {/* 이름 */}
             <div>
               <Label htmlFor="name" className="block text-sm font-medium text-secondary mb-1">
                 이름
@@ -152,8 +154,6 @@ export default function SignUpPage() {
               </div>
               {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
             </div>
-
-            {/* 이메일 */}
             <div>
               <Label htmlFor="email" className="block text-sm font-medium text-secondary mb-1">
                 이메일
@@ -173,8 +173,6 @@ export default function SignUpPage() {
               </div>
               {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
-
-            {/* 비밀번호 */}
             <div>
               <Label htmlFor="password" className="block text-sm font-medium text-secondary mb-1">
                 비밀번호
@@ -194,8 +192,6 @@ export default function SignUpPage() {
               </div>
               {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
-
-            {/* 비밀번호 확인 */}
             <div>
               <Label
                 htmlFor="passwordConfirm"
@@ -221,10 +217,8 @@ export default function SignUpPage() {
               )}
             </div>
 
-            {/* 일반 에러 (ex. 서버 에러 등) */}
             {errors.general && <p className="text-red-500 text-center">{errors.general}</p>}
 
-            {/* 회원가입 버튼 */}
             <Button
               type="submit"
               disabled={!isFormValid() || isLoading}
@@ -262,7 +256,6 @@ export default function SignUpPage() {
         </CardContent>
       </Card>
 
-      {/* 하단 링크 */}
       <div className="flex flex-col mt-4 items-center">
         <div className="text-center text-sm">
           <span className="text-primary">이미 계정이 있으신가요?</span>
