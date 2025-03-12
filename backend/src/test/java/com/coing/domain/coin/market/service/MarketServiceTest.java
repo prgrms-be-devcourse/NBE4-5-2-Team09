@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import com.coing.domain.coin.market.dto.MarketDto;
+import com.coing.domain.coin.market.dto.MarketResponseDto;
 import com.coing.domain.coin.market.entity.Market;
 import com.coing.domain.coin.market.repository.MarketRepository;
 
@@ -134,12 +135,12 @@ public class MarketServiceTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// when
-		Page<Market> result = marketService.getAllMarketsByQuote(type, pageable);
+		Page<MarketResponseDto> result = marketService.getAllMarketsByQuote(null, type, pageable);
 
 		// then
 		assertThat(result.getContent()).hasSize(2);
-		assertThat(result.getContent().get(0).getCode()).isEqualTo("KRW-BTC");
-		assertThat(result.getContent().get(1).getCode()).isEqualTo("KRW-ETH");
+		assertThat(result.getContent().get(0).code()).isEqualTo("KRW-BTC");
+		assertThat(result.getContent().get(1).code()).isEqualTo("KRW-ETH");
 	}
 
 	@Test
@@ -151,7 +152,7 @@ public class MarketServiceTest {
 		when(marketCacheService.getCachedMarketList()).thenReturn(Collections.emptyList());
 
 		// when
-		Page<Market> result = marketService.getAllMarketsByQuote(type, pageable);
+		Page<MarketResponseDto> result = marketService.getAllMarketsByQuote(null, type, pageable);
 
 		// then
 		assertThat(result.getContent()).isEmpty();

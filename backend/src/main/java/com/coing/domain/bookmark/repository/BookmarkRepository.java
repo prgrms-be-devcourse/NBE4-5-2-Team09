@@ -14,4 +14,6 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 
 	@Query("SELECT b FROM Bookmark b WHERE b.user.id = :userId AND b.market.code like CONCAT(:quote, '%')")
 	List<Bookmark> findByUserIdAndQuote(@Param("userId") UUID userId, @Param("quote") String quote);
+
+	Bookmark findByMarketCode(String code);
 }

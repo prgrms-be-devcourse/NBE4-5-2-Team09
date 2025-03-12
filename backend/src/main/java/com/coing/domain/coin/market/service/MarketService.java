@@ -82,6 +82,7 @@ public class MarketService {
 			.filter(market -> market.getCode().startsWith(type))
 			.toList();
 
+		log.info("[Check Bookmark] {}", principal);
 		Set<String> bookmarkedMarkets;
 		if (principal != null) {
 			List<Bookmark> bookmarks = bookmarkRepository.findByUserIdAndQuote(principal.id(), type);

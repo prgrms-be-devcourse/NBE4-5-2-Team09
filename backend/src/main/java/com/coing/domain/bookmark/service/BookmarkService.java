@@ -34,7 +34,7 @@ public class BookmarkService {
 	private final MessageUtil messageUtil;
 
 	@Transactional
-	public BookmarkResponse addBookmark(BookmarkRequest request, CustomUserPrincipal principal) {
+	public void addBookmark(BookmarkRequest request, CustomUserPrincipal principal) {
 		UUID userId = principal.id();
 		String coinCode = request.coinCode();
 
@@ -58,7 +58,7 @@ public class BookmarkService {
 			.build();
 
 		bookmarkRepository.save(bookmark);
-		return BookmarkResponse.of(bookmark);
+		//return BookmarkResponse.of(bookmark);
 	}
 
 	@Transactional(readOnly = true)
@@ -73,10 +73,12 @@ public class BookmarkService {
 	}
 
 	@Transactional
-	public void deleteBookmark(UUID userId, Long bookmarkId) {
-		Bookmark bookmark = bookmarkRepository.findById(bookmarkId)
-			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("bookmark.not.found"),
-				HttpStatus.NOT_FOUND));
+	public void deleteBookmark(UUID userId, String marketCode) {
+		Bookmark bookmark = bookmarkRepository.findByMarketCode(marketCode);
+		if (bookmark == null) {
+			throw new BusinessException(messageUtil.resolveMessage("bookmark.not.found"),
+				HttpStatus.NOT_FOUND);
+		}
 
 		// 인증된 사용자가 북마크의 소유자인지 확인
 		if (!bookmark.getUser().getId().equals(userId)) {
@@ -84,6 +86,6 @@ public class BookmarkService {
 				HttpStatus.FORBIDDEN);
 		}
 
-		bookmarkRepository.deleteById(bookmarkId);
+		bookmarkRepository.delete(bookmark);
 	}
 }

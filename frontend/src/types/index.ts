@@ -141,6 +141,7 @@ export type MarketDto = {
   code: string;
   koreanName: string;
   englishName: string;
+  isBookmarked: boolean;
 };
 
 export type MarketsDto = {

@@ -21,6 +21,7 @@ import com.coing.domain.bookmark.controller.dto.BookmarkResponse;
 import com.coing.domain.bookmark.service.BookmarkService;
 import com.coing.domain.coin.common.dto.PagedResponse;
 import com.coing.domain.user.CustomUserPrincipal;
+import com.coing.util.BasicResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -35,11 +36,12 @@ public class BookmarkController {
 
 	@Operation(summary = "북마크 등록", security = @SecurityRequirement(name = "bearerAuth"))
 	@PostMapping("/bookmark")
-	public ResponseEntity<BookmarkResponse> addBookmark(
+	public ResponseEntity<BasicResponse> addBookmark(
 		@RequestBody @Validated BookmarkRequest request,
 		@AuthenticationPrincipal CustomUserPrincipal principal) {
-		BookmarkResponse response = bookmarkService.addBookmark(request, principal);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		/*BookmarkResponse response =*/ bookmarkService.addBookmark(request, principal);
+		BasicResponse response = new BasicResponse(HttpStatus.CREATED, "북마크 등록 성공", "");
+		return ResponseEntity.ok(response);
 	}
 
 	@Operation(summary = "유저 북마크 조회", security = @SecurityRequirement(name = "bearerAuth"))
@@ -61,11 +63,12 @@ public class BookmarkController {
 	}
 
 	@Operation(summary = "특정 북마크 삭제", security = @SecurityRequirement(name = "bearerAuth"))
-	@DeleteMapping("/bookmark/{bookmarkId}")
-	public ResponseEntity<Void> deleteBookmark(
-		@PathVariable("bookmarkId") Long bookmarkId,
+	@DeleteMapping("/bookmark/{marketCode}")
+	public ResponseEntity<BasicResponse> deleteBookmark(
+		@PathVariable("marketCode") String marketCode,
 		@AuthenticationPrincipal CustomUserPrincipal principal) {
-		bookmarkService.deleteBookmark(principal.id(), bookmarkId);
-		return ResponseEntity.noContent().build();
+		bookmarkService.deleteBookmark(principal.id(), marketCode);
+		BasicResponse response = new BasicResponse(HttpStatus.NO_CONTENT, "북마크 삭제 성공", "");
+		return ResponseEntity.ok(response);
 	}
 }
