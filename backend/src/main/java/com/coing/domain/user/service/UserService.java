@@ -108,6 +108,18 @@ public class UserService {
 				HttpStatus.BAD_REQUEST, ""));
 	}
 
+	// 비밀번호 재설정 메서드
+	@Transactional
+	public void updatePassword(UUID userId, String newPassword) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("member.not.found"),
+				HttpStatus.BAD_REQUEST, ""));
+		String encodedPassword = passwordEncoder.encode(newPassword);
+		User updatedUser = user.withPassword(encodedPassword);
+		userRepository.save(updatedUser);
+		log.info("비밀번호 재설정 성공: {}", userId);
+	}
+
 	// 하루에 한번 실행하는 미인증 유저 삭제 스케줄러
 	// 매일 새벽 5시에 실행 (cron: 초, 분, 시, 일, 월, 요일)
 	@Scheduled(cron = "00 00 5 * * *")

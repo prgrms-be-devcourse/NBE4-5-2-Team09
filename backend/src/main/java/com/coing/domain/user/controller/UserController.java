@@ -18,12 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.coing.domain.user.CustomUserPrincipal;
 import com.coing.domain.user.controller.dto.EmailVerificationResponse;
+import com.coing.domain.user.controller.dto.PasswordResetConfirmRequest;
+import com.coing.domain.user.controller.dto.PasswordResetRequest;
 import com.coing.domain.user.controller.dto.SignOutRequest;
 import com.coing.domain.user.controller.dto.UserLoginRequest;
 import com.coing.domain.user.controller.dto.UserResponse;
 import com.coing.domain.user.controller.dto.UserSignUpRequest;
 import com.coing.domain.user.controller.dto.UserSignupResponse;
 import com.coing.domain.user.email.service.EmailVerificationService;
+import com.coing.domain.user.email.service.PasswordResetService;
 import com.coing.domain.user.entity.User;
 import com.coing.domain.user.repository.UserRepository;
 import com.coing.domain.user.service.AuthTokenService;
@@ -51,6 +54,7 @@ public class UserController {
 	private final AuthTokenService authTokenService;
 	private final EmailVerificationService emailVerificationService;
 	private final MessageUtil messageUtil;
+	private final PasswordResetService passwordResetService;
 
 	@Operation(summary = "일반 유저 회원 가입")
 	@PostMapping("/signup")
@@ -217,5 +221,37 @@ public class UserController {
 		}
 		UserResponse user = userService.findById(principal.id());
 		return ResponseEntity.ok(user);
+	}
+
+	@Operation(summary = "비밀번호 재설정 요청")
+	@PostMapping("/password-reset/request")
+	public ResponseEntity<?> requestPasswordReset(@RequestBody @Validated PasswordResetRequest request) {
+		Optional<User> userOptional = userRepository.findByEmail(request.email());
+		if (userOptional.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(Map.of("status", "error", "message", "사용자를 찾을 수 없습니다."));
+		}
+		User user = userOptional.get();
+		passwordResetService.sendPasswordResetEmail(user);
+		return ResponseEntity.ok(Map.of("status", "success", "message", "비밀번호 재설정 이메일 전송되었습니다."));
+	}
+
+	@Operation(summary = "비밀번호 재설정 확인")
+	@PostMapping("/password-reset/confirm")
+	public ResponseEntity<?> confirmPasswordReset(@RequestParam("token") String token,
+		@RequestBody @Validated PasswordResetConfirmRequest request) {
+		Map<String, Object> claims = authTokenService.verifyToken(token);
+		if (claims == null || claims.get("id") == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(Map.of("status", "error", "message", "유효하지 않은 토큰입니다."));
+		}
+		UUID userId = UUID.fromString(claims.get("id").toString());
+		// 비밀번호와 확인 비밀번호가 일치하는지 검증
+		if (!request.newPassword().equals(request.newPasswordConfirm())) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(Map.of("status", "error", "message", "비밀번호 확인이 일치하지 않습니다."));
+		}
+		userService.updatePassword(userId, request.newPassword());
+		return ResponseEntity.ok(Map.of("status", "success", "message", "비밀번호가 재설정되었습니다."));
 	}
 }

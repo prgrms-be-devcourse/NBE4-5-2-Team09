@@ -130,14 +130,14 @@ export default function Header() {
                     <button
                         onClick={handleLogout}
                         disabled={isLoggingOut}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
+                        className="bg-blue-500 hover:bg-blue-600 text-white cursor-pointer px-4 py-2 rounded-md text-sm"
                     >
                       {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
                     </button>
                 ) : (
                     <button
                         onClick={() => router.push('/user/login')}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
+                        className="bg-blue-500 hover:bg-blue-600 text-white cursor-pointer px-4 py-2 rounded-md text-sm"
                     >
                       로그인
                     </button>
