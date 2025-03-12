@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -107,11 +108,12 @@ public class MarketServiceTest {
 	@DisplayName("t4: 코인 목록 전체 조회 - 정상 동작 테스트")
 	void testGetMarkets() {
 		// Given
-		List<Market> mockMarkets = Arrays.asList(
-			new Market("KRW-BTC", "비트코인", "Bitcoin"),
-			new Market("KRW-ETH", "이더리움", "Ethereum")
+		Map<String, Market> mockMarketMap = Map.of(
+			"KRW-BTC", new Market("KRW-BTC", "비트코인", "Bitcoin"),
+			"KRW-ETH", new Market("KRW-ETH", "이더리움", "Ethereum")
 		);
-		when(marketCacheService.getCachedMarketList()).thenReturn(mockMarkets);
+
+		when(marketCacheService.getCachedMarketMap()).thenReturn(mockMarketMap);
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// When
@@ -127,11 +129,12 @@ public class MarketServiceTest {
 	void getAllCoinsByMarket_ShouldReturnFilteredMarkets() {
 		// given
 		String type = "KRW";
-		List<Market> mockMarkets = Arrays.asList(
-			new Market("KRW-BTC", "비트코인", "Bitcoin"),
-			new Market("KRW-ETH", "이더리움", "Ethereum")
+		Map<String, Market> mockMarketMap = Map.of(
+			"KRW-BTC", new Market("KRW-BTC", "비트코인", "Bitcoin"),
+			"KRW-ETH", new Market("KRW-ETH", "이더리움", "Ethereum")
 		);
-		when(marketCacheService.getCachedMarketList()).thenReturn(mockMarkets);
+
+		when(marketCacheService.getCachedMarketMap()).thenReturn(mockMarketMap);
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// when
@@ -149,7 +152,7 @@ public class MarketServiceTest {
 		// given
 		String type = "USD";
 		Pageable pageable = PageRequest.of(0, 10);
-		when(marketCacheService.getCachedMarketList()).thenReturn(Collections.emptyList());
+		when(marketCacheService.getCachedMarketMap()).thenReturn(Collections.emptyMap());
 
 		// when
 		Page<MarketResponseDto> result = marketService.getAllMarketsByQuote(null, type, pageable);

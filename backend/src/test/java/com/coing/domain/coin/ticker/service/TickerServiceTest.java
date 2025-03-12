@@ -108,7 +108,7 @@ public class TickerServiceTest {
 	@DisplayName("getTicker 성공 - 존재하는 마켓 코드 조회")
 	void getTicker_Success() throws Exception {
 		// given
-		when(marketService.getMarketByCode(anyString())).thenReturn(testMarket);
+		when(marketService.getCachedMarketByCode(anyString())).thenReturn(testMarket);
 		tickerService.updateTicker(testTicker);
 
 		// when
@@ -136,7 +136,7 @@ public class TickerServiceTest {
 	@DisplayName("updateTicker 성공 - 캐시에 저장 확인")
 	void updateTicker() throws Exception {
 		// when
-		when(marketService.getMarketByCode(anyString())).thenReturn(testMarket);
+		when(marketService.getCachedMarketByCode(anyString())).thenReturn(testMarket);
 		tickerService.updateTicker(testTicker);
 
 		// then
@@ -195,7 +195,7 @@ public class TickerServiceTest {
 	@DisplayName("publishCachedTickers 성공 - WebSocket을 통해 데이터 전송")
 	void publishCachedTickers() throws JsonProcessingException {
 		// given
-		when(marketService.getMarketByCode(anyString())).thenReturn(testMarket);
+		when(marketService.getCachedMarketByCode(anyString())).thenReturn(testMarket);
 		tickerService.updateTicker(testTicker);
 		TickerDto dto = TickerDto.from(testTicker, testMarket);
 
