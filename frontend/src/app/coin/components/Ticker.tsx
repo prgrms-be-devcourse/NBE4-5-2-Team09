@@ -79,28 +79,28 @@ export default function Ticker({ market, ticker }: TickerProps) {
         </h1>
       </div>
 
-      <div className="bg-blue-50 py-4 mb-4 rounded-lg">
+      <div className="bg-muted py-4 mb-4 rounded-lg">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-lg shadow-sm">
+            <div className="bg-background p-4 rounded-lg shadow-sm">
               <div className="text-sm text-gray-500">24시간 거래량</div>
               <div className="text-xl font-bold text-blue-600">
                 {currentTicker ? Math.floor(currentTicker.accTradeVolume24h).toLocaleString() : '-'}
                 <span className="text-sm">{market.split('-')[1]}</span>
               </div>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm">
+            <div className="bg-background p-4 rounded-lg shadow-sm">
               <div className="text-sm text-gray-500">전일 종가</div>
               <div className="text-xl font-bold text-blue-600">
                 {currentTicker ? currentTicker.prevClosingPrice.toLocaleString() : '-'}
                 <span className="text-sm">{market.split('-')[0]}</span>
               </div>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm">
+            <div className="bg-background p-4 rounded-lg shadow-sm">
               <div className="text-sm text-gray-500">도미넌스</div>
               <div className="text-xl font-bold text-blue-600">52.1%</div>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm">
+            <div className="bg-background p-4 rounded-lg shadow-sm">
               <div className="text-sm text-gray-500">전일대비</div>
               <div className="text-xl font-bold text-blue-600">
                 {currentTicker ? (currentTicker.signedChangeRate * 100).toFixed(2) + '%' : '-'}
