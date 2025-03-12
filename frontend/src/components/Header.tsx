@@ -56,7 +56,7 @@ export default function Header() {
           <Link href="/">
             <div className="flex">
               <img src="/logo.svg" alt="Coing Logo" className="h-8 mr-2" />
-              <span className="text-xl font-bold">Coing</span>
+              <span className="text-xl font-bold text-secondary">Coing</span>
             </div>
           </Link>
           <nav className="hidden md:flex space-x-8">
@@ -80,11 +80,13 @@ export default function Header() {
           {isAuthLoading ? (
             <Button disabled>로딩중...</Button>
           ) : isLoggedIn ? (
-            <Button onClick={handleLogout} disabled={isLoggingOut}>
+            <Button className="cursor-pointer" onClick={handleLogout} disabled={isLoggingOut}>
               {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
             </Button>
           ) : (
-            <Button onClick={() => router.push('/user/login')}>로그인</Button>
+            <Button className="cursor-pointer" onClick={() => router.push('/user/login')}>
+              로그인
+            </Button>
           )}
         </div>
       </div>

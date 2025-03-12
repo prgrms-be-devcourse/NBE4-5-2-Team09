@@ -18,8 +18,8 @@ export default function NavLink({ href, children }: NavLinkProps) {
       href={href}
       className={`flex gap-2 ${
         isActive
-          ? 'text-sidebar-primary font-medium border-b-2 border-primary pb-1'
-          : 'text-muted-foreground hover:text-card-foreground'
+          ? 'text-card-foreground font-medium border-b-2 border-primary pb-1'
+          : 'text-primary hover:text-card-foreground'
       }`}
     >
       {children}
