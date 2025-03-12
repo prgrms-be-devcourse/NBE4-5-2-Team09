@@ -256,9 +256,9 @@ export default function CandleChart({
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 h-[500px] relative">
       {/* 오버레이: 봉 단위 버튼 (우측 상단) */}
-      <div className="absolute top-2 right-2 z-10 flex space-x-2 bg-white bg-opacity-80 p-1 rounded">
+      <div className=" absolute top-2 right-2 z-10 flex space-x-2 bg-white bg-opacity-80 p-1 rounded">
         <button
-          className={`px-2 py-1 text-xs rounded ${
+          className={`px-2 py-1 cursor-pointer text-xs rounded ${
             candleType === 'seconds' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
           onClick={() => setCandleType('seconds')}
@@ -266,7 +266,7 @@ export default function CandleChart({
           초봉
         </button>
         <button
-          className={`px-2 py-1 text-xs rounded ${
+          className={`px-2 py-1 cursor-pointer text-xs rounded ${
             candleType === 'minutes' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
           onClick={() => setCandleType('minutes')}
@@ -274,7 +274,7 @@ export default function CandleChart({
           분봉
         </button>
         <button
-          className={`px-2 py-1 text-xs rounded ${
+          className={`px-2 py-1 cursor-pointer text-xs rounded ${
             candleType === 'days' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
           onClick={() => setCandleType('days')}
@@ -282,7 +282,7 @@ export default function CandleChart({
           일봉
         </button>
         <button
-          className={`px-2 py-1 text-xs rounded ${
+          className={`px-2 py-1 cursor-pointer text-xs rounded ${
             candleType === 'weeks' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
           onClick={() => setCandleType('weeks')}
@@ -290,7 +290,7 @@ export default function CandleChart({
           주봉
         </button>
         <button
-          className={`px-2 py-1 text-xs rounded ${
+          className={`px-2 py-1 cursor-pointer text-xs rounded ${
             candleType === 'months' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
           onClick={() => setCandleType('months')}
@@ -298,7 +298,7 @@ export default function CandleChart({
           월봉
         </button>
         <button
-          className={`px-2 py-1 text-xs rounded ${
+          className={`px-2 py-1 cursor-pointer text-xs rounded ${
             candleType === 'years' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
           onClick={() => setCandleType('years')}
@@ -309,7 +309,7 @@ export default function CandleChart({
 
       {/* 오버레이: 분봉 단위 선택 드롭다운 (좌측 상단, 분봉일 때만 표시) */}
       {candleType === 'minutes' && (
-        <div className="absolute top-2 left-2 z-10 bg-white bg-opacity-80 p-1 rounded text-xs">
+        <div className="absolute top-2  left-2 z-10 bg-white bg-opacity-80 p-1 rounded text-xs">
           <label className="mr-1">분봉 단위:</label>
           <select
             value={minuteUnit}

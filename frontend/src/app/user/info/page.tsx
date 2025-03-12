@@ -93,13 +93,13 @@ export default function UserInfoPage() {
         <input
           type="password"
           id="password"
-          className="border p-2 mt-1 w-full"
+          className="border p-2 mt-1 w-64"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
       <div className="mt-4">
-        <Button onClick={handleSignOut} disabled={loading}>
+        <Button onClick={handleSignOut} disabled={loading} className="cursor-pointer">
           {loading ? '처리 중...' : '회원 탈퇴'}
         </Button>
       </div>

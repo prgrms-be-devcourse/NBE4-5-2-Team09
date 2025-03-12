@@ -74,7 +74,7 @@ export default function LoginPage() {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 cursor-pointer"
           >
             로그인
           </button>
@@ -85,7 +85,7 @@ export default function LoginPage() {
           <span className="text-gray-600 text-sm">계정이 없으신가요?</span>
           <button
             onClick={() => router.push('/user/signup')}
-            className="ml-2 text-blue-600 font-semibold hover:underline"
+            className="ml-2 text-blue-600 font-semibold hover:underline cursor-pointer"
           >
             회원가입
           </button>

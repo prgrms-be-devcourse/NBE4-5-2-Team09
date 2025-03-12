@@ -118,7 +118,7 @@ export default function SignUpPage() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
       <div className="mb-6 text-2xl font-bold">LOGO</div>
       <div className="w-full max-w-md bg-white p-8 rounded-md shadow">
-        <h1 className="text-2xl font-bold mb-4">회원가입</h1>
+        <h1 className="text-2xl font-bold mb-4 ">회원가입</h1>
         <form className="space-y-4" onSubmit={handleSignUp}>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
@@ -172,7 +172,7 @@ export default function SignUpPage() {
           <button
             type="submit"
             disabled={!isFormValid() || isLoading}
-            className={`w-full flex justify-center items-center py-2 rounded transition ${
+            className={`w-full flex justify-center items-center py-2 rounded transition cursor-pointer ${
               isLoading
                 ? 'bg-gray-400 text-white cursor-not-allowed'
                 : 'bg-blue-600 text-white hover:bg-blue-700'
@@ -209,10 +209,10 @@ export default function SignUpPage() {
         </form>
 
         <div className="mt-4 text-center">
-          <span className="text-gray-600 text-sm">이미 계정이 있으신가요?</span>
+          <span className="text-gray-600 text-sm ">이미 계정이 있으신가요?</span>
           <button
             onClick={() => router.push('/user/login')}
-            className="ml-2 text-blue-600 font-semibold hover:underline"
+            className="ml-2 text-blue-600 font-semibold hover:underline cursor-pointer"
           >
             로그인
           </button>
