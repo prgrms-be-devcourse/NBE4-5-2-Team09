@@ -13,6 +13,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix && prettier --write \"**/*.{js,jsx,ts,tsx,md}\""
   },
   "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.1.6",
     "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-select": "^2.1.6",
     "@radix-ui/react-slot": "^1.1.2",

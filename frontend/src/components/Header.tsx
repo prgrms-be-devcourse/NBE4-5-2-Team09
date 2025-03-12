@@ -77,7 +77,7 @@ export default function Header() {
             className="flex items-center gap-1 text-sm font-medium text-secondary hover:text-card-foreground cursor-pointer"
           >
             <CircleUser />
-            {user?.name || 'Guest'}
+            {user?.name || '게스트'}
           </Link>
           <div style={{ minHeight: '36px' }}>
             {pathname !== '/user/login' && (

@@ -5,6 +5,7 @@ import '@/app/globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import Header from '@/components/Header';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { Toaster } from '@/components/ui/sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <AuthProvider>
             <Header />
             <main className="container mx-auto px-4 py-8">{children}</main>
+            <Toaster position="top-right" richColors />
           </AuthProvider>
         </ThemeProvider>
       </body>
