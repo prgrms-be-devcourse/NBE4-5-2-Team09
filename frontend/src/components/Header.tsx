@@ -2,12 +2,13 @@
 
 import { useAuth } from '@/context/AuthContext';
 import NavLink from '@/components/NavLink';
-import { useRouter } from 'next/navigation';
+import {usePathname, useRouter} from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { accessToken, isAuthLoading, setAccessToken, customFetch } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [userName, setUserName] = useState(''); // 백엔드에서 받아올 사용자 이름
@@ -123,21 +124,24 @@ export default function Header() {
                 </span>
               </Link>
             </div>
-            {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                disabled={isLoggingOut}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
-              >
-                {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
-              </button>
-            ) : (
-              <button
-                onClick={() => router.push('/user/login')}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
-              >
-                로그인
-              </button>
+            {/* 로그인 페이지일 때는 로그인 버튼 숨김 */}
+            {pathname !== '/user/login' && (
+                isLoggedIn ? (
+                    <button
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
+                    >
+                      {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
+                    </button>
+                ) : (
+                    <button
+                        onClick={() => router.push('/user/login')}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
+                    >
+                      로그인
+                    </button>
+                )
             )}
           </div>
         </div>
