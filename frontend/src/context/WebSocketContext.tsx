@@ -19,7 +19,7 @@ interface WebSocketContextProps {
   orderbooks: Record<string, OrderbookDto | null>;
   trades: Record<string, TradeDto | null>;
   candleCharts: Record<string, CandleChartDto[] | null>;
-  updateSubscriptions: (newSubscriptions: Subscription[]) => void; // ✅ 구독 변경 함수 추가
+  updateSubscriptions: (newSubscriptions: Subscription[]) => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextProps>({
@@ -27,7 +27,7 @@ const WebSocketContext = createContext<WebSocketContextProps>({
   orderbooks: {},
   trades: {},
   candleCharts: {},
-  updateSubscriptions: () => {}, // 기본적으로 빈 함수
+  updateSubscriptions: () => {},
 });
 
 export const WebSocketProvider = ({
@@ -46,10 +46,10 @@ export const WebSocketProvider = ({
   const [trades, setTrades] = useState<Record<string, TradeDto | null>>({});
   const [candles, setCandles] = useState<Record<string, CandleChartDto[] | null>>({});
 
-  // ✅ 현재 구독 상태를 state로 관리
+  // 현재 구독 상태를 state로 관리
   const [currentSubscriptions, setCurrentSubscriptions] = useState<Subscription[]>(subscriptions);
 
-  // ✅ WebSocket 구독 변경 함수
+  // WebSocket 구독 변경 함수
   const updateSubscriptions = (newSubscriptions: Subscription[]) => {
     setCurrentSubscriptions(newSubscriptions);
   };
@@ -116,7 +116,7 @@ export const WebSocketProvider = ({
         orderbooks,
         trades,
         candleCharts: candles,
-        updateSubscriptions, // ✅ 구독 변경 함수 제공
+        updateSubscriptions, // 구독 변경 함수 제공
       }}
     >
       {children}

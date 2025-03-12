@@ -5,11 +5,7 @@ export default function Page() {
   return (
     <>
       <WebSocketProvider
-        subscriptions={[
-          { type: 'ticker', markets: [] },
-          { type: 'trade', markets: [] },
-          { type: 'orderbook', markets: [] },
-        ]}
+        subscriptions={[{ type: 'ticker' }, { type: 'trade' }, { type: 'orderbook' }]}
       >
         <ClientPage />
       </WebSocketProvider>

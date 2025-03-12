@@ -2,18 +2,16 @@
 
 import { useState, useCallback, useRef } from 'react';
 import type { OrderbookDto } from '@/types';
-import { useWebSocket } from '@/context/WebSocketContext';
 import { OrderbookHeader } from './OrderbookHeader';
 import { OrderbookChart } from './OrderbookChart';
 
 interface OrderBookListProps {
   market: string;
+  orderbook: OrderbookDto | null;
 }
 
-export default function OrderbookList({ market }: OrderBookListProps) {
+export default function OrderbookList({ market, orderbook }: OrderBookListProps) {
   const [quote, base] = market.split('-');
-  const { orderbooks } = useWebSocket();
-  const orderbook: OrderbookDto | null = orderbooks[market] || null;
   const userScrolled = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isTotalMode, setIsTotalMode] = useState(false);

@@ -1,29 +1,66 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AskBid, TradeDto } from '@/types';
 
 interface TradeListProps {
-  trades: Record<string, TradeDto | null>;
+  market: string;
+  trade: TradeDto | null;
 }
 
-export default function TradeList({ trades }: TradeListProps) {
+type TradeResponse = {
+  trades: TradeDto[];
+};
+
+export default function TradeList({ market, trade }: TradeListProps) {
   const [clientTrades, setClientTrades] = useState<TradeDto[]>([]);
+  const isMounted = useRef(false);
 
   useEffect(() => {
-    const tradeArray = Object.values(trades).filter((trade) => trade !== null) as TradeDto[];
+    async function fetchTradeList() {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/trade/${market}`);
 
-    if (tradeArray.length > 0) {
+        if (!response.ok) {
+          throw new Error('체결 데이터를 불러오는 중 오류 발생');
+        }
+
+        const data: TradeResponse = await response.json();
+        setClientTrades((prevTrades) => {
+          // 기존 데이터와 새 데이터를 병합하면서 중복 제거
+          const mergedTrades = [...data.trades, ...prevTrades].filter(
+            (trade, index, self) =>
+              index === self.findIndex((t) => t.sequentialId === trade.sequentialId),
+          );
+
+          // 최신 거래가 맨 위에 오도록 정렬
+          return mergedTrades.sort((a, b) => b.sequentialId - a.sequentialId).slice(0, 20);
+        });
+      } catch (err) {
+        console.error('체결 데이터를 불러오는 중 오류 발생:', err);
+      } finally {
+        isMounted.current = true;
+      }
+    }
+
+    fetchTradeList();
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted.current) return;
+
+    if (trade) {
       setClientTrades((prevTrades) => {
-        const newTrades = tradeArray.filter(
-          (trade) => !prevTrades.some((t) => t.sequentialId === trade.sequentialId),
-        );
+        // 중복 확인 (기존 배열에 같은 id가 있으면 추가하지 않음)
+        if (prevTrades.some((t) => t.sequentialId === trade.sequentialId)) {
+          return prevTrades;
+        }
 
-        const updatedTrades = [...newTrades, ...prevTrades];
-        return updatedTrades.slice(0, 10);
+        const updatedTrades = [trade, ...prevTrades];
+        return updatedTrades.sort((a, b) => b.sequentialId - a.sequentialId).slice(0, 20);
       });
     }
-  }, [trades]);
+  }, [trade]);
 
   const formatTime = (timestamp: number) => {
     return new Date(timestamp).toLocaleTimeString('ko-KR', {

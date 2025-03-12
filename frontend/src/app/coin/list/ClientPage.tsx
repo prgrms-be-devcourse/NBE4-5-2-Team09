@@ -60,7 +60,7 @@ export default function ClientPage({ markets }: ClientPageProps) {
         return (
           <Card
             key={market.code}
-            className="flex flex-col gap-4 bg-white shadow-sm rounded-sm border-0 cursor-pointer shadow-md hover:shadow-lg"
+            className="flex flex-col gap-4 bg-white rounded-sm border-0 cursor-pointer shadow-md hover:shadow-lg"
           >
             <Link href={`/coin/${market.code}`} className="flex flex-col h-full">
               <CardHeader className="mb-4">

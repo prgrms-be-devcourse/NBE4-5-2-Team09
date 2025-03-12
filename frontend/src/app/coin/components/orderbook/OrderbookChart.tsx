@@ -85,14 +85,16 @@ export function OrderbookChart({
                                 : 'text-gray-500',
                         },
                       ].map((item, idx) => (
-                        <AutoTextSize key={`ask-box-${idx}`} className="w-full">
-                          <div className="flex justify-between w-full pr-2">
-                            <div className="font-medium text-left">{item.label}</div>
-                            <div className={`text-right ${item.valueClass || ''}`}>
-                              {item.value}
+                        <div key={`ask-box-${idx}`} className="w-full">
+                          <AutoTextSize className="w-full">
+                            <div className="flex justify-between w-full pr-2">
+                              <div className="font-medium text-left">{item.label}</div>
+                              <div className={`text-right ${item.valueClass || ''}`}>
+                                {item.value}
+                              </div>
                             </div>
-                          </div>
-                        </AutoTextSize>
+                          </AutoTextSize>
+                        </div>
                       ))}
                     </div>
                   </td>
@@ -118,12 +120,14 @@ export function OrderbookChart({
                           value: `${formatPrice(orderbook.totalBidSize)} ${base}`,
                         },
                       ].map((item, idx) => (
-                        <AutoTextSize key={`bid-box-${idx}`} className="w-full">
-                          <div className="flex justify-between w-full pl-2">
-                            <div className="font-medium text-left">{item.label}</div>
-                            <div className="text-right">{item.value}</div>
-                          </div>
-                        </AutoTextSize>
+                        <div key={`bid-box-${idx}`} className="w-full">
+                          <AutoTextSize className="w-full">
+                            <div className="flex justify-between w-full pr-2">
+                              <div className="font-medium text-left">{item.label}</div>
+                              <div className={`text-right ${item.value || ''}`}>{item.value}</div>
+                            </div>
+                          </AutoTextSize>
+                        </div>
                       ))}
                     </div>
                   </td>
