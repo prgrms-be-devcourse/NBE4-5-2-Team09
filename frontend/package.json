@@ -10,7 +10,8 @@
     "codegen:watch": "nodemon --watch ../api_schema.json --exec \"npm run codegen\"",
     "doppler": "doppler secrets download --no-file --format env-no-quotes > .env",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
-    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix && prettier --write \"**/*.{js,jsx,ts,tsx,md}\""
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix && prettier --write \"**/*.{js,jsx,ts,tsx,md}\"",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.2",
@@ -54,6 +55,7 @@
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-unused-imports": "^4.1.4",
     "globals": "^16.0.0",
+    "husky": "^8.0.0",
     "nodemon": "^3.1.9",
     "openapi-typescript": "^7.6.1",
     "postcss": "^8.5.3",

@@ -32,11 +32,9 @@ export default function LoginPage() {
         const authHeader = response.headers.get('Authorization');
         if (authHeader?.startsWith('Bearer ')) {
           const token = authHeader.slice(7);
-          setAccessToken(token); // 인메모리에 저장
+          setAccessToken(token);
           console.log('Access Token 저장됨:', token);
         }
-
-        alert('로그인 성공!');
         router.push('/');
       } else {
         const errorData = await response.json();
