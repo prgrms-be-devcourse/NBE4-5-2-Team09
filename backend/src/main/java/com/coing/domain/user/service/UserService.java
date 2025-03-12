@@ -81,6 +81,12 @@ public class UserService {
 			throw new BusinessException(messageUtil.resolveMessage("password.mismatch"),
 				HttpStatus.BAD_REQUEST, "");
 		}
+		// 이메일 인증 여부 확인 추가
+		if (!user.isVerified()) {
+			// 세 번째 인자로 user.getId().toString()을 전달하여 프론트에서 사용할 수 있도록 함
+			throw new BusinessException(messageUtil.resolveMessage("email.not.verified"),
+				HttpStatus.UNAUTHORIZED, user.getId().toString());
+		}
 		return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.isVerified());
 	}
 

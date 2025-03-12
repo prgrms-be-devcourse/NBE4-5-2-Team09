@@ -40,7 +40,17 @@ export default function LoginPage() {
         router.push('/');
       } else {
         const errorData = await response.json();
-        alert(`로그인 실패: ${errorData.message}`);
+        // 미인증 사용자라면 백엔드에서 userId를 detail 필드에 포함했다고 가정합니다.
+        if (errorData.message === '이메일 인증이 완료되지 않았습니다.') {
+          const userId = errorData.detail;
+          if (userId) {
+            router.push(`/user/email/email-verification?userId=${userId}`);
+          } else {
+            router.push('/user/email/email-verification');
+          }
+        } else {
+          alert(`로그인 실패: ${errorData.message}`);
+        }
       }
     } catch (error) {
       console.error('Login error:', error);
