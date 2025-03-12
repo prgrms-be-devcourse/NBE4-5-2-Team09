@@ -48,15 +48,14 @@ export default function EmailVerificationPage() {
   }, [searchParams, router]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-card">
-      <div className="text-center p-6 shadow-md rounded-md border border-muted bg-card w-96">
-        <h1 className="text-2xl font-bold mb-4">이메일 인증</h1>
-        {loading ? (
-          <p className="text-gray-600">이메일 인증을 진행 중입니다...</p>
-        ) : (
-          <p className="text-gray-800">{message}</p>
-        )}
-      </div>
+    <div className="flex flex-col items-center justify-center pt-10">
+      <img src="/logo.svg" alt="LOGO" className="h-12 mb-6" />
+      <h1 className="text-2xl mb-6 font-bold mb-2">이메일 인증 완료</h1>
+      {loading ? (
+        <p className="text-sm mb-6 text-muted-foreground">이메일 인증을 진행 중입니다...</p>
+      ) : (
+        <p className="text-sm mb-6 text-muted-foreground">{message}</p>
+      )}
     </div>
   );
 }
