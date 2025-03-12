@@ -31,12 +31,11 @@ export default function UserInfoPage() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
-  // user 상태가 업데이트되면 fetching 상태를 false로 설정
   useEffect(() => {
-    if (user) {
+    if (!accessToken) {
       setFetching(false);
     }
-  }, [user]);
+  }, [accessToken, user]);
 
   // 회원 탈퇴 핸들러
   const handleSignOut = async () => {
