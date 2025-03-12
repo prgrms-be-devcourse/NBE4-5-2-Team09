@@ -11,16 +11,15 @@ interface NavLinkProps {
 
 export default function NavLink({ href, children }: NavLinkProps) {
   const pathname = usePathname();
-  // 현재 경로가 정확히 일치하면 활성화 상태로 간주
   const isActive = pathname === href;
 
   return (
     <Link
       href={href}
-      className={`${
+      className={`flex gap-2 ${
         isActive
-          ? 'text-gray-900 font-medium border-b-2 border-blue-500 pb-1'
-          : 'text-gray-500 hover:text-gray-900'
+          ? 'text-card-foreground font-medium border-b-2 border-primary pb-1'
+          : 'text-primary hover:text-card-foreground'
       }`}
     >
       {children}

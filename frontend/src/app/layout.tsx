@@ -10,6 +10,7 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Coing',
   description: 'Real-time Coin Dashboard',
+  icons: '/logo.svg',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
