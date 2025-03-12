@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +35,13 @@ public class TickerService {
 	private final RestTemplate restTemplate;
 	private final Map<String, TickerDto> tickerCache = new ConcurrentHashMap<>();
 	private final Map<String, Long> lastSentTime = new ConcurrentHashMap<>();
-	private static final long THROTTLE_INTERVAL_MS = 500;
+	private static final long THROTTLE_INTERVAL_MS = 200;
+
+	public TickerDto getTicker(String market) {
+		return Optional.ofNullable(tickerCache.get(market)).orElseThrow(() -> new BusinessException(
+			messageUtil.resolveMessage("ticker.not.found"),
+			HttpStatus.NOT_FOUND));
+	}
 
 	public void updateTicker(Ticker ticker) {
 		TickerDto dto = TickerDto.from(ticker);
