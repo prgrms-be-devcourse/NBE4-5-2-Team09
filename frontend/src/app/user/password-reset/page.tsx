@@ -2,6 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Lock } from 'lucide-react';
 
 export default function PasswordResetPage() {
   const router = useRouter();
@@ -105,82 +110,112 @@ export default function PasswordResetPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-      <div className="mb-6 text-2xl font-bold">LOGO</div>
-      <div className="w-full max-w-md bg-white p-8 rounded-md shadow">
-        <h1 className="text-2xl font-bold mb-4">비밀번호 재설정</h1>
-        <form className="space-y-4" onSubmit={handlePasswordReset}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">새 비밀번호</label>
-            <input
-              type="password"
-              name="newPassword"
-              value={formData.newPassword}
-              onChange={handleInputChange}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-            {errors.newPassword && <p className="text-red-500 text-sm">{errors.newPassword}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호 확인</label>
-            <input
-              type="password"
-              name="newPasswordConfirm"
-              value={formData.newPasswordConfirm}
-              onChange={handleInputChange}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-            {errors.newPasswordConfirm && (
-              <p className="text-red-500 text-sm">{errors.newPasswordConfirm}</p>
-            )}
-          </div>
-          {errors.general && <p className="text-red-500 text-center">{errors.general}</p>}
-          <button
-            type="submit"
-            disabled={!isFormValid() || isLoading}
-            className={`w-full flex justify-center items-center py-2 rounded transition cursor-pointer ${
-              isLoading
-                ? 'bg-gray-400 text-white cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
-          >
-            {isLoading ? (
-              <>
-                <svg
-                  className="animate-spin h-5 w-5 mr-2 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8H4z"
-                  ></path>
-                </svg>
-                재설정 중...
-              </>
-            ) : (
-              '비밀번호 재설정'
-            )}
-          </button>
-        </form>
-        <div className="mt-4 text-center">
-          <button
-            onClick={() => router.push('/user/login')}
-            className="text-blue-600 font-semibold hover:underline cursor-pointer"
-          >
-            로그인 페이지로 이동
-          </button>
-        </div>
+    <div className="flex flex-col items-center justify-center pt-20">
+      <img src="/logo.svg" alt="Coing Logo" className="h-12 mb-6" />
+
+      <h1 className="text-2xl font-bold mb-2">비밀번호 재설정</h1>
+      <p className="text-sm mb-6 text-primary">새로운 비밀번호를 입력해 주세요.</p>
+
+      <Card className="w-full max-w-md">
+        <CardContent>
+          <form className="space-y-4" onSubmit={handlePasswordReset}>
+            <div>
+              <Label
+                htmlFor="newPassword"
+                className="block text-sm font-medium text-secondary mb-1"
+              >
+                새 비밀번호
+              </Label>
+              <div className="relative mt-2">
+                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-primary" />
+                <Input
+                  id="newPassword"
+                  name="newPassword"
+                  type="password"
+                  value={formData.newPassword}
+                  onChange={handleInputChange}
+                  placeholder="********"
+                  required
+                  className="border border-gray-300 pl-10 placeholder:text-primary"
+                />
+              </div>
+              {errors.newPassword && (
+                <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>
+              )}
+            </div>
+
+            <div>
+              <Label
+                htmlFor="newPasswordConfirm"
+                className="block text-sm font-medium text-secondary mb-1"
+              >
+                비밀번호 확인
+              </Label>
+              <div className="relative mt-2">
+                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-primary" />
+                <Input
+                  id="newPasswordConfirm"
+                  name="newPasswordConfirm"
+                  type="password"
+                  value={formData.newPasswordConfirm}
+                  onChange={handleInputChange}
+                  placeholder="********"
+                  required
+                  className="border border-gray-300 pl-10 placeholder:text-primary"
+                />
+              </div>
+              {errors.newPasswordConfirm && (
+                <p className="text-red-500 text-sm mt-1">{errors.newPasswordConfirm}</p>
+              )}
+            </div>
+
+            {errors.general && <p className="text-red-500 text-center">{errors.general}</p>}
+
+            <Button
+              type="submit"
+              disabled={!isFormValid() || isLoading}
+              className="w-full cursor-pointer"
+            >
+              {isLoading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8H4z"
+                    ></path>
+                  </svg>
+                  재설정 중...
+                </>
+              ) : (
+                '비밀번호 재설정'
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      <div className="flex flex-col mt-4">
+        <Button
+          variant="link"
+          className="text-sm text-point cursor-pointer"
+          onClick={() => router.push('/user/login')}
+        >
+          로그인 페이지로 이동
+        </Button>
       </div>
     </div>
   );

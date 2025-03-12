@@ -110,7 +110,7 @@ export default function EmailVerificationWaitingScreen() {
     <div className="flex flex-col items-center justify-center pt-10">
       <img src="/logo.svg" alt="LOGO" className="h-12 mb-6" />
       <h1 className="text-2xl font-bold mb-2">이메일 인증</h1>
-      <p className="text-sm mb-6 text-muted-foreground">이메일 인증이 필요합니다</p>
+      <p className="text-sm mb-6 text-primary">이메일 인증이 필요합니다</p>
 
       <Card className="w-full max-w-md">
         <CardContent className="text-center py-8">
