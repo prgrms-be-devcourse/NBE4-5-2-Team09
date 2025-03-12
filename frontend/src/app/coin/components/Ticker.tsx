@@ -59,10 +59,10 @@ export default function Ticker({ market, ticker }: TickerProps) {
                 <span
                   className={`text-xl ${
                     currentTicker.change === 'RISE'
-                      ? 'text-green-500'
+                      ? 'text-red-500'
                       : currentTicker.change === 'FALL'
-                        ? 'text-red-500'
-                        : 'text-gray-500'
+                        ? 'text-blue-500'
+                        : 'text-black-500'
                   }`}
                 >
                   {currentTicker.tradePrice.toLocaleString()}
@@ -80,28 +80,36 @@ export default function Ticker({ market, ticker }: TickerProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded-lg shadow-sm">
               <div className="text-sm text-gray-500">24시간 거래량</div>
-              <div className="text-xl font-bold text-blue-600">
+              <div className="text-xl font-bold text-black-600">
                 {currentTicker ? Math.floor(currentTicker.accTradeVolume24h).toLocaleString() : '-'}
                 <span className="text-sm">{market.split('-')[1]}</span>
               </div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-sm">
               <div className="text-sm text-gray-500">거래대금</div>
-              <div className="text-xl font-bold text-blue-600">
+              <div className="text-xl font-bold text-black-600">
                 {currentTicker ? Math.floor(currentTicker.accTradePrice24h).toLocaleString() : '-'}
                 <span className="text-sm">{market.split('-')[0]}</span>
               </div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-sm">
               <div className="text-sm text-gray-500">전일 종가</div>
-              <div className="text-xl font-bold text-blue-600">
+              <div className="text-xl font-bold text-black-600">
                 {currentTicker ? currentTicker.prevClosingPrice.toLocaleString() : '-'}
                 <span className="text-sm">{market.split('-')[0]}</span>
               </div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-sm">
               <div className="text-sm text-gray-500">전일대비</div>
-              <div className="text-xl font-bold text-blue-600">
+              <div
+                className={`text-xl font-bold ${
+                  currentTicker?.change === 'RISE'
+                    ? 'text-red-500'
+                    : currentTicker?.change === 'FALL'
+                      ? 'text-blue-500'
+                      : 'text-black-500'
+                }`}
+              >
                 {currentTicker ? (currentTicker.signedChangeRate * 100).toFixed(2) + '%' : '-'}
               </div>
             </div>
