@@ -47,7 +47,7 @@ public class TickerService {
 	}
 
 	public void updateTicker(Ticker ticker) {
-		Market market = marketService.getMarketByCode(ticker.getCode());
+		Market market = marketService.getCachedMarketByCode(ticker.getCode());
 		TickerDto dto = TickerDto.from(ticker, market);
 		tickerCache.put(ticker.getCode(), dto);
 		publish(dto);

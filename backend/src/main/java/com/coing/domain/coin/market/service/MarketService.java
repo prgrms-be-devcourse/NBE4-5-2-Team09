@@ -124,6 +124,11 @@ public class MarketService {
 			.orElseThrow(() -> new BusinessException("Market not found", HttpStatus.NOT_FOUND));
 	}
 
+	public Market getCachedMarketByCode(String code) {
+		return Optional.ofNullable(marketCacheService.getCachedMarketMap().get(code))
+			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("market.not.found"),
+				HttpStatus.NOT_FOUND));
+	}
 
 	public List<Market> getCachedMarketList() {
 		return marketCacheService.getCachedMarketMap()
