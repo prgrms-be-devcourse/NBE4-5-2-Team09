@@ -126,7 +126,7 @@ export default function EmailVerificationWaitingScreen() {
           <Button
             onClick={handleResendEmail}
             disabled={isResending}
-            className="w-full mt-2 transition cursor-pointer"
+            className="w-full mt-2 transition cursor-pointer text-background"
           >
             {isResending ? '재전송 중...' : '인증 메일 재전송'}
           </Button>

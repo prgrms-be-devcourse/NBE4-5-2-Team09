@@ -174,7 +174,7 @@ export default function PasswordResetPage() {
             <Button
               type="submit"
               disabled={!isFormValid() || isLoading}
-              className="w-full cursor-pointer"
+              className="w-full cursor-pointer text-background"
             >
               {isLoading ? (
                 <>

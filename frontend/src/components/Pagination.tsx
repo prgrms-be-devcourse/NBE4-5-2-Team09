@@ -82,7 +82,7 @@ export default function PaginationComponent({
                   <PaginationLink
                     className={
                       currentPage === pageNum
-                        ? 'bg-primary text-primary-foreground px-3 py-1 rounded-md'
+                        ? 'bg-primary text-background px-3 py-1 rounded-md'
                         : 'px-3 py-1 cursor-pointer'
                     }
                     onClick={() => onPageChange(pageNum)}

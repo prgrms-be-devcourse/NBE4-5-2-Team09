@@ -86,7 +86,7 @@ export default function PasswordResetRequestPage() {
               <Button
                 type="button"
                 onClick={handleGoToLogin}
-                className="w-full py-2 cursor-pointer"
+                className="w-full py-2 text-background cursor-pointer"
               >
                 로그인 페이지로 이동
               </Button>
@@ -94,8 +94,8 @@ export default function PasswordResetRequestPage() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-2 ${
-                  isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                className={`w-full py-2 text-background ${
+                  isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer '
                 }`}
               >
                 {isLoading ? '요청 중...' : '요청하기'}

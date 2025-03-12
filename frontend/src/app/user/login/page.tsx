@@ -83,12 +83,12 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
                   required
-                  className="border border-gray-300 pl-10 placeholder:text-primary"
+                  className="border border-input pl-10 placeholder:text-primary bg-background"
                 />
               </div>
             </div>
             <div>
-              <Label htmlFor="password" className="mb-1">
+              <Label htmlFor="password" className="mb-1 pt-4">
                 비밀번호
               </Label>
               <div className="relative mt-2">
@@ -99,12 +99,12 @@ export default function LoginPage() {
                   placeholder="********"
                   value={password}
                   required
-                  className="border border-gray-300 pl-10"
+                  className="border border-input pl-10 placeholder:text-primary bg-background"
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>
-            <Button type="submit" className="w-full cursor-pointer">
+            <Button type="submit" className="w-full mt-4 text-background cursor-pointer">
               로그인
             </Button>
           </form>

@@ -149,7 +149,7 @@ export default function SignUpPage() {
                   onChange={handleInputChange}
                   placeholder="홍길동"
                   required
-                  className="border border-gray-300 pl-10 placeholder:text-primary"
+                  className="border border-input pl-10 placeholder:text-primary bg-background"
                 />
               </div>
               {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
@@ -168,7 +168,7 @@ export default function SignUpPage() {
                   onChange={handleInputChange}
                   placeholder="name@example.com"
                   required
-                  className="border border-gray-300 pl-10 placeholder:text-primary"
+                  className="border border-input pl-10 placeholder:text-primary bg-background"
                 />
               </div>
               {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
@@ -187,12 +187,12 @@ export default function SignUpPage() {
                   value={formData.password}
                   onChange={handleInputChange}
                   required
-                  className="border border-gray-300 pl-10"
+                  className="border border-input pl-10 placeholder:text-primary bg-background"
                 />
               </div>
               {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
-            <div>
+            <div className="pb-4">
               <Label
                 htmlFor="passwordConfirm"
                 className="block text-sm font-medium text-secondary mb-1"
@@ -209,7 +209,7 @@ export default function SignUpPage() {
                   value={formData.passwordConfirm}
                   onChange={handleInputChange}
                   required
-                  className="border border-gray-300 pl-10"
+                  className="border border-input pl-10 placeholder:text-primary bg-background"
                 />
               </div>
               {errors.passwordConfirm && (
@@ -222,7 +222,7 @@ export default function SignUpPage() {
             <Button
               type="submit"
               disabled={!isFormValid() || isLoading}
-              className="w-full flex justify-center"
+              className="w-full flex justify-center text-background cursor-pointer"
             >
               {isLoading ? (
                 <>
@@ -232,14 +232,7 @@ export default function SignUpPage() {
                     fill="none"
                     viewBox="0 0 24 24"
                   >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
+                    <circle className="opacity-25" cx="12" cy="12" r="10" strokeWidth="4"></circle>
                     <path
                       className="opacity-75"
                       fill="currentColor"
