@@ -93,6 +93,33 @@ public class TickerServiceTest {
 	}
 
 	@Test
+	@DisplayName("getTicker 성공 - 존재하는 마켓 코드 조회")
+	void getTicker_Success() throws Exception {
+		// given
+		tickerService.updateTicker(testTicker);
+
+		// when
+		TickerDto result = tickerService.getTicker(testTicker.getCode());
+
+		// then
+		assertNotNull(result);
+		assertEquals(testTicker.getCode(), result.code());
+	}
+
+	@Test
+	@DisplayName("getTicker 실패 - 존재하지 않는 현재가 조회 시 예외 발생")
+	void getTicker_Failure() {
+		// given
+		when(messageUtil.resolveMessage("ticker.not.found")).thenReturn("해당 현재가를 찾을 수 없습니다.");
+
+		// when & then
+		BusinessException exception = assertThrows(BusinessException.class, () ->
+			tickerService.getTicker("KRW-ETH"));
+
+		assertEquals("해당 현재가를 찾을 수 없습니다.", exception.getMessage());
+	}
+
+	@Test
 	@DisplayName("updateTicker 성공 - 캐시에 저장 확인")
 	void updateTicker() throws Exception {
 		// when
