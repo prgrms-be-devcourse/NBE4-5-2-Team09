@@ -7,13 +7,14 @@ import { components } from '@/lib/api/generated/schema';
 import { useAuth } from '@/context/AuthContext';
 import { client } from '@/lib/api';
 import RequireAuthenticated from '@/components/RequireAutenticated';
+import { MarketDto } from '@/types';
 
 type BookmarkResponse = components['schemas']['BookmarkResponse'];
 type PageBookmarkResponse = components['schemas']['PagedResponseBookmarkResponse'];
 
 export default function Page() {
   const { accessToken } = useAuth();
-  const [bookmarksData, setBookmarksData] = useState<PageBookmarkResponse | null>(null);
+  const [bookmarksData, setBookmarksData] = useState<BookmarkResponse[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const itemsPerPage = 9;
   const quote = 'KRW';
@@ -46,18 +47,18 @@ export default function Page() {
         const filteredPageData: PageBookmarkResponse = {
           ...pageData,
           content:
-            pageData.content?.filter((bookmark): bookmark is Required<BookmarkResponse> =>
+            pageData.content?.filter((bookmark): bookmark is Required<MarketDto> =>
               Boolean(
-                bookmark.id &&
+                bookmark.code &&
                   bookmark.code?.startsWith('KRW-') &&
                   bookmark.koreanName &&
                   bookmark.englishName &&
-                  bookmark.createAt,
+                  bookmark.isBookmarked,
               ),
             ) ?? [],
         };
 
-        setBookmarksData(filteredPageData);
+        setBookmarksData(filteredPageData.content);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : '북마크 데이터를 불러오는 중 오류가 발생했습니다.',

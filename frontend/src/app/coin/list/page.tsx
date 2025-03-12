@@ -70,9 +70,15 @@ export default function Page() {
       <div className="max-w-7xl mx-auto p-6">
         <Tabs value={quote} onValueChange={handleQuoteChange}>
           <TabsList className="grid w-full grid-cols-3 bg-muted">
-            <TabsTrigger value="KRW">KRW</TabsTrigger>
-            <TabsTrigger value="BTC">BTC</TabsTrigger>
-            <TabsTrigger value="USDT">USDT</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="KRW">
+              KRW
+            </TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="BTC">
+              BTC
+            </TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="USDT">
+              USDT
+            </TabsTrigger>
           </TabsList>
         </Tabs>
         <ClientPage markets={markets.slice(0, size)} />
