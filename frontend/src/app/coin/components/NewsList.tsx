@@ -19,19 +19,19 @@ export default function NewsList({ news }: NewsListProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div className="p-4 border-b border-gray-200">
+    <div className="bg-card rounded-lg shadow-sm overflow-hidden">
+      <div className="p-4 border-b border-muted">
         <h2 className="text-lg font-semibold">뉴스</h2>
       </div>
 
       <div className="overflow-y-auto max-h-[400px]">
-        <ul className="divide-y divide-gray-200">
+        <ul className="divide-y divide-muted">
           {news.map((item) => (
-            <li key={item.id} className="p-4 hover:bg-gray-50">
+            <li key={item.id} className="p-4 hover:bg-muted">
               <a href={item.url} className="block">
-                <h3 className="font-medium text-gray-900 mb-1">{item.title}</h3>
-                <p className="text-sm text-gray-600 mb-2">{item.summary}</p>
-                <div className="flex justify-between text-xs text-gray-500">
+                <h3 className="font-medium mb-1">{item.title}</h3>
+                <p className="text-sm text-secondary mb-2">{item.summary}</p>
+                <div className="flex justify-between text-xs text-primary">
                   <span>{item.source}</span>
                   <span>{formatDate(item.publishedAt)}</span>
                 </div>

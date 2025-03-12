@@ -2,6 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@radix-ui/react-label';
+import { Mail } from 'lucide-react';
 
 export default function PasswordResetRequestPage() {
   const router = useRouter();
@@ -46,44 +51,59 @@ export default function PasswordResetRequestPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md bg-white p-8 rounded-md shadow">
-        <h1 className="text-2xl font-bold mb-4">비밀번호 재설정 요청</h1>
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">이메일 주소</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-          </div>
-          {message && <p className="text-green-600 text-center">{message}</p>}
-          {error && <p className="text-red-600 text-center">{error}</p>}
-          {/* 버튼을 emailSent 상태에 따라 분기 처리 */}
-          {emailSent ? (
-            <button
-              type="button"
-              onClick={handleGoToLogin}
-              className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 cursor-pointer"
-            >
-              로그인 페이지로 이동
-            </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`w-full bg-blue-600 text-white py-2 rounded ${
-                isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700 cursor-pointer'
-              }`}
-            >
-              {isLoading ? '요청 중...' : '요청하기'}
-            </button>
-          )}
-        </form>
-      </div>
+    <div className="flex flex-col items-center justify-center pt-10">
+      <img src="/logo.svg" alt="Coing Logo" className="h-12 mb-6" />
+      <h1 className="text-2xl font-bold mb-2">비밀번호 재설정 요청</h1>
+      <p className="text-sm mb-6 text-primary">
+        이메일 주소를 입력하시면, 재설정 링크를 보내드립니다.
+      </p>
+
+      <Card className="w-full max-w-md">
+        <CardContent>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div>
+              <Label htmlFor="email" className="block text-sm font-medium text-secondary mb-1">
+                이메일 주소
+              </Label>
+              <div className="relative mt-2">
+                <Mail className="absolute left-3 top-2.5 h-4 w-4 text-primary" />
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  className="border border-gray-300 pl-10 placeholder:text-primary"
+                />
+              </div>
+            </div>
+
+            {message && <p className="text-primary text-center">{message}</p>}
+            {error && <p className="text-destructive text-center">{error}</p>}
+
+            {emailSent ? (
+              <Button
+                type="button"
+                onClick={handleGoToLogin}
+                className="w-full py-2 text-background cursor-pointer"
+              >
+                로그인 페이지로 이동
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className={`w-full py-2 text-background ${
+                  isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer '
+                }`}
+              >
+                {isLoading ? '요청 중...' : '요청하기'}
+              </Button>
+            )}
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

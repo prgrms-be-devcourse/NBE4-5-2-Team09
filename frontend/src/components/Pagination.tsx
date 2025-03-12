@@ -45,10 +45,10 @@ export default function PaginationComponent({
     <div className="w-full flex flex-wrap items-center justify-between mt-6 gap-6">
       <div>
         <Select value={String(size)} onValueChange={(value) => onSizeChange(Number(value))}>
-          <SelectTrigger className="w-20 rounded-lg bg-white cursor-pointer">
+          <SelectTrigger className="w-20 rounded-lg bg-card cursor-pointer">
             <SelectValue>{size}개</SelectValue>
           </SelectTrigger>
-          <SelectContent className="bg-white shadow-md rounded-lg">
+          <SelectContent className="bg-card shadow-md rounded-lg">
             {pageSizeList.map((num) => (
               <SelectItem
                 key={num}
@@ -82,7 +82,7 @@ export default function PaginationComponent({
                   <PaginationLink
                     className={
                       currentPage === pageNum
-                        ? 'bg-primary text-primary-foreground px-3 py-1 rounded-md'
+                        ? 'bg-primary text-background px-3 py-1 rounded-md'
                         : 'px-3 py-1 cursor-pointer'
                     }
                     onClick={() => onPageChange(pageNum)}

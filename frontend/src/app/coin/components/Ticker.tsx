@@ -75,7 +75,7 @@ export default function Ticker({ market, ticker }: TickerProps) {
         </h1>
       </div>
 
-      <div className="bg-blue-50 py-4 mb-4 rounded-lg">
+      <div className="bg-muted py-4 mb-4 rounded-lg">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded-lg shadow-sm">
@@ -99,7 +99,7 @@ export default function Ticker({ market, ticker }: TickerProps) {
                 <span className="text-sm">{market.split('-')[0]}</span>
               </div>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm">
+            <div className="bg-background p-4 rounded-lg shadow-sm">
               <div className="text-sm text-gray-500">전일대비</div>
               <div
                 className={`text-xl font-bold ${

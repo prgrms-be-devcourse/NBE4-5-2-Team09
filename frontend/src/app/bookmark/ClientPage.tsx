@@ -103,7 +103,7 @@ export default function ClientPage({ bookmarks }: ClientPageProps) {
           setPage(1);
         }}
       >
-        <TabsList className="grid w-full grid-cols-3 bg-gray-100">
+        <TabsList className="grid w-full grid-cols-3 bg-muted">
           <TabsTrigger value="KRW">KRW</TabsTrigger>
           <TabsTrigger value="BTC">BTC</TabsTrigger>
           <TabsTrigger value="USDT">USDT</TabsTrigger>
@@ -117,19 +117,19 @@ export default function ClientPage({ bookmarks }: ClientPageProps) {
           if (!ticker) {
             return (
               <Link key={bookmark.code} href={`/coin/${bookmark.code}`}>
-                <Card className="bg-white shadow-sm rounded-sm border-0">
+                <Card className="bg-card shadow-sm rounded-sm border-0">
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-1">
                       <h2 className="text-base font-bold">{bookmark.koreanName}</h2>
-                      <h3 className="text-sm text-gray-500">{bookmark.englishName}</h3>
+                      <h3 className="text-sm text-muted-foreground">{bookmark.englishName}</h3>
                     </div>
                     <div className="flex justify-between items-end mt-1">
                       <p className="text-xl font-semibold">
                         0 <span className="text-xs">{bookmark.code?.split('-')[0]}</span>
                       </p>
-                      <p className="text-sm text-gray-500">0%</p>
+                      <p className="text-sm text-muted-foreground">0%</p>
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">거래량: 0</p>
+                    <p className="text-xs text-muted-foreground mt-2">거래량: 0</p>
                   </CardContent>
                 </Card>
               </Link>
@@ -137,11 +137,11 @@ export default function ClientPage({ bookmarks }: ClientPageProps) {
           }
           return (
             <Link key={bookmark.code} href={`/coin/${bookmark.code}`}>
-              <Card className="bg-white shadow-sm rounded-sm border-0">
+              <Card className="bg-card shadow-sm rounded-sm border-0">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-1">
                     <h2 className="text-base font-bold">{bookmark.koreanName}</h2>
-                    <h3 className="text-sm text-gray-500">{bookmark.englishName}</h3>
+                    <h3 className="text-sm text-muted-foreground">{bookmark.englishName}</h3>
                   </div>
                   <div className="flex justify-between items-end mt-1">
                     <p className="text-xl font-semibold">
@@ -167,7 +167,7 @@ export default function ClientPage({ bookmarks }: ClientPageProps) {
                         : '0%'}
                     </p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     거래량:{' '}
                     {new Intl.NumberFormat().format(
                       parseFloat(ticker.accTradeVolume?.toFixed(3) || '0'),

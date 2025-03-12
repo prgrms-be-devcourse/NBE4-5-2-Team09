@@ -28,8 +28,8 @@ export function OrderbookChart({
   return (
     <div className="overflow-y-auto max-h-[500px]" ref={setContainerRef}>
       <table className="w-full table-fixed">
-        <thead className="bg-gray-50 sticky top-0">
-          <tr className="text-gray-500 text-xs">
+        <thead className="bg-muted sticky top-0">
+          <tr className="text-muted-foreground text-xs">
             <th className="px-4 py-2 text-right w-1/3">
               {isTotalMode ? '매도 총액' : '매도 잔량'}
             </th>
@@ -37,17 +37,16 @@ export function OrderbookChart({
             <th className="px-4 py-2 text-left w-1/3">{isTotalMode ? '매수 총액' : '매수 잔량'}</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-muted">
           {orderbook.orderbookUnits.map(({ askPrice, askSize }, index) => {
             const askDisplayValue = isTotalMode ? askPrice * askSize : askSize;
             return (
-              <tr key={`ask-${index}`} className="border-b border-gray-100">
+              <tr key={`ask-${index}`} className="border-b border-muted">
                 <td className="px-4 py-2 text-sm">
                   <div
-                    className="h-6 flex items-center justify-end pr-2 ml-auto text-xs"
+                    className="bg-light-red h-6 flex items-center justify-end pr-2 ml-auto text-xs"
                     style={{
                       width: `${maxAskValue ? (askDisplayValue / maxAskValue) * 100 : 0}%`,
-                      backgroundColor: 'rgb(254, 202, 202)',
                       minWidth: '2px',
                       whiteSpace: 'nowrap',
                     }}
@@ -60,7 +59,7 @@ export function OrderbookChart({
                 </td>
                 {index === 0 && (
                   <td rowSpan={orderbook.orderbookUnits.length} className="px-1 py-2 align-bottom">
-                    <div className="flex flex-col w-full gap-1 text-gray-500 text-xs">
+                    <div className="flex flex-col w-full gap-1 text-muted-foreground text-xs">
                       {[
                         {
                           label: '중간 가격:',
@@ -82,7 +81,7 @@ export function OrderbookChart({
                               ? 'text-blue-500'
                               : orderbook.imbalance < 0
                                 ? 'text-red-500'
-                                : 'text-gray-500',
+                                : 'text-muted-foreground',
                         },
                       ].map((item, idx) => (
                         <div key={`ask-box-${idx}`} className="w-full">
@@ -106,10 +105,10 @@ export function OrderbookChart({
           {orderbook.orderbookUnits.map(({ bidPrice, bidSize }, index) => {
             const bidDisplayValue = isTotalMode ? bidPrice * bidSize : bidSize;
             return (
-              <tr key={`bid-${index}`} className="border-b border-gray-100">
+              <tr key={`bid-${index}`} className="border-b border-muted">
                 {index === 0 && (
                   <td rowSpan={orderbook.orderbookUnits.length} className="px-1 py-2 align-top">
-                    <div className="flex flex-col w-full gap-1 text-gray-500 text-xs">
+                    <div className="flex flex-col w-full gap-1 text-muted-foreground text-xs">
                       {[
                         {
                           label: '전체 매도 잔량:',
@@ -122,9 +121,9 @@ export function OrderbookChart({
                       ].map((item, idx) => (
                         <div key={`bid-box-${idx}`} className="w-full">
                           <AutoTextSize className="w-full">
-                            <div className="flex justify-between w-full pr-2">
+                            <div className="flex justify-between w-full pl-2">
                               <div className="font-medium text-left">{item.label}</div>
-                              <div className={`text-right ${item.value || ''}`}>{item.value}</div>
+                              <div className="text-right">{item.value}</div>
                             </div>
                           </AutoTextSize>
                         </div>
@@ -137,10 +136,9 @@ export function OrderbookChart({
                 </td>
                 <td className="px-4 py-2 text-sm">
                   <div
-                    className="h-6 flex items-center text-xs px-2 mr-2"
+                    className="bg-light-blue h-6 flex items-center text-xs px-2 mr-2"
                     style={{
                       width: `${maxBidValue ? (bidDisplayValue / maxBidValue) * 100 : 0}%`,
-                      backgroundColor: 'rgb(191, 219, 254)',
                       minWidth: '2px',
                       whiteSpace: 'nowrap',
                     }}

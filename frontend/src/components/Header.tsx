@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { Coins, Bookmark, CircleUser } from 'lucide-react';
 import { Button } from './ui/button';
 import { useUserStore } from '@/store/user.store';
+import { ModeToggle } from './ThemeToggle';
 
 const navItems = [
   { name: '코인 대시보드', href: '/coin/list', icon: Coins },
@@ -51,7 +52,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200">
+    <header className="bg-card border-b border-muted">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-4">
           <Link href="/">
@@ -83,7 +84,7 @@ export default function Header() {
           <div style={{ minHeight: '36px' }}>
             {pathname !== '/user/login' && (
               <Button
-                className="cursor-pointer"
+                className="cursor-pointer text-card"
                 onClick={isLoggedIn ? handleLogout : () => router.push('/user/login')}
                 disabled={isAuthLoading || isLoggingOut}
               >
@@ -97,6 +98,7 @@ export default function Header() {
               </Button>
             )}
           </div>
+          <ModeToggle />
         </div>
       </div>
     </header>
