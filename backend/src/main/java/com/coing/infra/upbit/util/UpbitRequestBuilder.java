@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.coing.domain.coin.market.entity.Market;
 import com.coing.domain.coin.market.service.MarketCacheService;
 import com.coing.infra.upbit.dto.UpbitWebSocketFormatDto;
 import com.coing.infra.upbit.dto.UpbitWebSocketTicketDto;
@@ -24,7 +23,7 @@ public class UpbitRequestBuilder {
 	private final MarketCacheService marketCacheService;
 
 	public String makeRequest(EnumUpbitRequestType type) throws JsonProcessingException {
-		List<String> codes = marketCacheService.getCachedMarketList().stream().map(Market::getCode).toList();
+		List<String> codes = marketCacheService.getCachedMarketMap().keySet().stream().toList();
 		UpbitWebSocketTicketDto ticketDto = UpbitWebSocketTicketDto.builder()
 			.ticket(type.getValue())
 			.build();

@@ -1,8 +1,10 @@
 package com.coing.domain.coin.market.service;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,6 +26,7 @@ import com.coing.domain.coin.market.entity.Market;
 import com.coing.domain.coin.market.repository.MarketRepository;
 import com.coing.domain.user.CustomUserPrincipal;
 import com.coing.global.exception.BusinessException;
+import com.coing.util.MessageUtil;
 import com.coing.util.PageUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -34,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MarketService {
 
+	private final MessageUtil messageUtil;
 	@Value("${upbit.market.uri}")
 	private String UPBIT_MARKET_URI;
 
@@ -71,14 +75,14 @@ public class MarketService {
 
 	// 컨트롤러
 	public Page<Market> getMarkets(Pageable pageable) {
-		List<Market> allMarkets = marketCacheService.getCachedMarketList();
+		List<Market> allMarkets = getCachedMarketList();
 		return PageUtil.paginate(allMarkets, pageable);
 	}
 
 	// 컨트롤러
 	public Page<MarketResponseDto> getAllMarketsByQuote(CustomUserPrincipal principal, String type, Pageable pageable) {
 		log.info("[Market] Get all market list by quote currency");
-		List<Market> filtered = marketCacheService.getCachedMarketList().stream()
+		List<Market> filtered = getCachedMarketList().stream()
 			.filter(market -> market.getCode().startsWith(type))
 			.toList();
 
@@ -109,8 +113,8 @@ public class MarketService {
 	}
 
 	// 컨트롤러
-	public MarketResponseDto getMarketByCode(CustomUserPrincipal principal, String code) {
-		List<Market> cachedMarkets = marketCacheService.getCachedMarketList();
+	public MarketResponseDto getMarketByUserAndCode(CustomUserPrincipal principal, String code) {
+		List<Market> cachedMarkets = getCachedMarketList();
 		boolean isBookmarked = principal != null && bookmarkRepository.existsByUserIdAndMarketCode(principal.id(), code);
 
 		return cachedMarkets.stream()
@@ -118,5 +122,14 @@ public class MarketService {
 			.findFirst()
 			.map(m -> MarketResponseDto.of(m, isBookmarked))
 			.orElseThrow(() -> new BusinessException("Market not found", HttpStatus.NOT_FOUND));
+	}
+
+
+	public List<Market> getCachedMarketList() {
+		return marketCacheService.getCachedMarketMap()
+			.values()
+			.stream()
+			.sorted(Comparator.comparing(Market::getCode))
+			.toList();
 	}
 }

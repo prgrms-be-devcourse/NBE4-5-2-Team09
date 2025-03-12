@@ -31,19 +31,12 @@ public class MarketController {
 
 	private final MarketService marketService;
 
-	/*@Operation(summary = "마켓 전체 조회")
-	@GetMapping
-	public ResponseEntity<Page<MarketResponse>> getMarkets(@PageableDefault(sort = "code") Pageable pageable) {
-		return ResponseEntity.ok(marketService.getMarkets(pageable)
-			.map(MarketResponse::from));
-	}*/
-
-	@Operation(summary = "특정 마켓 정보 조회")
+	@Operation(summary = "북마크한 특정 마켓 정보 조회")
 	@GetMapping("/{code}")
-	public ResponseEntity<MarketResponse> getMarketByCode(
+	public ResponseEntity<MarketResponse> getMarketByUserAndCode(
 		@AuthenticationPrincipal CustomUserPrincipal principal,
 		@PathVariable("code") String code) {
-		MarketResponse response = MarketResponse.from(marketService.getMarketByCode(principal, code));
+		MarketResponse response = MarketResponse.from(marketService.getMarketByUserAndCode(principal, code));
 		return ResponseEntity.ok(response);
 	}
 
