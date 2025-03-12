@@ -10,7 +10,7 @@
     "doppler": "npm run doppler:setup && turbo run doppler",
     "doppler:setup": "doppler setup --no-interactive",
     "precommit": "lint-staged",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "devDependencies": {
     "husky": "^9.1.7",

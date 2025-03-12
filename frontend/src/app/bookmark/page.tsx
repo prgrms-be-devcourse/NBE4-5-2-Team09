@@ -6,6 +6,7 @@ import WebSocketProvider from '@/context/WebSocketContext';
 import { components } from '@/lib/api/generated/schema';
 import { useAuth } from '@/context/AuthContext';
 import { client } from '@/lib/api';
+import RequireAuthenticated from '@/components/RequireAutenticated';
 
 type BookmarkResponse = components['schemas']['BookmarkResponse'];
 type PageBookmarkResponse = components['schemas']['PagedResponseBookmarkResponse'];
@@ -18,10 +19,6 @@ export default function Page() {
   const quote = 'KRW';
 
   useEffect(() => {
-    if (!accessToken) {
-      setError('로그인이 필요합니다.');
-      return;
-    }
     async function fetchBookmarks() {
       try {
         const { data, error: fetchError } = await client.GET('/api/bookmarks/{quote}', {
@@ -88,8 +85,10 @@ export default function Page() {
 // 에러 메시지 렌더링 함수
 function renderError(message: string) {
   return (
-    <div className="p-6 flex justify-center items-center">
-      <p className="text-red-500">{message}</p>
-    </div>
+    <RequireAuthenticated>
+      <div className="p-6 flex justify-center items-center">
+        <p className="text-red-500">{message}</p>
+      </div>
+    </RequireAuthenticated>
   );
 }

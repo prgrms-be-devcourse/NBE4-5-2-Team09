@@ -4,29 +4,28 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import RequireAuthenticated from '@/components/RequireAutenticated';
 
 export default function UserInfoPage() {
-  const { accessToken } = useAuth();
+  const { accessToken, customFetch } = useAuth();
   const router = useRouter();
   const [userInfo, setUserInfo] = useState<{ name: string; email: string } | null>(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string>('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
 
   // 사용자 정보 fetch
   useEffect(() => {
     if (!accessToken) {
-      setError('로그인이 필요합니다.');
+      setFetching(false);
       return;
     }
-    async function fetchUserInfo() {
+    const fetchUserInfo = async () => {
       try {
-        const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/auth/info', {
+        const res = await customFetch(process.env.NEXT_PUBLIC_API_URL + '/api/auth/info', {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
+          headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
         });
         if (!res.ok) {
@@ -36,10 +35,12 @@ export default function UserInfoPage() {
         setUserInfo(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : '오류 발생');
+      } finally {
+        setFetching(false);
       }
-    }
+    };
     fetchUserInfo();
-  }, [accessToken]);
+  }, [accessToken, customFetch]);
 
   // 회원 탈퇴 핸들러
   const handleSignOut = async () => {
@@ -50,12 +51,9 @@ export default function UserInfoPage() {
     }
     setLoading(true);
     try {
-      const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/auth/signout', {
+      const res = await customFetch(process.env.NEXT_PUBLIC_API_URL + '/api/auth/signout', {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ password }),
       });
@@ -74,35 +72,51 @@ export default function UserInfoPage() {
     }
   };
 
-  if (error) return <div className="p-6">{error}</div>;
-  if (!userInfo) return <div className="p-6">로딩 중...</div>;
+  if (error) {
+    return (
+      <RequireAuthenticated>
+        <div className="p-6 text-center text-red-500">{error}</div>
+      </RequireAuthenticated>
+    );
+  }
+
+  if (fetching || !userInfo) {
+    return (
+      <RequireAuthenticated>
+        <div className="p-6 text-center">로딩 중...</div>
+      </RequireAuthenticated>
+    );
+  }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">내 정보</h1>
-      <p>
-        <strong>이름:</strong> {userInfo.name}
-      </p>
-      <p>
-        <strong>이메일:</strong> {userInfo.email}
-      </p>
-      <div className="mt-4">
-        <label htmlFor="password" className="block font-medium">
-          회원 탈퇴를 위해 비밀번호 입력:
-        </label>
-        <input
-          type="password"
-          id="password"
-          className="border p-2 mt-1 w-full"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+    <RequireAuthenticated>
+      <div className="p-6 max-w-md mx-auto">
+        <h1 className="text-2xl font-bold mb-4">내 정보</h1>
+        <p className="mb-2">
+          <strong>이름:</strong> {userInfo.name}
+        </p>
+        <p className="mb-4">
+          <strong>이메일:</strong> {userInfo.email}
+        </p>
+        <div className="mt-4">
+          <label htmlFor="password" className="block font-medium mb-1">
+            회원 탈퇴를 위해 비밀번호 입력:
+          </label>
+          <input
+            type="password"
+            id="password"
+            className="border p-2 w-full"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="비밀번호를 입력하세요"
+          />
+        </div>
+        <div className="mt-4">
+          <Button onClick={handleSignOut} disabled={loading}>
+            {loading ? '처리 중...' : '회원 탈퇴'}
+          </Button>
+        </div>
       </div>
-      <div className="mt-4">
-        <Button onClick={handleSignOut} disabled={loading}>
-          {loading ? '처리 중...' : '회원 탈퇴'}
-        </Button>
-      </div>
-    </div>
+    </RequireAuthenticated>
   );
 }

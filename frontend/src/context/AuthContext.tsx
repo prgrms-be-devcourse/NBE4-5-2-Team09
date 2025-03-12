@@ -1,8 +1,10 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useUserStore } from '@/store/user.store';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 interface AuthContextType {
+  isLogin: boolean;
   accessToken: string | null;
   setAccessToken: (token: string | null) => void;
   isAuthLoading: boolean;
@@ -12,7 +14,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  // 초기 상태: 세션 스토리지에서 accessToken 읽어오기
+  // 세션 스토리지에서 accessToken 초기 로드
   const [accessToken, setAccessTokenState] = useState<string | null>(() => {
     if (typeof window !== 'undefined') {
       const token = sessionStorage.getItem('accessToken') || null;
@@ -22,24 +24,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return null;
   });
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
+  const { setUser } = useUserStore();
 
-  // 세션 스토리지와 상태를 동시에 업데이트하는 함수
   const setAccessToken = (token: string | null) => {
     setAccessTokenState(token);
-    if (token) {
-      sessionStorage.setItem('accessToken', token);
-      console.log('[AuthProvider] accessToken 저장:', token);
-    } else {
-      sessionStorage.removeItem('accessToken');
-      console.log('[AuthProvider] accessToken 삭제');
+    if (typeof window !== 'undefined') {
+      if (token) {
+        sessionStorage.setItem('accessToken', token);
+        console.log('[AuthProvider] accessToken 저장:', token);
+      } else {
+        sessionStorage.removeItem('accessToken');
+        console.log('[AuthProvider] accessToken 삭제');
+      }
     }
   };
 
-  // 리프레시 토큰으로 새 액세스 토큰 발급 함수 (기존 로직 유지)
+  // 토큰 재발급 함수
   async function refreshAccessToken(): Promise<string | null> {
     console.log('[AuthProvider] refreshAccessToken 호출');
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL + '/api/auth/refresh'}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -63,50 +67,39 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return null;
   }
 
-  // 모든 API 요청에 사용할 커스텀 fetch 함수
-  const customFetch = async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
-    console.log('[customFetch] 요청 시작:', input);
-    // 현재 accessToken을 헤더에 추가
-    const token = accessToken;
-    let headers = {
-      ...(init?.headers || {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    };
+  // customFetch: 모든 API 요청 시 토큰을 헤더에 포함하고, 403 발생 시 재요청
+  const customFetch = useCallback(
+    async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
+      console.log('[customFetch] 요청 시작:', input);
+      let headers = {
+        ...(init?.headers || {}),
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      };
+      console.log('[customFetch] 사용되는 헤더:', headers);
+      let response = await fetch(input, { ...init, headers, credentials: 'include' });
+      console.log('[customFetch] 초기 응답 상태:', response.status);
 
-    console.log('[customFetch] 사용되는 헤더:', headers);
-    let response = await fetch(input, {
-      ...init,
-      headers,
-      credentials: 'include',
-    });
-    console.log('[customFetch] 초기 응답 상태:', response.status);
-
-    // 403 응답 시, refresh token으로 새 액세스 토큰 발급 후 재요청
-    if (response.status === 403) {
-      console.warn('[customFetch] 403 응답 감지됨. refresh token으로 재발급 시도합니다.');
-      const newToken = await refreshAccessToken();
-      if (newToken) {
-        headers = {
-          ...init?.headers,
-          Authorization: `Bearer ${newToken}`,
-        };
-        console.log('[customFetch] 새 토큰으로 재요청 헤더:', headers);
-        response = await fetch(input, {
-          ...init,
-          headers,
-          credentials: 'include',
-        });
-        console.log('[customFetch] 재요청 응답 상태:', response.status);
-      } else {
-        console.error('[customFetch] refresh token 재발급 실패. 로그인 페이지로 리다이렉트합니다.');
-        window.location.href = '/login';
+      if (response.status === 403) {
+        console.warn('[customFetch] 403 응답 감지됨. refresh token으로 재발급 시도합니다.');
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          headers = { ...init?.headers, Authorization: `Bearer ${newToken}` };
+          console.log('[customFetch] 새 토큰으로 재요청 헤더:', headers);
+          response = await fetch(input, { ...init, headers, credentials: 'include' });
+          console.log('[customFetch] 재요청 응답 상태:', response.status);
+        } else {
+          console.error(
+            '[customFetch] refresh token 재발급 실패. 로그인 페이지로 리다이렉트합니다.',
+          );
+          window.location.href = '/login';
+        }
       }
-    }
+      return response;
+    },
+    [accessToken],
+  );
 
-    return response;
-  };
-
-  // 컴포넌트 마운트 시 세션 스토리지에 토큰이 있는지만 체크 (토큰 파싱 로직 제거)
+  // 컴포넌트 마운트 시 토큰 유무 체크
   useEffect(() => {
     async function validateToken() {
       console.log('[AuthProvider] validateToken 시작');
@@ -120,8 +113,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     validateToken();
   }, []);
 
+  // accessToken이 있을 때 사용자 정보를 한 번만 API 호출로 가져와 전역 스토어에 저장
+  useEffect(() => {
+    async function fetchUserInfo() {
+      if (!accessToken) return;
+      try {
+        const res = await customFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/info`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUser({ name: data.name || '', email: data.email || '' });
+          console.log('[AuthProvider] 사용자 정보 업데이트:', data.name);
+        } else {
+          console.error('[AuthProvider] 사용자 정보를 가져오지 못했습니다.');
+          setUser({ name: '', email: '' });
+        }
+      } catch (error) {
+        console.error('[AuthProvider] 사용자 정보 요청 실패:', error);
+        setUser({ name: '', email: '' });
+      }
+    }
+    fetchUserInfo();
+  }, [accessToken, customFetch, setUser]);
+
   return (
-    <AuthContext.Provider value={{ accessToken, setAccessToken, isAuthLoading, customFetch }}>
+    <AuthContext.Provider
+      value={{
+        isLogin: !!accessToken,
+        accessToken,
+        setAccessToken,
+        isAuthLoading,
+        customFetch,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

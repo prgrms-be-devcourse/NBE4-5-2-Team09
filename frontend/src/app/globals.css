@@ -11,9 +11,9 @@
   --card-foreground: hsl(210, 15%, 20%);
   --popover: hsl(210, 15%, 98%);
   --popover-foreground: hsl(210, 15%, 20%);
-  --primary: hsl(210, 15%, 60%);
+  --primary: hsl(215.4 16.3% 46.9%);
   --primary-foreground: hsl(210, 15%, 98%);
-  --secondary: hsl(210, 15%, 40%);
+  --secondary: hsl(215.3 19.3% 34.5%);
   --secondary-foreground: hsl(210, 15%, 98%);
   --muted: hsl(210, 15%, 90%);
   --muted-foreground: hsl(210, 15%, 40%);
@@ -72,6 +72,7 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+  --logo: hsl(28, 47%, 58%);
 }
 
 @theme inline {
@@ -111,6 +112,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-logo: var(--logo);
 }
 
 @layer base {
