@@ -115,10 +115,10 @@ export default function Ticker({ market, ticker }: TickerProps) {
               <div key={index} className="bg-background p-4 rounded-lg shadow-sm">
                 <div className="text-sm text-gray-500">{label}</div>
                 <div
-                  className={`text-xl font-bold ${color || 'text-black-600'} flex flex-wrap items-center gap-x-1 text-left min-w-0`}
+                  className={`text-xl font-bold ${color || 'text-black-600'} flex flex-wrap items-end gap-x-1 text-left min-w-0`}
                 >
                   <span className="break-all w-auto min-w-0">{value}</span>
-                  {unit && <span className="text-sm flex-shrink-0">{unit}</span>}
+                  {unit && <span className="text-sm flex-shrink-0 mb-0.5">{unit}</span>}
                 </div>
               </div>
             ))}
