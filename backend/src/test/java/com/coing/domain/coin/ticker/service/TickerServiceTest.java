@@ -23,6 +23,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.coing.domain.coin.common.enums.AskBid;
 import com.coing.domain.coin.common.enums.Change;
+import com.coing.domain.coin.market.entity.Market;
+import com.coing.domain.coin.market.service.MarketService;
 import com.coing.domain.coin.ticker.dto.TickerDto;
 import com.coing.domain.coin.ticker.entity.Ticker;
 import com.coing.domain.coin.ticker.entity.enums.MarketState;
@@ -49,10 +51,14 @@ public class TickerServiceTest {
 	@InjectMocks
 	private TickerService tickerService;
 
+	@Mock
+	private MarketService marketService;
+
 	@Autowired
 	private ObjectMapper mapper;
 
 	private Ticker testTicker;
+	private Market testMarket;
 
 	@BeforeEach
 	public void setUp() {
@@ -90,12 +96,19 @@ public class TickerServiceTest {
 			.marketWarning(MarketWarning.NONE)
 			.timestamp(System.currentTimeMillis())
 			.build();
+
+		testMarket = Market.builder()
+			.code("KRW-BTC")
+			.koreanName("비트코인")
+			.englishName("Bitcoin")
+			.build();
 	}
 
 	@Test
 	@DisplayName("getTicker 성공 - 존재하는 마켓 코드 조회")
 	void getTicker_Success() throws Exception {
 		// given
+		when(marketService.getMarketByCode(anyString())).thenReturn(testMarket);
 		tickerService.updateTicker(testTicker);
 
 		// when
@@ -123,6 +136,7 @@ public class TickerServiceTest {
 	@DisplayName("updateTicker 성공 - 캐시에 저장 확인")
 	void updateTicker() throws Exception {
 		// when
+		when(marketService.getMarketByCode(anyString())).thenReturn(testMarket);
 		tickerService.updateTicker(testTicker);
 
 		// then
@@ -181,8 +195,9 @@ public class TickerServiceTest {
 	@DisplayName("publishCachedTickers 성공 - WebSocket을 통해 데이터 전송")
 	void publishCachedTickers() throws JsonProcessingException {
 		// given
+		when(marketService.getMarketByCode(anyString())).thenReturn(testMarket);
 		tickerService.updateTicker(testTicker);
-		TickerDto dto = TickerDto.from(testTicker);
+		TickerDto dto = TickerDto.from(testTicker, testMarket);
 
 		// when
 		tickerService.publish(dto);
