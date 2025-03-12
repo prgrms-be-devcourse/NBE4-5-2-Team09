@@ -78,41 +78,50 @@ export default function Ticker({ market, ticker }: TickerProps) {
       <div className="bg-muted py-4 mb-4 rounded-lg">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-lg shadow-sm">
-              <div className="text-sm text-gray-500">24시간 거래량</div>
-              <div className="text-xl font-bold text-black-600">
-                {currentTicker ? Math.floor(currentTicker.accTradeVolume24h).toLocaleString() : '-'}
-                <span className="text-sm">{market.split('-')[1]}</span>
-              </div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm">
-              <div className="text-sm text-gray-500">거래대금</div>
-              <div className="text-xl font-bold text-black-600">
-                {currentTicker ? Math.floor(currentTicker.accTradePrice24h).toLocaleString() : '-'}
-                <span className="text-sm">{market.split('-')[0]}</span>
-              </div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm">
-              <div className="text-sm text-gray-500">전일 종가</div>
-              <div className="text-xl font-bold text-black-600">
-                {currentTicker ? currentTicker.prevClosingPrice.toLocaleString() : '-'}
-                <span className="text-sm">{market.split('-')[0]}</span>
-              </div>
-            </div>
-            <div className="bg-background p-4 rounded-lg shadow-sm">
-              <div className="text-sm text-gray-500">전일대비</div>
-              <div
-                className={`text-xl font-bold ${
+            {[
+              {
+                label: '24시간 거래량',
+                value: currentTicker
+                  ? Math.floor(currentTicker.accTradeVolume24h).toLocaleString()
+                  : '-',
+                unit: market.split('-')[1],
+              },
+              {
+                label: '거래대금',
+                value: currentTicker
+                  ? Math.floor(currentTicker.accTradePrice24h).toLocaleString()
+                  : '-',
+                unit: market.split('-')[0],
+              },
+              {
+                label: '전일 종가',
+                value: currentTicker ? currentTicker.prevClosingPrice.toLocaleString() : '-',
+                unit: market.split('-')[0],
+              },
+              {
+                label: '전일대비',
+                value: currentTicker
+                  ? (currentTicker.signedChangeRate * 100).toFixed(2) + '%'
+                  : '-',
+                unit: '',
+                color:
                   currentTicker?.change === 'RISE'
                     ? 'text-red-500'
                     : currentTicker?.change === 'FALL'
                       ? 'text-blue-500'
-                      : 'text-black-500'
-                }`}
-              >
-                {currentTicker ? (currentTicker.signedChangeRate * 100).toFixed(2) + '%' : '-'}
+                      : 'text-black-500',
+              },
+            ].map(({ label, value, unit, color }, index) => (
+              <div key={index} className="bg-background p-4 rounded-lg shadow-sm">
+                <div className="text-sm text-gray-500">{label}</div>
+                <div
+                  className={`text-xl font-bold ${color || 'text-black-600'} flex flex-wrap items-center gap-x-1 text-left min-w-0`}
+                >
+                  <span className="break-all w-auto min-w-0">{value}</span>
+                  {unit && <span className="text-sm flex-shrink-0">{unit}</span>}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
