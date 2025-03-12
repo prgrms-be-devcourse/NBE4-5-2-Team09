@@ -31,7 +31,7 @@ export default function UserInfoPage() {
   const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
-    if (!accessToken) {
+    if (accessToken || user) {
       setFetching(false);
     }
   }, [accessToken, user]);
@@ -67,8 +67,8 @@ export default function UserInfoPage() {
     }
   };
 
-  if (fetching || !user) {
-    return <div className="w-full flex justify-center text-background">로딩 중...</div>;
+  if (fetching) {
+    return <div className="w-full flex justify-center bg-background">로딩 중...</div>;
   }
 
   return (
