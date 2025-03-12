@@ -11,6 +11,7 @@ import { generateMockNews } from '@/lib/utils';
 import type { CandleChartDto, CandleItem } from '@/types';
 import TradeList from '@/app/coin/components/TradeList';
 import Ticker from '@/app/coin/components/Ticker';
+import { fetchApi } from '@/lib/api';
 
 export default function ClientPage() {
   const { market } = useParams() as { market: string };
@@ -51,22 +52,16 @@ export default function ClientPage() {
   useEffect(() => {
     const fetchCandles = async () => {
       try {
-        const unitQuery = candleType === 'minutes' ? `?unit=${minuteUnit}` : '';
-        const url =
-          process.env.NEXT_PUBLIC_API_URL + `/api/candles/${market}/${candleType}${unitQuery}`;
-        const response = await axios.get(url);
-        const data: CandleChartDto[] = response.data;
-        const mapped: CandleItem[] = data.map((dto) => ({
-          time: new Date(dto.candle_date_time_utc).getTime(),
-          open: dto.opening_price,
-          high: dto.high_price,
-          low: dto.low_price,
-          close: dto.trade_price,
-          volume: dto.candle_acc_trade_volume,
-        }));
-        setCandles(mapped);
-      } catch (error) {
-        console.error('캔들 데이터 호출 오류:', error);
+        const unitQuery = candleType === 'minutes' && minuteUnit ? `&unit=${minuteUnit}` : '';
+        const data = await fetchApi<CandleItem[]>(
+          `/api/candle?market=${market}&candleType=${candleType}${unitQuery}`,
+          {
+            method: 'GET',
+          },
+        );
+        setCandles(data);
+      } catch (err: any) {
+        console.error('캔들 데이터 호출 오류:', err);
       }
     };
 
