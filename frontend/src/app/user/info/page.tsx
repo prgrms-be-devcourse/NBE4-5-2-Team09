@@ -105,7 +105,7 @@ export default function UserInfoPage() {
           <input
             type="password"
             id="password"
-            className="border p-2 w-full"
+            className="border p-2 w-64"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="비밀번호를 입력하세요"

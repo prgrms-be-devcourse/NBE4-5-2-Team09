@@ -1,9 +1,11 @@
 package com.coing.domain.user.service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,6 +81,12 @@ public class UserService {
 			throw new BusinessException(messageUtil.resolveMessage("password.mismatch"),
 				HttpStatus.BAD_REQUEST, "");
 		}
+		// 이메일 인증 여부 확인 추가
+		if (!user.isVerified()) {
+			// 세 번째 인자로 user.getId().toString()을 전달하여 프론트에서 사용할 수 있도록 함
+			throw new BusinessException(messageUtil.resolveMessage("email.not.verified"),
+				HttpStatus.UNAUTHORIZED, user.getId().toString());
+		}
 		return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.isVerified());
 	}
 
@@ -104,5 +112,30 @@ public class UserService {
 			.map(u -> new UserResponse(u.getId(), u.getName(), u.getEmail(), u.isVerified()))
 			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("member.not.found"),
 				HttpStatus.BAD_REQUEST, ""));
+	}
+
+	// 비밀번호 재설정 메서드
+	@Transactional
+	public void updatePassword(UUID userId, String newPassword) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("member.not.found"),
+				HttpStatus.BAD_REQUEST, ""));
+		String encodedPassword = passwordEncoder.encode(newPassword);
+		User updatedUser = user.withPassword(encodedPassword);
+		userRepository.save(updatedUser);
+		log.info("비밀번호 재설정 성공: {}", userId);
+	}
+
+	// 하루에 한번 실행하는 미인증 유저 삭제 스케줄러
+	// 매일 새벽 5시에 실행 (cron: 초, 분, 시, 일, 월, 요일)
+	@Scheduled(cron = "00 00 5 * * *")
+	@Transactional
+	public void cleanupUnverifiedUsers() {
+		// 현재 시각에서 1주일을 뺀 시간보다 가입된 사용자는 삭제 대상
+		LocalDateTime threshold = LocalDateTime.now().minusWeeks(1);
+		int deletedCount = userRepository.deleteUnverifiedUsers(threshold);
+		if (deletedCount > 0) {
+			log.info("삭제된 인증 미완료 사용자 수: {}", deletedCount);
+		}
 	}
 }

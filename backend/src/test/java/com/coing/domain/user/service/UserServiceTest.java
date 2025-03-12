@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -113,11 +114,14 @@ public class UserServiceTest {
 		String email = "test@test.com";
 		String password = "test";
 		String encodedPassword = "encodedPassword";
+		UUID userId = UUID.randomUUID(); // ID 생성
 
 		User user = User.builder()
+			.id(userId) // 생성된 ID 할당
 			.name("테스트")
 			.email(email)
 			.password(encodedPassword)
+			.verified(true) // 인증 완료 상태
 			.build();
 
 		when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
@@ -127,6 +131,9 @@ public class UserServiceTest {
 
 		assertNotNull(result);
 		assertEquals(email, result.email());
+		assertTrue(result.verified());
+		// 필요하면 userId도 확인할 수 있습니다.
+		assertEquals(userId, result.id());
 	}
 
 	@Test

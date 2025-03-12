@@ -19,16 +19,13 @@ export default function CandleChart({
   setMinuteUnit,
 }: CandleChartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // 초기 zoom을 5로 설정 (최대 확대 상태)
   const [zoom, setZoom] = useState(5);
   const [crosshair, setCrosshair] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     if (!canvasRef.current || candles.length === 0) return;
 
-    // 시간 기준 오름차순 정렬
     const sortedCandles = [...candles].sort((a, b) => a.time - b.time);
-
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -50,8 +47,8 @@ export default function CandleChart({
       let priceRange = maxPrice - minPrice;
       if (priceRange === 0) priceRange = 1;
 
-      // 차트 영역 설정
-      const padding = { top: 20, right: 60, bottom: 30, left: 100 };
+      // 차트 영역 설정 (하단 패딩을 늘려 x축 레이블이 잘리지 않도록 함)
+      const padding = { top: 20, right: 60, bottom: 40, left: 100 };
       const chartWidth = rect.width - padding.left - padding.right;
       const chartHeight = rect.height - padding.top - padding.bottom;
       const yScale = chartHeight / priceRange;
@@ -63,19 +60,14 @@ export default function CandleChart({
       const baseXScale = timeRange === 0 ? 1 : chartWidth / timeRange;
       const candleXScale = baseXScale * zoom;
 
-      // grid용 x 좌표: 기본 스케일 사용
-      const calcXBase = (time: number) =>
-        padding.left + chartWidth - (lastTime - time) * baseXScale;
-      // 캔들용 x 좌표: 줌 적용
-      const calcXCandle = (time: number) =>
-        padding.left + chartWidth - (lastTime - time) * candleXScale;
+      // 줌 적용 x 좌표 계산
+      const calcX = (time: number) => padding.left + chartWidth - (lastTime - time) * candleXScale;
 
-      // ────────────
-      // y축 그리드 및 레이블 (grid는 고정)
+      // y축 그리드 및 레이블 (grid 밀도 10)
+      const numGridLines = 10;
       ctx.beginPath();
       ctx.strokeStyle = '#e5e7eb';
       ctx.lineWidth = 1;
-      const numGridLines = 5;
       for (let i = 0; i <= numGridLines; i++) {
         const y = padding.top + chartHeight - (i / numGridLines) * chartHeight;
         const price = minPrice + (i / numGridLines) * priceRange;
@@ -95,8 +87,8 @@ export default function CandleChart({
       }
       ctx.stroke();
 
-      // x축 레이블 (grid용: 기본 스케일)
-      const numXLabels = 10;
+      // x축 레이블 (grid 밀도 15)
+      const numXLabels = 15;
       let dateFormatter: Intl.DateTimeFormat;
       switch (candleType) {
         case 'seconds':
@@ -140,7 +132,7 @@ export default function CandleChart({
       }
       for (let i = 0; i <= numXLabels; i++) {
         const labelTime = lastTime - (timeRange * i) / numXLabels;
-        const x = calcXBase(labelTime);
+        const x = calcX(labelTime);
         ctx.beginPath();
         ctx.strokeStyle = '#e5e7eb';
         ctx.moveTo(x, padding.top);
@@ -152,7 +144,6 @@ export default function CandleChart({
         const kstTime = new Date(labelTime + 9 * 3600 * 1000);
         ctx.fillText(dateFormatter.format(kstTime), x, padding.top + chartHeight + 20);
       }
-      // ────────────
 
       // 클리핑: 캔들 그리기 영역만 확대/축소 적용
       ctx.save();
@@ -161,9 +152,9 @@ export default function CandleChart({
       ctx.clip();
 
       // 캔들 그리기 (줌 적용)
-      const candleWidth = 10; // 고정 캔들 너비
+      const candleWidth = 10;
       sortedCandles.forEach((candle) => {
-        const x = calcXCandle(candle.time);
+        const x = calcX(candle.time);
         const openY = padding.top + chartHeight - (candle.open - minPrice) * yScale;
         const closeY = padding.top + chartHeight - (candle.close - minPrice) * yScale;
         const highY = padding.top + chartHeight - (candle.high - minPrice) * yScale;
@@ -186,7 +177,7 @@ export default function CandleChart({
       });
       ctx.restore();
 
-      // Crosshair 그리기 (마우스가 캔버스 위에 있을 때)
+      // Crosshair (크로스 헤어) 그리기: 날짜, 시간, 가격 정보를 함께 표시
       if (crosshair) {
         ctx.beginPath();
         ctx.strokeStyle = 'gray';
@@ -204,15 +195,17 @@ export default function CandleChart({
         ctx.font = '12px sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(
+          `Date: ${kstAtCross.toLocaleDateString('ko-KR')}`,
+          crosshair.x + 5,
+          crosshair.y - 35,
+        );
+        ctx.fillText(
           `Time: ${kstAtCross.toLocaleTimeString('ko-KR', { hour12: false })}`,
           crosshair.x + 5,
           crosshair.y - 20,
         );
         ctx.fillText(
-          `Price: ${priceAtCross.toLocaleString('ko-KR', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}`,
+          `Price: ${priceAtCross.toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
           crosshair.x + 5,
           crosshair.y - 5,
         );
@@ -258,7 +251,7 @@ export default function CandleChart({
       {/* 오버레이: 봉 단위 버튼 (우측 상단) */}
       <div className="absolute top-2 right-2 z-10 flex space-x-2 bg-white bg-opacity-80 p-1 rounded">
         <button
-          className={`px-2 py-1 text-xs rounded ${
+          className={`px-2 py-1 cursor-pointer text-xs rounded ${
             candleType === 'seconds' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
           onClick={() => setCandleType('seconds')}
@@ -266,7 +259,7 @@ export default function CandleChart({
           초봉
         </button>
         <button
-          className={`px-2 py-1 text-xs rounded ${
+          className={`px-2 py-1 cursor-pointer text-xs rounded ${
             candleType === 'minutes' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
           onClick={() => setCandleType('minutes')}
@@ -274,7 +267,7 @@ export default function CandleChart({
           분봉
         </button>
         <button
-          className={`px-2 py-1 text-xs rounded ${
+          className={`px-2 py-1 cursor-pointer text-xs rounded ${
             candleType === 'days' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
           onClick={() => setCandleType('days')}
@@ -282,7 +275,7 @@ export default function CandleChart({
           일봉
         </button>
         <button
-          className={`px-2 py-1 text-xs rounded ${
+          className={`px-2 py-1 cursor-pointer text-xs rounded ${
             candleType === 'weeks' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
           onClick={() => setCandleType('weeks')}
@@ -290,7 +283,7 @@ export default function CandleChart({
           주봉
         </button>
         <button
-          className={`px-2 py-1 text-xs rounded ${
+          className={`px-2 py-1 cursor-pointer text-xs rounded ${
             candleType === 'months' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
           onClick={() => setCandleType('months')}
@@ -298,7 +291,7 @@ export default function CandleChart({
           월봉
         </button>
         <button
-          className={`px-2 py-1 text-xs rounded ${
+          className={`px-2 py-1 cursor-pointer text-xs rounded ${
             candleType === 'years' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
           }`}
           onClick={() => setCandleType('years')}
@@ -307,7 +300,7 @@ export default function CandleChart({
         </button>
       </div>
 
-      {/* 오버레이: 분봉 단위 선택 드롭다운 (좌측 상단, 분봉일 때만 표시) */}
+      {/* 오버레이: 분봉 단위 선택 드롭다운 (분봉일 때만 표시) */}
       {candleType === 'minutes' && (
         <div className="absolute top-2 left-2 z-10 bg-white bg-opacity-80 p-1 rounded text-xs">
           <label className="mr-1">분봉 단위:</label>

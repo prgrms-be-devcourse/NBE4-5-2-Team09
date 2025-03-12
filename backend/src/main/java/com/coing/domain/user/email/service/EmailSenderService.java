@@ -27,6 +27,9 @@ public class EmailSenderService {
 	@Value("${custom.jwt.mail-verification-url}")
 	private String emailVerificationUrl;
 
+	@Value("${custom.jwt.password-reset-url}")
+	private String passwordResetUrl;
+
 	public MimeMessage createEmailVerificationMail(String recipientEmail, String token) throws MessagingException {
 		MimeMessage message = javaMailSender.createMimeMessage();
 		String fromEmail = senderEmail;
@@ -48,6 +51,32 @@ public class EmailSenderService {
 			log.info("인증 이메일 전송 성공: {}", recipientEmail);
 		} catch (MailException e) {
 			log.error("인증 이메일 전송 에러: {}", recipientEmail, e);
+			throw new BusinessException(messageUtil.resolveMessage("mail.send.fail"),
+				org.springframework.http.HttpStatus.BAD_REQUEST, "");
+		}
+	}
+
+	// 비밀번호 재설정 이메일 관련 메서드
+
+	public MimeMessage createPasswordResetMail(String recipientEmail, String token) throws MessagingException {
+		MimeMessage message = javaMailSender.createMimeMessage();
+		message.setFrom(senderEmail);
+		message.setRecipients(MimeMessage.RecipientType.TO, recipientEmail);
+		message.setSubject("비밀번호 재설정");
+		String resetLink = passwordResetUrl + token;
+		String body = "<h3>아래 링크를 클릭하여 비밀번호 재설정을 진행하세요.</h3>"
+			+ "<p><a href=\"" + resetLink + "\">비밀번호 재설정하기</a></p>";
+		message.setText(body, "UTF-8", "html");
+		return message;
+	}
+
+	public void sendPasswordResetEmailMessage(String recipientEmail, String token) throws MessagingException {
+		MimeMessage message = createPasswordResetMail(recipientEmail, token);
+		try {
+			javaMailSender.send(message);
+			log.info("비밀번호 재설정 이메일 전송 성공: {}", recipientEmail);
+		} catch (MailException e) {
+			log.error("비밀번호 재설정 이메일 전송 에러: {}", recipientEmail, e);
 			throw new BusinessException(messageUtil.resolveMessage("mail.send.fail"),
 				org.springframework.http.HttpStatus.BAD_REQUEST, "");
 		}

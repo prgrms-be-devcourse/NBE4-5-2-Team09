@@ -6,11 +6,10 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { accessToken, setAccessToken } = useAuth(); // AuthContext에서 토큰 가져오기
+  const { accessToken, setAccessToken } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // 로그인 상태라면 자동 리다이렉트
   useEffect(() => {
     if (accessToken) {
       router.push('/');
@@ -32,15 +31,23 @@ export default function LoginPage() {
         const authHeader = response.headers.get('Authorization');
         if (authHeader?.startsWith('Bearer ')) {
           const token = authHeader.slice(7);
-          setAccessToken(token); // 인메모리에 저장
+          setAccessToken(token);
           console.log('Access Token 저장됨:', token);
         }
-
-        alert('로그인 성공!');
         router.push('/');
       } else {
         const errorData = await response.json();
-        alert(`로그인 실패: ${errorData.message}`);
+        // 미인증 사용자라면 백엔드에서 userId를 detail 필드에 포함했다고 가정합니다.
+        if (errorData.message === '이메일 인증이 완료되지 않았습니다.') {
+          const userId = errorData.detail;
+          if (userId) {
+            router.push(`/user/email/email-verification?userId=${userId}`);
+          } else {
+            router.push('/user/email/email-verification');
+          }
+        } else {
+          alert(`로그인 실패: ${errorData.message}`);
+        }
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -76,18 +83,28 @@ export default function LoginPage() {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 cursor-pointer"
           >
             로그인
           </button>
         </form>
 
-        {/* ✅ 회원가입 버튼 추가 */}
+        {/* 비밀번호 재설정 버튼 */}
+        <div className="mt-4 text-center">
+          <button
+            onClick={() => router.push('/user/password-reset/request')}
+            className="text-blue-600 font-semibold hover:underline cursor-pointer"
+          >
+            비밀번호 재설정
+          </button>
+        </div>
+
+        {/* 회원가입 버튼 */}
         <div className="mt-4 text-center">
           <span className="text-gray-600 text-sm">계정이 없으신가요?</span>
           <button
             onClick={() => router.push('/user/signup')}
-            className="ml-2 text-blue-600 font-semibold hover:underline"
+            className="ml-2 text-blue-600 font-semibold hover:underline cursor-pointer"
           >
             회원가입
           </button>
