@@ -1,9 +1,11 @@
 package com.coing.domain.user.service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,5 +106,18 @@ public class UserService {
 			.map(u -> new UserResponse(u.getId(), u.getName(), u.getEmail(), u.isVerified()))
 			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("member.not.found"),
 				HttpStatus.BAD_REQUEST, ""));
+	}
+
+	// 하루에 한번 실행하는 미인증 유저 삭제 스케줄러
+	// 매일 새벽 5시에 실행 (cron: 초, 분, 시, 일, 월, 요일)
+	@Scheduled(cron = "00 00 5 * * *")
+	@Transactional
+	public void cleanupUnverifiedUsers() {
+		// 현재 시각에서 1주일을 뺀 시간보다 가입된 사용자는 삭제 대상
+		LocalDateTime threshold = LocalDateTime.now().minusWeeks(1);
+		int deletedCount = userRepository.deleteUnverifiedUsers(threshold);
+		if (deletedCount > 0) {
+			log.info("삭제된 인증 미완료 사용자 수: {}", deletedCount);
+		}
 	}
 }

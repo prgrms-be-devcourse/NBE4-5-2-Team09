@@ -1,5 +1,6 @@
 package com.coing.domain.user.entity;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
@@ -46,10 +47,17 @@ public class User {
 	@Column(name = "authority", nullable = false)
 	private Authority authority;
 
+	// 회원 가입 시각 기록
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
+
 	@PrePersist
 	public void prePersist() {
 		if (authority == null) {
 			authority = Authority.USER;
+		}
+		if (createdAt == null) {
+			createdAt = LocalDateTime.now();
 		}
 	}
 
