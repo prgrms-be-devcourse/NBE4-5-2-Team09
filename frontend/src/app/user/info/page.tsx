@@ -74,49 +74,49 @@ export default function UserInfoPage() {
 
   if (error) {
     return (
-        <RequireAuthenticated>
-          <div className="p-6 text-center text-red-500">{error}</div>
-        </RequireAuthenticated>
+      <RequireAuthenticated>
+        <div className="p-6 text-center text-red-500">{error}</div>
+      </RequireAuthenticated>
     );
   }
 
   if (fetching || !userInfo) {
     return (
-        <RequireAuthenticated>
-          <div className="p-6 text-center">로딩 중...</div>
-        </RequireAuthenticated>
+      <RequireAuthenticated>
+        <div className="p-6 text-center">로딩 중...</div>
+      </RequireAuthenticated>
     );
   }
 
   return (
-      <RequireAuthenticated>
-        <div className="p-6 max-w-md mx-auto">
-          <h1 className="text-2xl font-bold mb-4">내 정보</h1>
-          <p className="mb-2">
-            <strong>이름:</strong> {userInfo.name}
-          </p>
-          <p className="mb-4">
-            <strong>이메일:</strong> {userInfo.email}
-          </p>
-          <div className="mt-4">
-            <label htmlFor="password" className="block font-medium mb-1">
-              회원 탈퇴를 위해 비밀번호 입력:
-            </label>
-            <input
-                type="password"
-                id="password"
-                className="border p-2 w-64"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="비밀번호를 입력하세요"
-            />
-          </div>
-          <div className="mt-4">
-            <Button onClick={handleSignOut} disabled={loading}>
-              {loading ? '처리 중...' : '회원 탈퇴'}
-            </Button>
-          </div>
+    <RequireAuthenticated>
+      <div className="p-6 max-w-md mx-auto">
+        <h1 className="text-2xl font-bold mb-4">내 정보</h1>
+        <p className="mb-2">
+          <strong>이름:</strong> {userInfo.name}
+        </p>
+        <p className="mb-4">
+          <strong>이메일:</strong> {userInfo.email}
+        </p>
+        <div className="mt-4">
+          <label htmlFor="password" className="block font-medium mb-1">
+            회원 탈퇴를 위해 비밀번호 입력:
+          </label>
+          <input
+            type="password"
+            id="password"
+            className="border p-2 w-64"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="비밀번호를 입력하세요"
+          />
         </div>
-      </RequireAuthenticated>
+        <div className="mt-4">
+          <Button onClick={handleSignOut} disabled={loading}>
+            {loading ? '처리 중...' : '회원 탈퇴'}
+          </Button>
+        </div>
+      </div>
+    </RequireAuthenticated>
   );
 }

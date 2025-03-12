@@ -20,15 +20,12 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + '/api/auth/login',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-            credentials: 'include',
-          }
-      );
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include',
+      });
 
       if (response.ok) {
         const authHeader = response.headers.get('Authorization');
@@ -59,64 +56,60 @@ export default function LoginPage() {
   };
 
   return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <div className="mb-6 text-2xl font-bold">LOGO</div>
-        <div className="w-full max-w-md bg-white p-8 rounded-md shadow">
-          <h1 className="text-2xl font-bold mb-4">환영합니다</h1>
-          <form className="space-y-4" onSubmit={handleLogin}>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                이메일 주소
-              </label>
-              <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                비밀번호
-              </label>
-              <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2"
-              />
-            </div>
-            <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 cursor-pointer"
-            >
-              로그인
-            </button>
-          </form>
-
-          {/* 비밀번호 재설정 버튼 */}
-          <div className="mt-4 text-center">
-            <button
-                onClick={() => router.push('/user/password-reset/request')}
-                className="text-blue-600 font-semibold hover:underline cursor-pointer"
-            >
-              비밀번호 재설정
-            </button>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+      <div className="mb-6 text-2xl font-bold">LOGO</div>
+      <div className="w-full max-w-md bg-white p-8 rounded-md shadow">
+        <h1 className="text-2xl font-bold mb-4">환영합니다</h1>
+        <form className="space-y-4" onSubmit={handleLogin}>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">이메일 주소</label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border border-gray-300 rounded px-3 py-2"
+            />
           </div>
-
-          {/* 회원가입 버튼 */}
-          <div className="mt-4 text-center">
-            <span className="text-gray-600 text-sm">계정이 없으신가요?</span>
-            <button
-                onClick={() => router.push('/user/signup')}
-                className="ml-2 text-blue-600 font-semibold hover:underline cursor-pointer"
-            >
-              회원가입
-            </button>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full border border-gray-300 rounded px-3 py-2"
+            />
           </div>
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 cursor-pointer"
+          >
+            로그인
+          </button>
+        </form>
+
+        {/* 비밀번호 재설정 버튼 */}
+        <div className="mt-4 text-center">
+          <button
+            onClick={() => router.push('/user/password-reset/request')}
+            className="text-blue-600 font-semibold hover:underline cursor-pointer"
+          >
+            비밀번호 재설정
+          </button>
+        </div>
+
+        {/* 회원가입 버튼 */}
+        <div className="mt-4 text-center">
+          <span className="text-gray-600 text-sm">계정이 없으신가요?</span>
+          <button
+            onClick={() => router.push('/user/signup')}
+            className="ml-2 text-blue-600 font-semibold hover:underline cursor-pointer"
+          >
+            회원가입
+          </button>
         </div>
       </div>
+    </div>
   );
 }
