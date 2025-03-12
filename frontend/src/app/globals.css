@@ -7,7 +7,7 @@
 :root {
   --background: hsl(210, 15%, 98%);
   --foreground: hsl(210, 15%, 20%);
-  --card: hsl(210, 15%, 98%);
+  --card: hsl(0, 0%, 100%);
   --card-foreground: hsl(210, 15%, 20%);
   --popover: hsl(210, 15%, 98%);
   --popover-foreground: hsl(210, 15%, 20%);
@@ -15,7 +15,7 @@
   --primary-foreground: hsl(210, 15%, 98%);
   --secondary: hsl(215.3 19.3% 34.5%);
   --secondary-foreground: hsl(210, 15%, 98%);
-  --muted: hsl(210, 15%, 90%);
+  --muted: hsl(210, 15%, 95%);
   --muted-foreground: hsl(210, 15%, 40%);
   --accent: hsl(210, 15%, 60%);
   --accent-foreground: hsl(210, 15%, 98%);
@@ -38,25 +38,30 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --light-red: rgb(254, 202, 202);
+  --light-blue: rgb(191, 219, 254);
+  --light-green: rgb(202, 254, 202);
+  --point: hsl(240, 94%, 69%);
 }
 
 .dark {
   --background: hsl(210, 15%, 20%);
   --foreground: hsl(210, 15%, 98%);
-  --card: hsl(210, 15%, 20%);
+  --card: hsl(210, 15%, 30%);
   --card-foreground: hsl(210, 15%, 98%);
   --popover: hsl(210, 15%, 20%);
   --popover-foreground: hsl(210, 15%, 98%);
-  --primary: hsl(210, 15%, 60%);
+  --primary: hsl(214.3 31.8% 91.4%);
   --primary-foreground: hsl(210, 15%, 98%);
-  --secondary: hsl(210, 15%, 40%);
+  --secondary: hsl(212.7 26.8% 83.9%);
   --secondary-foreground: hsl(210, 15%, 98%);
-  --muted: hsl(210, 15%, 30%);
+  --muted: hsl(210, 15%, 35%);
   --muted-foreground: hsl(210, 15%, 85%);
   --accent: hsl(210, 15%, 60%);
   --accent-foreground: hsl(210, 15%, 98%);
   --destructive: hsl(0, 70%, 50%);
   --destructive-foreground: hsl(0, 0%, 98%);
+  --border: oklch(0.922 0 98%);
   --input: oklch(0.269 0 0);
   --ring: oklch(0.439 0 0);
   --chart-1: oklch(0.488 0.243 264.376);
@@ -73,6 +78,18 @@
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
   --logo: hsl(28, 47%, 58%);
+  --light-red: rgb(244, 152, 152);
+  --light-blue: rgb(131, 159, 244);
+  --light-green: rgb(162, 244, 162);
+  --point: hsl(240, 94%, 69%);
+}
+
+.bg-light-red {
+  background-color: var(--light-red);
+}
+
+.bg-light-blue {
+  background-color: var(--light-blue);
 }
 
 @theme inline {
@@ -113,6 +130,10 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-logo: var(--logo);
+  --color-light-red: var(--light-red);
+  --color-light-blue: var(--light-blue);
+  --color-light-green: var(--light-green);
+  --color-point: var(--point);
 }
 
 @layer base {

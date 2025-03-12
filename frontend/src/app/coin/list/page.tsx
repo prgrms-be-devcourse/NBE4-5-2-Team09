@@ -55,14 +55,14 @@ export default function Page() {
   };
 
   if (loading) return <Skeleton className="h-96 w-full rounded-md" />;
-  if (error) return <p className="text-destructive">{error}</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
   if (!markets) return <p>No data found</p>;
 
   return (
     <WebSocketProvider subscriptions={[]}>
       <div className="max-w-7xl mx-auto p-6">
         <Tabs value={quote} onValueChange={handleQuoteChange}>
-          <TabsList className="grid w-full grid-cols-3 bg-gray-100">
+          <TabsList className="grid w-full grid-cols-3 bg-muted">
             <TabsTrigger value="KRW">KRW</TabsTrigger>
             <TabsTrigger value="BTC">BTC</TabsTrigger>
             <TabsTrigger value="USDT">USDT</TabsTrigger>

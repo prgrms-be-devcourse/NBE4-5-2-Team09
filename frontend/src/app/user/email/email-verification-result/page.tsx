@@ -48,8 +48,8 @@ export default function EmailVerificationPage() {
   }, [searchParams, router]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-white">
-      <div className="text-center p-6 shadow-md rounded-md border border-gray-200 bg-white w-96">
+    <div className="flex items-center justify-center min-h-screen bg-card">
+      <div className="text-center p-6 shadow-md rounded-md border border-muted bg-card w-96">
         <h1 className="text-2xl font-bold mb-4">이메일 인증</h1>
         {loading ? (
           <p className="text-gray-600">이메일 인증을 진행 중입니다...</p>

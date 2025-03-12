@@ -3,6 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { Card, CardContent } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Mail, Lock } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -56,58 +61,73 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-      <div className="mb-6 text-2xl font-bold">LOGO</div>
-      <div className="w-full max-w-md bg-white p-8 rounded-md shadow">
-        <h1 className="text-2xl font-bold mb-4">환영합니다</h1>
-        <form className="space-y-4" onSubmit={handleLogin}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">이메일 주소</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 cursor-pointer"
-          >
-            로그인
-          </button>
-        </form>
+    <div className="flex flex-col items-center justify-center pt-20">
+      <img src="/logo.svg" alt="Coing Logo" className="h-12 mb-6" />
 
-        {/* 비밀번호 재설정 버튼 */}
-        <div className="mt-4 text-center">
-          <button
-            onClick={() => router.push('/user/password-reset/request')}
-            className="text-blue-600 font-semibold hover:underline cursor-pointer"
-          >
-            비밀번호 재설정
-          </button>
-        </div>
+      <h1 className="text-2xl font-bold mb-2">환영합니다</h1>
+      <p className="text-sm mb-6 text-primary">서비스를 이용하시려면 로그인해 주세요.</p>
 
-        {/* 회원가입 버튼 */}
-        <div className="mt-4 text-center">
-          <span className="text-gray-600 text-sm">계정이 없으신가요?</span>
-          <button
+      <Card className="w-full max-w-md">
+        <CardContent>
+          <form className="space-y-4" onSubmit={handleLogin}>
+            <div>
+              <Label htmlFor="email" className="block text-sm font-medium text-secondary mb-1">
+                이메일 주소
+              </Label>
+              <div className="relative mt-2">
+                <Mail className="absolute left-3 top-2.5 h-4 w-4 text-primary" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  required
+                  className="border border-gray-300 pl-10 placeholder:text-primary"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="password" className="mb-1">
+                비밀번호
+              </Label>
+              <div className="relative mt-2">
+                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-primary" />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="********"
+                  value={password}
+                  required
+                  className="border border-gray-300 pl-10"
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+            <Button type="submit" className="w-full cursor-pointer">
+              로그인
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+      <div className="flex flex-col mt-4">
+        <Button
+          variant="link"
+          className="text-sm text-point cursor-pointer"
+          onClick={() => router.push('/user/password-reset/request')}
+        >
+          비밀번호를 잊으셨나요?
+        </Button>
+
+        <div className="text-center text-sm">
+          <span className="text-primary">아직 회원이 아니신가요?</span>
+          <Button
+            variant="link"
             onClick={() => router.push('/user/signup')}
-            className="ml-2 text-blue-600 font-semibold hover:underline cursor-pointer"
+            className="ml-2 p-0 text-sm text-point cursor-pointer"
           >
             회원가입
-          </button>
+          </Button>
         </div>
       </div>
     </div>

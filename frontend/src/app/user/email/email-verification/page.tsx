@@ -104,7 +104,7 @@ export default function EmailVerificationWaitingScreen() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-muted">
       <div className="w-full max-w-md bg-white p-8 rounded-md shadow text-center">
         <h1 className="text-2xl font-bold mb-4">이메일 인증 대기</h1>
         {/* 안내 문구 */}

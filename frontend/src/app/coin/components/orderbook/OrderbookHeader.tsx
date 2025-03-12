@@ -16,7 +16,7 @@ export function OrderbookHeader({
   base,
 }: OrderbookHeaderProps) {
   return (
-    <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+    <div className="p-4 border-b border-muted flex justify-between items-center">
       <h2 className="text-lg font-semibold">호가 정보</h2>
       <div className="flex items-center gap-2">
         <Label htmlFor="toggle-switch">{isTotalMode ? `총액(${quote})` : `수량(${base})`}</Label>
@@ -24,7 +24,7 @@ export function OrderbookHeader({
           id="toggle-switch"
           checked={isTotalMode}
           onCheckedChange={handleToggleMode}
-          className="w-10 h-6 data-[state=checked]:bg-gray-500 data-[state=unchecked]:bg-gray-300"
+          className="w-10 h-6 data-[state=checked]:bg-muted-foreground data-[state=unchecked]:bg-gray-300"
         />
       </div>
     </div>

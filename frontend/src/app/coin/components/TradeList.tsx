@@ -76,26 +76,26 @@ export default function TradeList({ market, trade }: TradeListProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div className="p-4 border-b border-gray-200">
+    <div className="bg-card rounded-lg shadow-sm overflow-hidden">
+      <div className="p-4 border-b border-muted">
         <h2 className="text-lg font-semibold">체결 내역</h2>
       </div>
       {clientTrades.length === 0 ? (
-        <div className="p-4 text-center text-gray-500">체결 내역 없음</div>
+        <div className="p-4 text-center text-muted-foreground">체결 내역 없음</div>
       ) : (
         <div className="overflow-y-auto max-h-[400px]">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted">
               <tr>
-                <th className="px-4 py-2 text-xs text-gray-500 text-left">시간</th>
-                <th className="px-4 py-2 text-xs text-gray-500 text-right">가격(KRW)</th>
-                <th className="px-4 py-2 text-xs text-gray-500 text-right">수량(BTC)</th>
-                <th className="px-4 py-2 text-xs text-gray-500 text-center">구분</th>
+                <th className="px-4 py-2 text-xs text-muted-foreground text-left">시간</th>
+                <th className="px-4 py-2 text-xs text-muted-foreground text-right">가격(KRW)</th>
+                <th className="px-4 py-2 text-xs text-muted-foreground text-right">수량(BTC)</th>
+                <th className="px-4 py-2 text-xs text-muted-foreground text-center">구분</th>
               </tr>
             </thead>
             <tbody>
               {clientTrades.map((trade) => (
-                <tr key={trade.sequentialId} className="border-b border-gray-100">
+                <tr key={trade.sequentialId} className="border-b border-muted">
                   <td className="px-4 py-2 text-sm text-gray-600">{formatTime(trade.timestamp)}</td>
                   <td
                     className={`px-4 py-2 text-sm text-right ${
@@ -109,8 +109,8 @@ export default function TradeList({ market, trade }: TradeListProps) {
                     <span
                       className={`inline-block px-2 py-1 rounded-full text-xs ${
                         trade.askBid === AskBid.ASK
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-green-100 text-green-800'
+                          ? 'bg-light-red text-red-800'
+                          : 'bg-light-green text-green-800'
                       }`}
                     >
                       {trade.askBid === AskBid.ASK ? '매도' : '매수'}

@@ -42,7 +42,7 @@ export default function OrderbookList({ market, orderbook }: OrderBookListProps)
   const formatQuantity = (quantity: number) => quantity.toFixed(4);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+    <div className="bg-card rounded-lg shadow-sm overflow-hidden">
       <OrderbookHeader
         isTotalMode={isTotalMode}
         handleToggleMode={handleToggleMode}
@@ -70,7 +70,7 @@ export default function OrderbookList({ market, orderbook }: OrderBookListProps)
           setContainerRef={setContainerRef}
         />
       ) : (
-        <div className="p-4 text-center text-gray-500">호가 내역 없음</div>
+        <div className="p-4 text-center text-muted-foreground">호가 내역 없음</div>
       )}
     </div>
   );

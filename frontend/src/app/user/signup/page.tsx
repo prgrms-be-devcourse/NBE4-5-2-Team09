@@ -3,6 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { User, Mail, Lock } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -115,107 +120,159 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-      <div className="mb-6 text-2xl font-bold">LOGO</div>
-      <div className="w-full max-w-md bg-white p-8 rounded-md shadow">
-        <h1 className="text-2xl font-bold mb-4 ">회원가입</h1>
-        <form className="space-y-4" onSubmit={handleSignUp}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-            {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-            {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호 확인</label>
-            <input
-              type="password"
-              name="passwordConfirm"
-              value={formData.passwordConfirm}
-              onChange={handleInputChange}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-            {errors.passwordConfirm && (
-              <p className="text-red-500 text-sm">{errors.passwordConfirm}</p>
-            )}
-          </div>
+    <div className="flex flex-col items-center justify-center pt-20">
+      {/* 로고 */}
+      <img src="/logo.svg" alt="Coing Logo" className="h-12 mb-6" />
 
-          {errors.general && <p className="text-red-500 text-center">{errors.general}</p>}
+      {/* 상단 안내 */}
+      <h1 className="text-2xl font-bold mb-2">회원가입</h1>
+      <p className="text-sm mb-6 text-primary">서비스 이용을 위해 회원가입을 진행해 주세요.</p>
 
-          <button
-            type="submit"
-            disabled={!isFormValid() || isLoading}
-            className={`w-full flex justify-center items-center py-2 rounded transition cursor-pointer ${
-              isLoading
-                ? 'bg-gray-400 text-white cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
-          >
-            {isLoading ? (
-              <>
-                <svg
-                  className="animate-spin h-5 w-5 mr-2 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8H4z"
-                  ></path>
-                </svg>
-                회원가입 중...
-              </>
-            ) : (
-              '회원가입'
-            )}
-          </button>
-        </form>
+      {/* Card 영역 */}
+      <Card className="w-full max-w-md">
+        <CardContent>
+          <form className="space-y-4" onSubmit={handleSignUp}>
+            {/* 이름 */}
+            <div>
+              <Label htmlFor="name" className="block text-sm font-medium text-secondary mb-1">
+                이름
+              </Label>
+              <div className="relative mt-2">
+                <User className="absolute left-3 top-2.5 h-4 w-4 text-primary" />
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="홍길동"
+                  required
+                  className="border border-gray-300 pl-10 placeholder:text-primary"
+                />
+              </div>
+              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+            </div>
 
-        <div className="mt-4 text-center">
-          <span className="text-gray-600 text-sm ">이미 계정이 있으신가요?</span>
-          <button
+            {/* 이메일 */}
+            <div>
+              <Label htmlFor="email" className="block text-sm font-medium text-secondary mb-1">
+                이메일
+              </Label>
+              <div className="relative mt-2">
+                <Mail className="absolute left-3 top-2.5 h-4 w-4 text-primary" />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="name@example.com"
+                  required
+                  className="border border-gray-300 pl-10 placeholder:text-primary"
+                />
+              </div>
+              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            </div>
+
+            {/* 비밀번호 */}
+            <div>
+              <Label htmlFor="password" className="block text-sm font-medium text-secondary mb-1">
+                비밀번호
+              </Label>
+              <div className="relative mt-2">
+                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-primary" />
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="********"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                  className="border border-gray-300 pl-10"
+                />
+              </div>
+              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+            </div>
+
+            {/* 비밀번호 확인 */}
+            <div>
+              <Label
+                htmlFor="passwordConfirm"
+                className="block text-sm font-medium text-secondary mb-1"
+              >
+                비밀번호 확인
+              </Label>
+              <div className="relative mt-2">
+                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-primary" />
+                <Input
+                  id="passwordConfirm"
+                  name="passwordConfirm"
+                  type="password"
+                  placeholder="********"
+                  value={formData.passwordConfirm}
+                  onChange={handleInputChange}
+                  required
+                  className="border border-gray-300 pl-10"
+                />
+              </div>
+              {errors.passwordConfirm && (
+                <p className="text-red-500 text-sm mt-1">{errors.passwordConfirm}</p>
+              )}
+            </div>
+
+            {/* 일반 에러 (ex. 서버 에러 등) */}
+            {errors.general && <p className="text-red-500 text-center">{errors.general}</p>}
+
+            {/* 회원가입 버튼 */}
+            <Button
+              type="submit"
+              disabled={!isFormValid() || isLoading}
+              className="w-full flex justify-center"
+            >
+              {isLoading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2 text-card-foreground"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8H4z"
+                    ></path>
+                  </svg>
+                  회원가입 중...
+                </>
+              ) : (
+                '회원가입'
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      {/* 하단 링크 */}
+      <div className="flex flex-col mt-4 items-center">
+        <div className="text-center text-sm">
+          <span className="text-primary">이미 계정이 있으신가요?</span>
+          <Button
+            variant="link"
             onClick={() => router.push('/user/login')}
-            className="ml-2 text-blue-600 font-semibold hover:underline cursor-pointer"
+            className="ml-2 p-0 text-sm text-point cursor-pointer"
           >
             로그인
-          </button>
+          </Button>
         </div>
       </div>
     </div>
