@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useUserStore } from '@/store/user.store';
 import RequireAuthenticated from '@/components/RequireAutenticated';
 import { Input } from '@/components/ui/input';
-import { Mail, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,7 +26,6 @@ export default function UserInfoPage() {
   const { user, deleteUser } = useUserStore();
   const router = useRouter();
 
-  const [error, setError] = useState<string>('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -67,10 +66,6 @@ export default function UserInfoPage() {
       setLoading(false);
     }
   };
-
-  if (error) {
-    return <div className="w-full flex justify-center text-background text-red-500">{error}</div>;
-  }
 
   if (fetching || !user) {
     return <div className="w-full flex justify-center text-background">로딩 중...</div>;

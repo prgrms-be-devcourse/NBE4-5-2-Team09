@@ -39,8 +39,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }));
 
     return NextResponse.json(mapped);
-  } catch (error: any) {
+  } catch (error) {
     console.error('캔들 데이터 호출 오류:', error);
-    return NextResponse.json({ error: error.message || '캔들 데이터 호출 오류' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    return NextResponse.json({ error: errorMessage || '캔들 데이터 호출 오류' }, { status: 500 });
   }
 }

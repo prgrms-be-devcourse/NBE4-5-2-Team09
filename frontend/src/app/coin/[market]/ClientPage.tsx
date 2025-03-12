@@ -3,12 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useWebSocket } from '@/context/WebSocketContext';
-import axios from 'axios';
 import OrderbookList from '../components/orderbook/OrderbookList';
 import CandleChart from '../components/CandleChart';
 import NewsList from '../components/NewsList';
 import { generateMockNews } from '@/lib/utils';
-import type { CandleChartDto, CandleItem } from '@/types';
+import type { CandleItem } from '@/types';
 import TradeList from '@/app/coin/components/TradeList';
 import Ticker from '@/app/coin/components/Ticker';
 import { fetchApi } from '@/lib/api';
@@ -60,7 +59,7 @@ export default function ClientPage() {
           },
         );
         setCandles(data);
-      } catch (err: any) {
+      } catch (err) {
         console.error('캔들 데이터 호출 오류:', err);
       }
     };
