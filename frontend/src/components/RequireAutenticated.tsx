@@ -16,7 +16,7 @@ export default function RequireAuthenticated({ children }: { children: React.Rea
               해당 페이지는 로그인 후 이용할 수 있습니다.
             </p>
             <Button className="mt-6" asChild>
-              <Link href="/">홈으로 돌아가기</Link>
+              <Link href="/user/login">로그인하러 가기</Link>
             </Button>
           </div>
         </Card>

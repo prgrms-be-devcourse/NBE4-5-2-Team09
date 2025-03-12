@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import NavLink from '@/components/NavLink';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Link from 'next/link';
 import { Coins, Bookmark, CircleUser } from 'lucide-react';
@@ -16,6 +16,7 @@ const navItems = [
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { accessToken, isAuthLoading, setAccessToken } = useAuth();
   const { user, deleteUser } = useUserStore();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -77,17 +78,23 @@ export default function Header() {
             <CircleUser />
             {user?.name || 'Guest'}
           </Link>
-          {isAuthLoading ? (
-            <Button disabled>로딩중...</Button>
-          ) : isLoggedIn ? (
-            <Button className="cursor-pointer" onClick={handleLogout} disabled={isLoggingOut}>
-              {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
-            </Button>
-          ) : (
-            <Button className="cursor-pointer" onClick={() => router.push('/user/login')}>
-              로그인
-            </Button>
-          )}
+          <div style={{ minHeight: '36px' }}>
+            {pathname !== '/user/login' && (
+              <Button
+                className="cursor-pointer"
+                onClick={isLoggedIn ? handleLogout : () => router.push('/user/login')}
+                disabled={isAuthLoading || isLoggingOut}
+              >
+                {isAuthLoading
+                  ? '로딩중...'
+                  : isLoggedIn
+                    ? isLoggingOut
+                      ? '로그아웃 중...'
+                      : '로그아웃'
+                    : '로그인'}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </header>
