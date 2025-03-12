@@ -1,6 +1,8 @@
 export type TickerDto = {
   type: string; // 데이터 타입 (예: "ticker")
   code: string; // 마켓 코드 (예: "KRW-BTC")
+  koreanName: string; // 한글 이름
+  englishName: string; // 영어 이름
   openingPrice: number; // 시가
   highPrice: number; // 고가
   lowPrice: number; // 저가

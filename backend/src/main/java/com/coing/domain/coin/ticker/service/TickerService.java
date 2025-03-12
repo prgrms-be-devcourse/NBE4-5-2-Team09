@@ -15,6 +15,8 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.coing.domain.coin.market.entity.Market;
+import com.coing.domain.coin.market.service.MarketService;
 import com.coing.domain.coin.ticker.dto.TickerDto;
 import com.coing.domain.coin.ticker.entity.Ticker;
 import com.coing.global.exception.BusinessException;
@@ -31,6 +33,7 @@ public class TickerService {
 	private String UPBIT_TRADE_URI;
 
 	private final MessageUtil messageUtil;
+	private final MarketService marketService;
 	private final SimpMessageSendingOperations messagingTemplate;
 	private final RestTemplate restTemplate;
 	private final Map<String, TickerDto> tickerCache = new ConcurrentHashMap<>();
@@ -44,7 +47,8 @@ public class TickerService {
 	}
 
 	public void updateTicker(Ticker ticker) {
-		TickerDto dto = TickerDto.from(ticker);
+		Market market = marketService.getMarketByCode(ticker.getCode());
+		TickerDto dto = TickerDto.from(ticker, market);
 		tickerCache.put(ticker.getCode(), dto);
 		publish(dto);
 	}

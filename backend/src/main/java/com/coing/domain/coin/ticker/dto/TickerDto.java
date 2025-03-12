@@ -5,6 +5,7 @@ import java.time.LocalTime;
 
 import com.coing.domain.coin.common.enums.AskBid;
 import com.coing.domain.coin.common.enums.Change;
+import com.coing.domain.coin.market.entity.Market;
 import com.coing.domain.coin.ticker.entity.Ticker;
 import com.coing.domain.coin.ticker.entity.enums.MarketState;
 import com.coing.domain.coin.ticker.entity.enums.MarketWarning;
@@ -15,6 +16,8 @@ import lombok.Builder;
 public record TickerDto(
 	String type, // 데이터 타입 (예: "ticker")
 	String code, // 마켓 코드 (예: "KRW-BTC")
+	String koreanName, // 한글 이름
+	String englishName, // 영어 이름
 	double openingPrice, // 시가
 	double highPrice, // 고가
 	double lowPrice, // 저가
@@ -51,10 +54,12 @@ public record TickerDto(
 	// double oneMinuteRate // 단기 변동률(1분)
 ) {
 
-	public static TickerDto from(Ticker ticker) {
+	public static TickerDto from(Ticker ticker, Market market) {
 		return TickerDto.builder()
 			.type(ticker.getType())
 			.code(ticker.getCode())
+			.koreanName(market.getKoreanName())
+			.englishName(market.getEnglishName())
 			.openingPrice(ticker.getOpeningPrice())
 			.highPrice(ticker.getHighPrice())
 			.lowPrice(ticker.getLowPrice())

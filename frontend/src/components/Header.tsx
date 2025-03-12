@@ -53,14 +53,16 @@ export default function Header() {
   return (
     <header className="bg-white border-b border-gray-200">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <div className="flex items-center space-x-8">
+        <div className="flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-4">
           <Link href="/">
-            <div className="flex">
+            <div className="flex items-center">
               <img src="/logo.svg" alt="Coing Logo" className="h-8 mr-2" />
               <span className="text-xl font-bold text-secondary">Coing</span>
             </div>
           </Link>
-          <nav className="hidden md:flex space-x-8">
+
+          {/* 기본적으로 row, 화면이 작아지면 column으로 변경 */}
+          <nav className="flex flex-col md:flex-row md:space-x-4 gap-y-2">
             {navItems.map((item) => (
               <NavLink key={item.href} href={item.href}>
                 <item.icon className="w-4" />
