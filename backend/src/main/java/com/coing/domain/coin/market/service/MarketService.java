@@ -1,7 +1,10 @@
 package com.coing.domain.coin.market.service;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -13,9 +16,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import com.coing.domain.bookmark.entity.Bookmark;
+import com.coing.domain.bookmark.repository.BookmarkRepository;
 import com.coing.domain.coin.market.dto.MarketDto;
+import com.coing.domain.coin.market.dto.MarketResponseDto;
 import com.coing.domain.coin.market.entity.Market;
 import com.coing.domain.coin.market.repository.MarketRepository;
+import com.coing.domain.user.CustomUserPrincipal;
 import com.coing.global.exception.BusinessException;
 import com.coing.util.PageUtil;
 
@@ -30,10 +37,12 @@ public class MarketService {
 	@Value("${upbit.market.uri}")
 	private String UPBIT_MARKET_URI;
 
+	private final MarketCacheService marketCacheService;
+	private final BookmarkRepository bookmarkRepository;
 	private final MarketRepository marketRepository;
 	private final RestTemplate restTemplate;
-	private final MarketCacheService marketCacheService;
 
+	// 업비트
 	@Transactional
 	@Scheduled(initialDelay = 0, fixedRate = 6 * 60 * 60 * 1000)
 	public void updateMarketList() {
@@ -41,6 +50,7 @@ public class MarketService {
 		marketCacheService.updateMarketCache(markets);
 	}
 
+	// 업비트
 	private List<Market> fetchAndUpdateCoins() {
 		try {
 			ResponseEntity<MarketDto[]> response = restTemplate.getForEntity(UPBIT_MARKET_URI, MarketDto[].class);
@@ -59,19 +69,37 @@ public class MarketService {
 		}
 	}
 
+	// 컨트롤러
 	public Page<Market> getMarkets(Pageable pageable) {
 		List<Market> allMarkets = marketCacheService.getCachedMarketList();
 		return PageUtil.paginate(allMarkets, pageable);
 	}
 
-	public Page<Market> getAllMarketsByQuote(String type, Pageable pageable) {
+	// 컨트롤러
+	public Page<MarketResponseDto> getAllMarketsByQuote(CustomUserPrincipal principal, String type, Pageable pageable) {
 		log.info("[Market] Get all market list by quote currency");
 		List<Market> filtered = marketCacheService.getCachedMarketList().stream()
 			.filter(market -> market.getCode().startsWith(type))
 			.toList();
-		return PageUtil.paginate(filtered, pageable);
+
+		Set<String> bookmarkedMarkets;
+		if (principal != null) {
+			List<Bookmark> bookmarks = bookmarkRepository.findByUserIdAndQuote(principal.id(), type);
+			bookmarkedMarkets = bookmarks.stream()
+				.map(bookmark -> bookmark.getMarket().getCode())
+				.collect(Collectors.toSet());
+		} else {
+			bookmarkedMarkets = new HashSet<>();
+		}
+
+		List<MarketResponseDto> responseList = filtered.stream()
+			.map(market -> MarketResponseDto.of(market, bookmarkedMarkets.contains(market.getCode())))
+			.toList();
+
+		return PageUtil.paginate(responseList, pageable);
 	}
 
+	// 컨트롤러
 	@Transactional
 	public void refreshMarketList() {
 		log.info("[Market] Refresh market list");
@@ -79,11 +107,15 @@ public class MarketService {
 		marketCacheService.updateMarketCache(markets);
 	}
 
-	public Market getMarketByCode(String code) {
+	// 컨트롤러
+	public MarketResponseDto getMarketByCode(CustomUserPrincipal principal, String code) {
 		List<Market> cachedMarkets = marketCacheService.getCachedMarketList();
+		boolean isBookmarked = principal != null && bookmarkRepository.existsByUserIdAndMarketCode(principal.id(), code);
+
 		return cachedMarkets.stream()
-			.filter(market -> market.getCode().equals(code))
+			.filter(m -> m.getCode().equals(code))
 			.findFirst()
+			.map(m -> MarketResponseDto.of(m, isBookmarked))
 			.orElseThrow(() -> new BusinessException("Market not found", HttpStatus.NOT_FOUND));
 	}
 }

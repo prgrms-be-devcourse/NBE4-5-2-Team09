@@ -2,10 +2,8 @@ package com.coing.domain.bookmark.service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,6 +20,7 @@ import com.coing.domain.user.entity.User;
 import com.coing.domain.user.repository.UserRepository;
 import com.coing.global.exception.BusinessException;
 import com.coing.util.MessageUtil;
+import com.coing.util.PageUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -64,13 +63,13 @@ public class BookmarkService {
 
 	@Transactional(readOnly = true)
 	public Page<BookmarkResponse> getBookmarksByQuote(UUID userId, String quote, Pageable pageable) {
-		Page<Bookmark> bookmarks = bookmarkRepository.findByUserIdAndQuote(userId, quote, pageable);
+		List<Bookmark> bookmarks = bookmarkRepository.findByUserIdAndQuote(userId, quote);
 
 		List<BookmarkResponse> responses = bookmarks.stream()
 			.map(BookmarkResponse::of)
-			.collect(Collectors.toList());
+			.toList();
 
-		return new PageImpl<>(responses, pageable, bookmarks.getTotalElements());
+		return PageUtil.paginate(responses, pageable);
 	}
 
 	@Transactional
