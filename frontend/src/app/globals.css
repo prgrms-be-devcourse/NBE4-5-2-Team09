@@ -136,9 +136,17 @@
   --color-point: var(--point);
 }
 
+@font-face {
+  font-family: 'Pretendard';
+  font-style: normal;
+  font-weight: normal;
+  src: url('/fonts/Pretendard-Regular.woff') format('woff');
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    font-family: 'Pretendard', sans-serif;
   }
   body {
     @apply bg-background text-foreground;
