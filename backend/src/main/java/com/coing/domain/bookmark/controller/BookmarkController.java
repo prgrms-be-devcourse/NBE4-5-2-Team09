@@ -39,7 +39,7 @@ public class BookmarkController {
 	public ResponseEntity<BasicResponse> addBookmark(
 		@RequestBody @Validated BookmarkRequest request,
 		@AuthenticationPrincipal CustomUserPrincipal principal) {
-		/*BookmarkResponse response =*/ bookmarkService.addBookmark(request, principal);
+		bookmarkService.addBookmark(request, principal);
 		BasicResponse response = new BasicResponse(HttpStatus.CREATED, "북마크 등록 성공", "");
 		return ResponseEntity.ok(response);
 	}
@@ -50,7 +50,7 @@ public class BookmarkController {
 		@AuthenticationPrincipal CustomUserPrincipal principal,
 		@PathVariable("quote") String quote,
 		@ParameterObject @PageableDefault(size = 9) Pageable pageable) {
-		Page<BookmarkResponse> result = bookmarkService.getBookmarksByQuote(principal.id(), quote, pageable);
+		Page<BookmarkResponse> result = bookmarkService.getBookmarksByQuote(principal, quote, pageable);
 
 		PagedResponse<BookmarkResponse> response = new PagedResponse<>(
 			result.getNumber(),

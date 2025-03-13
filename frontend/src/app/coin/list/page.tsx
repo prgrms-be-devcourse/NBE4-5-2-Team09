@@ -73,7 +73,7 @@ export default function Page() {
     setPage(1);
   };
 
-  if (loading) return <Skeleton className="h-96 w-full rounded-md" />;
+  if (loading) return <div className="p-6 flex justify-center items-center">로딩 중...</div>;
   if (error) return <p className="text-red-500">{error}</p>;
   if (!markets) return <p>No data found</p>;
 

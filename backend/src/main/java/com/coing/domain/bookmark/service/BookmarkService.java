@@ -35,6 +35,11 @@ public class BookmarkService {
 
 	@Transactional
 	public void addBookmark(BookmarkRequest request, CustomUserPrincipal principal) {
+		if (principal == null) {
+			throw new BusinessException(messageUtil.resolveMessage("member.not.found"),
+				HttpStatus.NOT_FOUND);
+		}
+
 		UUID userId = principal.id();
 		String coinCode = request.coinCode();
 
@@ -58,11 +63,17 @@ public class BookmarkService {
 			.build();
 
 		bookmarkRepository.save(bookmark);
-		//return BookmarkResponse.of(bookmark);
 	}
 
 	@Transactional(readOnly = true)
-	public Page<BookmarkResponse> getBookmarksByQuote(UUID userId, String quote, Pageable pageable) {
+	public Page<BookmarkResponse> getBookmarksByQuote(CustomUserPrincipal principal, String quote, Pageable pageable) {
+		if (principal == null) {
+			throw new BusinessException(messageUtil.resolveMessage("member.not.found"),
+				HttpStatus.NOT_FOUND);
+		}
+
+		UUID userId = principal.id();
+
 		List<Bookmark> bookmarks = bookmarkRepository.findByUserIdAndQuote(userId, quote);
 
 		List<BookmarkResponse> responses = bookmarks.stream()
