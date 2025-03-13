@@ -33,14 +33,20 @@ export default function Page() {
     try {
       setLoading(true);
       setError(null);
+
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+
+      if (accessToken) {
+        headers.Authorization = `Bearer ${accessToken}`;
+      }
+
       const res = await fetch(
         process.env.NEXT_PUBLIC_API_URL + `/api/market?type=${quote}&page=${page - 1}&size=${size}`,
         {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
+          headers,
           credentials: 'include',
         },
       );
