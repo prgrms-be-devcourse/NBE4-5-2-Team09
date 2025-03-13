@@ -18,6 +18,6 @@ export async function GET(
   if (response.error) {
     return NextResponse.json({ error: response['error'] }, { status: 400 });
   }
-  const market: MarketDto = response.data;
+  const market: MarketDto = response.data as MarketDto;
   return NextResponse.json(market);
 }

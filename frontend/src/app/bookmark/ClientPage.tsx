@@ -11,6 +11,7 @@ import { useBookmarkToggle } from '@/hooks/useBookmarkToggle'; // 훅 불러오�
 import PaginationComponent from '@/components/Pagination';
 import { MarketDto, PaginationDto } from '@/types';
 import MarketCard from '../coin/components/MarketCard';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 type BookmarkResponse = components['schemas']['BookmarkResponse'];
 
@@ -30,10 +31,17 @@ export default function ClientPage({ bookmarks }: ClientPageProps) {
 
   // 기본 필터링: "KRW" (탭의 값으로 사용)
   const [quote, setQuote] = useState('KRW');
-  const [page, setPage] = useState(1);
   const [size, setSize] = useState(9);
   const [loading, setLoading] = useState(false);
   const [bookmarksData, setBookmarksData] = useState<BookmarkResponse[]>(bookmarks);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const initialPage = Number(searchParams.get('page')) || 1;
+  const [page, setPage] = useState(initialPage);
+
+  if (!accessToken) {
+    return renderError('로그인이 필요합니다.');
+  }
 
   // API 호출 (페이지나 quote가 변경될 때)
   useEffect(() => {
@@ -98,6 +106,14 @@ export default function ClientPage({ bookmarks }: ClientPageProps) {
     return renderError('북마크 데이터를 불러올 수 없습니다.');
   }
 
+  // 페이지 변경 시 URL 업데이트
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    const params = new URLSearchParams(searchParams);
+    params.set('page', newPage.toString());
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
   // 탭 전환: quote 변경 시 페이지 리셋
   return (
     <div className="p-6">
@@ -151,7 +167,7 @@ export default function ClientPage({ bookmarks }: ClientPageProps) {
           currentPage={page}
           totalPages={pagination.totalPages ?? 1}
           maxPageButtons={5}
-          onPageChange={(newPage) => setPage(newPage)}
+          onPageChange={handlePageChange}
           size={size}
           onSizeChange={(newSize) => setSize(newSize)}
           totalElements={pagination.totalElements ?? 0}

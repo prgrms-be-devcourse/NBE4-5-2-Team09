@@ -19,6 +19,10 @@ export default function Page() {
   const itemsPerPage = 9;
   const quote = 'KRW';
 
+  if (!accessToken) {
+    return renderError('로그인이 필요합니다.');
+  }
+
   useEffect(() => {
     async function fetchBookmarks() {
       try {

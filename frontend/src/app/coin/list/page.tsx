@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/context/AuthContext';
 
 import PaginationComponent from '@/components/Pagination';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function Page() {
   const [pagination, setPagination] = useState<PaginationDto>({
@@ -19,11 +20,14 @@ export default function Page() {
   });
   const [markets, setMarkets] = useState<MarketDto[]>([]);
   const [quote, setQuote] = useState('KRW');
-  const [page, setPage] = useState(1);
   const [size, setSize] = useState(9);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { accessToken } = useAuth();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const initialPage = Number(searchParams.get('page')) || 1;
+  const [page, setPage] = useState(initialPage);
 
   async function fetchMarkets() {
     try {
@@ -54,6 +58,14 @@ export default function Page() {
   useEffect(() => {
     fetchMarkets();
   }, [quote, page, size]);
+
+  // 페이지 변경 시 URL 업데이트
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    const params = new URLSearchParams(searchParams);
+    params.set('page', newPage.toString());
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
 
   // 기준 통화 변경 시 페이지 번호 초기화
   const handleQuoteChange = (newQuote: string) => {
@@ -88,7 +100,7 @@ export default function Page() {
             currentPage={page}
             totalPages={pagination.totalPages ?? 1}
             maxPageButtons={5}
-            onPageChange={(newPage) => setPage(newPage)}
+            onPageChange={handlePageChange}
             size={size}
             onSizeChange={(newSize) => setSize(newSize)}
             totalElements={pagination.totalElements ?? 0}

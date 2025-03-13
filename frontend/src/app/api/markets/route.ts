@@ -24,6 +24,6 @@ export async function GET(
     return NextResponse.json({ error: response['error'] }, { status: 400 });
   }
 
-  const markets: MarketsDto = response.data;
+  const markets: MarketsDto = response.data as MarketsDto;
   return NextResponse.json(markets);
 }
