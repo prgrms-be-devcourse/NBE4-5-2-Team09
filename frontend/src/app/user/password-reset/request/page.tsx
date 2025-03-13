@@ -68,13 +68,14 @@ export default function PasswordResetRequestPage() {
               <div className="relative mt-2">
                 <Mail className="absolute left-3 top-2.5 h-4 w-4 text-primary" />
                 <Input
-                  id="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  className="border border-gray-300 pl-10 placeholder:text-primary"
+                    id="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="email@example.com"
+                    disabled={isLoading || emailSent}
+                    className="border border-input pl-10 placeholder:text-primary bg-background"
                 />
               </div>
             </div>
