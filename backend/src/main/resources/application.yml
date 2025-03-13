@@ -72,6 +72,3 @@ upbit:
     uri: ${UPBIT_MARKET_URI:https://api.upbit.com/v1/market/all}
   trade:
     uri: ${UPBIT_TRADE_URI:https://api.upbit.com/v1/trades/ticks}
-http://localhost:3000/user/email/email-verification-result?token=eyJhbGciOiJIUzUxMiJ9:
-  eyJpZCI6ImFkZjQ4OWE1LTYxNDItNDAzZC1iNTllLTVhNDg3MmE4MTQwZiIsImlhdCI6MTc0MTgyOTcwOSwiZXhwIjoxNzQxODMwMzA5fQ:
-    9Z1w5DRjellDpH5cmmJlpnmYNaqr24tXbQRnyyAEYs-SI2mkVMR6jyMiqxIACkrQsjrO95NOt-BcwpvLim6Z8g:
