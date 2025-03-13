@@ -16,6 +16,7 @@ interface MarketCardProps {
 export default function MarketCard({ market, ticker, onBookmarkToggle }: MarketCardProps) {
     const { accessToken } = useAuth();
     const [showLoginAlert, setShowLoginAlert] = useState(false);
+    const [isBookmarked, setIsBookmarked] = useState(market.isBookmarked); // 북마크 상태 추가
 
     const formatTradePrice = (tradePrice: number): string => {
         const decimalPlaces = tradePrice <= 1 ? 8 : tradePrice < 1000 ? 1 : 0;
@@ -35,6 +36,26 @@ export default function MarketCard({ market, ticker, onBookmarkToggle }: MarketC
       maximumFractionDigits: 3,
     }).format(volume);
   };
+
+    const handleBookmarkClick = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        if (!accessToken) {
+            setShowLoginAlert(true);
+            return;
+        }
+
+        // 먼저 색을 변경 (UI 업데이트)
+        setIsBookmarked((prev) => !prev);
+
+        // 서버로 북마크 요청 보내기
+        try {
+            await onBookmarkToggle(market); // onBookmarkToggle 함수는 실제 서버 요청을 처리함
+        } catch (error) {
+            // 오류가 발생한 경우 색을 원래대로 되돌리기
+            setIsBookmarked((prev) => !prev);
+        }
+    };
 
     return (
         <>
@@ -77,18 +98,11 @@ export default function MarketCard({ market, ticker, onBookmarkToggle }: MarketC
                     {/* Bookmark 버튼 */}
                     <button
                         className="cursor-pointer absolute top-1 right-5.5 text-gray-300 hover:text-gray-600 transition-colors"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            if (!accessToken) {
-                                setShowLoginAlert(true);
-                                return;
-                            }
-                            onBookmarkToggle(market);
-                        }}
+                        onClick={handleBookmarkClick}
                     >
                         <svg
                             className="w-5 h-5"
-                            fill={market.isBookmarked ? '#FFCC33' : 'currentColor'}
+                            fill={isBookmarked ? '#FFCC33' : 'currentColor'} // 상태에 따라 색 변경
                             viewBox="0 0 24 24"
                         >
                             <path
