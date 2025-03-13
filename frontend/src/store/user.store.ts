@@ -11,10 +11,23 @@ interface UserState {
   deleteUser: () => void;
 }
 
-const defaultState: UserProfile = { name: '게스트', email: '' };
+const storedUser =
+  typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('user') || 'null') : null;
+
+export const defaultState: UserProfile = { name: '게스트', email: '' };
 
 export const useUserStore = create<UserState>((set) => ({
-  user: defaultState,
-  setUser: (user: UserProfile) => set({ user }),
-  deleteUser: () => set({ user: defaultState }),
+  user: storedUser || defaultState,
+  setUser: (user: UserProfile) => {
+    set({ user });
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('user', JSON.stringify(user));
+    }
+  },
+  deleteUser: () => {
+    set({ user: defaultState });
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('user');
+    }
+  },
 }));

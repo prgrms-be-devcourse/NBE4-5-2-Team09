@@ -1,6 +1,6 @@
 'use client';
 
-import { useUserStore } from '@/store/user.store';
+import { defaultState, useUserStore } from '@/store/user.store';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 interface AuthContextType {
@@ -31,10 +31,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (typeof window !== 'undefined') {
       if (token) {
         sessionStorage.setItem('accessToken', token);
-        console.log('[AuthProvider] accessToken 저장:', token);
       } else {
         sessionStorage.removeItem('accessToken');
-        console.log('[AuthProvider] accessToken 삭제');
       }
     }
   };
@@ -47,19 +45,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         method: 'POST',
         credentials: 'include',
       });
-      console.log('[AuthProvider] refresh 응답 상태:', response.status);
       if (response.ok) {
         const authHeader = response.headers.get('Authorization');
         if (authHeader?.startsWith('Bearer ')) {
           const newToken = authHeader.slice(7);
           setAccessToken(newToken);
-          console.log('[AuthProvider] 새 액세스 토큰 발급됨:', newToken);
           return newToken;
-        } else {
-          console.warn('[AuthProvider] Authorization 헤더 없음');
         }
-      } else {
-        console.error('[AuthProvider] 리프레시 토큰 발급 실패:', response.status);
       }
     } catch (error) {
       console.error('[AuthProvider] 리프레시 요청 중 오류 발생:', error);
@@ -70,27 +62,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // customFetch: 모든 API 요청 시 토큰을 헤더에 포함하고, 403 발생 시 재요청
   const customFetch = useCallback(
     async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
-      console.log('[customFetch] 요청 시작:', input);
       let headers = {
         ...(init?.headers || {}),
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       };
-      console.log('[customFetch] 사용되는 헤더:', headers);
       let response = await fetch(input, { ...init, headers, credentials: 'include' });
-      console.log('[customFetch] 초기 응답 상태:', response.status);
 
       if (response.status === 403) {
-        console.warn('[customFetch] 403 응답 감지됨. refresh token으로 재발급 시도합니다.');
         const newToken = await refreshAccessToken();
         if (newToken) {
           headers = { ...init?.headers, Authorization: `Bearer ${newToken}` };
-          console.log('[customFetch] 새 토큰으로 재요청 헤더:', headers);
           response = await fetch(input, { ...init, headers, credentials: 'include' });
-          console.log('[customFetch] 재요청 응답 상태:', response.status);
         } else {
-          console.error(
-            '[customFetch] refresh token 재발급 실패. 로그인 페이지로 리다이렉트합니다.',
-          );
           window.location.href = '/login';
         }
       }
@@ -102,13 +85,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // 컴포넌트 마운트 시 토큰 유무 체크
   useEffect(() => {
     async function validateToken() {
-      console.log('[AuthProvider] validateToken 시작');
       const token = sessionStorage.getItem('accessToken');
-      if (!token) {
-        console.warn('[AuthProvider] 세션 스토리지에 토큰 없음 → 로그인 상태 아님');
-      }
       setIsAuthLoading(false);
-      console.log('[AuthProvider] validateToken 완료, isAuthLoading false');
     }
     validateToken();
   }, []);
@@ -116,7 +94,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // accessToken이 있을 때 사용자 정보를 한 번만 API 호출로 가져와 전역 스토어에 저장
   useEffect(() => {
     async function fetchUserInfo() {
-      if (!accessToken) return;
+      if (!accessToken) {
+        setUser(defaultState);
+        return;
+      }
       try {
         const res = await customFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/info`, {
           method: 'GET',
@@ -125,19 +106,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
         if (res.ok) {
           const data = await res.json();
-          setUser({ name: data.name || '', email: data.email || '' });
-          console.log('[AuthProvider] 사용자 정보 업데이트:', data.name);
+          setUser({ name: data.name, email: data.email });
         } else {
-          console.error('[AuthProvider] 사용자 정보를 가져오지 못했습니다.');
-          setUser({ name: '', email: '' });
+          setUser(defaultState);
         }
       } catch (error) {
         console.error('[AuthProvider] 사용자 정보 요청 실패:', error);
-        setUser({ name: '', email: '' });
+        setUser(defaultState);
       }
     }
     fetchUserInfo();
-  }, [accessToken, customFetch, setUser]);
+  }, [accessToken, setUser]);
 
   return (
     <AuthContext.Provider
