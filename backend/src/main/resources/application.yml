@@ -74,5 +74,5 @@ upbit:
 
 naver:
   client:
-    id: ${NAVER_CLIENT_ID}
-    secret: ${NAVER_CLIENT_SECRET}
+    id: ${NAVER_CLIENT_ID:default_client_id}
+    secret: ${NAVER_CLIENT_SECRET:default_client_secret}
