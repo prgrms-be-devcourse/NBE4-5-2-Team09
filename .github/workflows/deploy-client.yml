@@ -40,18 +40,19 @@ jobs:
         with:
           node-version-file: "frontend/.nvmrc"
 
-      - name: Dependencies 설치
-        run: npm install
-
       - name: Doppler CLI 설치
         uses: dopplerhq/cli-action@v3
 
       - name: Doppler 설정
+        working-directory: frontend
         run: |
-          npm run doppler:setup
+          doppler setup --no-interactive
           doppler configure set config prd
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_FRONTEND_TOKEN }}
+
+      - name: Dependencies 설치
+        run: npm install --prefix .
 
       - name: schema.d.ts 생성
         working-directory: frontend
@@ -59,7 +60,7 @@ jobs:
 
       - name: .env 파일 다운로드
         working-directory: frontend
-        run: npm run doppler
+        run: doppler secrets download --no-file --format env-no-quotes > .env
 
       - name: Vercel CLI 설치
         working-directory: frontend
