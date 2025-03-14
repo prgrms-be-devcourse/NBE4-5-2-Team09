@@ -16,38 +16,6 @@ jobs:
       - name: Github Repository 파일 불러오기
         uses: actions/checkout@v4
 
-      - name: JDK 설치
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 23
-
-      - name: api_schema.json 생성하기 위해 빌드
-        working-directory: backend
-        run: ./gradlew clean build
-        env:
-          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-          JWT_EXPIRE_SECONDS: ${{ secrets.JWT_EXPIRE_SECONDS }}
-          JWT_REFRESH_EXPIRE_SECONDS: ${{ secrets.JWT_REFRESH_EXPIRE_SECONDS }}
-          UPBIT_WS_URI: ${{ secrets.UPBIT_WS_URI }}
-          MAIL_HOST: ${{ secrets.MAIL_HOST }}
-          MAIL_PORT: ${{ secrets.MAIL_PORT }}
-          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
-          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-
-      - name: Start Backend Server
-        working-directory: backend
-        run: nohup java -jar build/libs/*.jar > backend.log 2>&1 & echo $! > backend_pid.txt && sleep 10
-
-      - name: Wait for Backend Server
-        working-directory: backend
-        run: |
-          timeout 180s bash -c 'until curl -sSf http://localhost:8080/actuator/health; do sleep 5; done'
-
-      - name: Stop Backend Server
-        working-directory: backend
-        run: kill $(cat backend_pid.txt)
-
       - name: Node.js 설치
         uses: actions/setup-node@v4
         with:
