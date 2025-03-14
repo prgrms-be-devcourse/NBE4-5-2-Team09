@@ -20,7 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.test.context.ActiveProfiles;
+
 import com.coing.domain.coin.common.enums.AskBid;
 import com.coing.domain.coin.common.enums.Change;
 import com.coing.domain.coin.market.entity.Market;
@@ -37,7 +37,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
-@ActiveProfiles("test")
 public class TickerServiceTest {
 
 	@Mock
