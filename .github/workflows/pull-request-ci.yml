@@ -58,6 +58,10 @@ jobs:
           JWT_EXPIRE_SECONDS: ${{ secrets.JWT_EXPIRE_SECONDS }}
           JWT_REFRESH_EXPIRE_SECONDS: ${{ secrets.JWT_REFRESH_EXPIRE_SECONDS }}
           UPBIT_WS_URI: ${{ secrets.UPBIT_WS_URI }}
+          MAIL_HOST: ${{ secrets.MAIL_HOST }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
