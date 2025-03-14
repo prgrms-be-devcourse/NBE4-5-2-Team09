@@ -36,9 +36,13 @@ jobs:
         working-directory: frontend
         run: npm install --prefix .
 
+      - name: Check node_modules
+        working-directory: frontend
+        run: ls -l node_modules/.bin/
+
       - name: schema.d.ts 생성
         working-directory: frontend
-        run: openapi-typescript ../api_schema.json -o ./src/lib/api/generated/schema.d.ts
+        run: npx openapi-typescript ../api_schema.json -o ./src/lib/api/generated/schema.d.ts
 
       - name: .env 파일 다운로드
         working-directory: frontend
