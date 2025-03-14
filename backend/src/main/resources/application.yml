@@ -5,7 +5,7 @@ spring:
   application:
     name: coing
   profiles:
-    active: ${SPRING_ACTIVE_PROFILES:prod}
+    active: ${SPRING_ACTIVE_PROFILES:dev}
   config:
     import: optional:file:./.env[.properties]
   output:
@@ -64,7 +64,6 @@ custom:
     mail-verification-url: ${EMAIL_VERIFICATION_URL:http://localhost:3000/api/auth/verify-email-?token=}
     password-reset-url: ${PASSWORD_RESET_URL:http://localhost:3000/user/password-reset?token=}
 
-
 upbit:
   websocket:
     uri: ${UPBIT_WS_URI:wss://api.upbit.com/websocket/v1}
@@ -72,3 +71,8 @@ upbit:
     uri: ${UPBIT_MARKET_URI:https://api.upbit.com/v1/market/all}
   trade:
     uri: ${UPBIT_TRADE_URI:https://api.upbit.com/v1/trades/ticks}
+
+naver:
+  client:
+    id: eeIXlekB447ZTOL1nEq6
+    secret: cinZywG_Gb
