@@ -5,33 +5,56 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 on:
-  workflow_run:
-    workflows: ["PR SpringBoot Test"]
-    types:
-      - completed
+  push:
     branches:
-      - main
+      - deploy
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Github Repository 파일 불러오기
         uses: actions/checkout@v4
 
-      - name: Install Vercel CLI
+      - name: JDK 설치
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 23
+
+      - name: api_schema.json 생성하기 위해 빌드
+        working-directory: backend
+        run: ./gradlew clean build
+
+      - name: Node.js 설치
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "frontend/.nvmrc"
+          cache: "npm"
+
+      - name: Dependencies 설치
+        run: npm install
+
+      - name: Doppler CLI 설치
+        run: npm install -g @dopplerhq/cli
+
+      - name: Doppler 설정
+        run: npm run doppler:setup
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+
+      - name: schema.d.ts 생성
+        working-directory: frontend
+        run: npm run codegen
+
+      - name: .env 파일 다운로드
+        working-directory: frontend
+        run: npm run doppler
+
+      - name: Vercel CLI 설치
         working-directory: frontend
         run: npm install -g vercel
 
-      - name: Pull Vercel Environment Information
+      - name: Vercel에 배포
         working-directory: frontend
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build Project Artifacts
-        working-directory: frontend
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy Project Artifacts to Vercel
-        working-directory: frontend
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
