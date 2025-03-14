@@ -74,5 +74,5 @@ upbit:
 
 naver:
   client:
-    id: eeIXlekB447ZTOL1nEq6
-    secret: cinZywG_Gb
+    id: ${NAVER_CLIENT_ID}
+    secret: ${NAVER_CLIENT_SECRET}
