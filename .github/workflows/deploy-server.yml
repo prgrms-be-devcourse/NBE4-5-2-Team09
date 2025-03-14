@@ -12,27 +12,20 @@ jobs:
       - name: Github Repository 파일 불러오기
         uses: actions/checkout@v4
 
-      - name: Node.js 설치
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "frontend/.nvmrc"
-
-      - name: Dependencies 설치
-        run: npm install
-
       - name: Doppler CLI 설치
         uses: dopplerhq/cli-action@v3
 
       - name: Doppler 설정
+        working-directory: backend
         run: |
-          npm run doppler:setup
+          doppler setup --no-interactive
           doppler configure set config prd
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_BACKEND_TOKEN }}
 
       - name: .env 파일 다운로드
         working-directory: backend
-        run: npm run doppler
+        run: doppler secrets download --no-file --format env-no-quotes > .env
 
       - name: JDK 설치
         uses: actions/setup-java@v4
