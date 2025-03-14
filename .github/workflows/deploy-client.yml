@@ -1,0 +1,53 @@
+name: Deploy To Vercel
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+on:
+  push:
+    branches:
+      - deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Github Repository 파일 불러오기
+        uses: actions/checkout@v4
+
+      - name: Node.js 설치
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "frontend/.nvmrc"
+
+      - name: Doppler CLI 설치
+        uses: dopplerhq/cli-action@v3
+
+      - name: Doppler 설정
+        working-directory: frontend
+        run: |
+          doppler setup --no-interactive
+          doppler configure set config prd
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_FRONTEND_TOKEN }}
+
+      - name: Dependencies 설치
+        working-directory: frontend
+        run: npm install --prefix .
+
+      - name: schema.d.ts 생성
+        working-directory: frontend
+        run: npx openapi-typescript ../api_schema.json -o ./src/lib/api/generated/schema.d.ts
+
+      - name: .env 파일 다운로드
+        working-directory: frontend
+        run: doppler secrets download --no-file --format env-no-quotes > .env
+
+      - name: Vercel CLI 설치
+        working-directory: frontend
+        run: npm install -g vercel
+
+      - name: Vercel에 배포
+        working-directory: frontend
+        run: vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
