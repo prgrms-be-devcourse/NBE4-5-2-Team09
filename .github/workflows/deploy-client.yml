@@ -52,6 +52,7 @@ jobs:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_FRONTEND_TOKEN }}
 
       - name: Dependencies 설치
+        working-directory: frontend
         run: npm install --prefix .
 
       - name: schema.d.ts 생성
