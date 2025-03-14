@@ -35,7 +35,7 @@ jobs:
         run: npm install
 
       - name: Doppler CLI 설치
-        run: npm install -g @dopplerhq/cli
+        uses: dopplerhq/cli-action@v3
 
       - name: Doppler 설정
         run: npm run doppler:setup
