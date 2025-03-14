@@ -47,7 +47,9 @@ jobs:
         uses: dopplerhq/cli-action@v3
 
       - name: Doppler 설정
-        run: npm run doppler:setup
+        run: |
+          npm run doppler:setup
+          doppler configure set config prd
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_FRONTEND_TOKEN }}
 
