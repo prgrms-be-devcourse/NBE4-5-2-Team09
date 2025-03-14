@@ -26,7 +26,7 @@ jobs:
       - name: Doppler 설정
         run: npm run doppler:setup
         env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_BACKEND_TOKEN }}
 
       - name: .env 파일 다운로드
         working-directory: backend
@@ -41,6 +41,15 @@ jobs:
       - name: 테스트 및 빌드
         working-directory: backend
         run: ./gradlew clean build
+        env:
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          JWT_EXPIRE_SECONDS: ${{ secrets.JWT_EXPIRE_SECONDS }}
+          JWT_REFRESH_EXPIRE_SECONDS: ${{ secrets.JWT_REFRESH_EXPIRE_SECONDS }}
+          UPBIT_WS_URI: ${{ secrets.UPBIT_WS_URI }}
+          MAIL_HOST: ${{ secrets.MAIL_HOST }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
 
       - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
         uses: aws-actions/configure-aws-credentials@v4

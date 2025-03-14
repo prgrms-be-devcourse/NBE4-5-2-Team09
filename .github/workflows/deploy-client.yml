@@ -25,6 +25,15 @@ jobs:
       - name: api_schema.json 생성하기 위해 빌드
         working-directory: backend
         run: ./gradlew clean build
+        env:
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          JWT_EXPIRE_SECONDS: ${{ secrets.JWT_EXPIRE_SECONDS }}
+          JWT_REFRESH_EXPIRE_SECONDS: ${{ secrets.JWT_REFRESH_EXPIRE_SECONDS }}
+          UPBIT_WS_URI: ${{ secrets.UPBIT_WS_URI }}
+          MAIL_HOST: ${{ secrets.MAIL_HOST }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
 
       - name: Node.js 설치
         uses: actions/setup-node@v4
@@ -40,7 +49,7 @@ jobs:
       - name: Doppler 설정
         run: npm run doppler:setup
         env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_FRONTEND_TOKEN }}
 
       - name: schema.d.ts 생성
         working-directory: frontend
