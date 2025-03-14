@@ -35,6 +35,18 @@ jobs:
           MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
 
+      - name: Start Backend Server
+        working-directory: backend
+        run: nohup java -jar build/libs/*.jar > backend.log 2>&1 & echo $! > backend_pid.txt && sleep 10
+
+      - name: Check if Backend Server is Running
+        working-directory: backend
+        run: curl --retry 5 --retry-delay 5 --retry-connrefused http://localhost:8080/actuator/health
+
+      - name: Stop Backend Server
+        working-directory: backend
+        run: kill $(cat backend_pid.txt)
+
       - name: Node.js 설치
         uses: actions/setup-node@v4
         with:
@@ -57,7 +69,7 @@ jobs:
 
       - name: schema.d.ts 생성
         working-directory: frontend
-        run: npm run codegen
+        run: openapi-typescript ../api_schema.json -o ./src/lib/api/generated/schema.d.ts
 
       - name: .env 파일 다운로드
         working-directory: frontend
