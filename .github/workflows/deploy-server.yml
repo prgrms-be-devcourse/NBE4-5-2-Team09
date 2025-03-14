@@ -70,7 +70,12 @@ jobs:
         run: docker push ${{ steps.login-ecr.outputs.registry }}/coing-server:latest
 
       - name: .env 파일을 EC2로 복사
-        run: scp -i <(echo "${{ secrets.EC2_PRIVATE_KEY }}") backend/.env ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USERNAME }}/.env
+        working-directory: backend
+        run: |
+          echo "${{ secrets.EC2_PRIVATE_KEY }}" > devcoing-keypair.pem
+          chmod 600 devcoing-keypair.pem
+          scp -o StrictHostKeyChecking=no -i devcoing-keypair.pem .env ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USERNAME }}/.env
+          rm -f devcoing-keypair.pem
 
       - name: SSH로 EC2에 접속
         uses: appleboy/ssh-action@v1.0.3
