@@ -30,7 +30,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: "frontend/.nvmrc"
-          cache: "npm"
 
       - name: Dependencies 설치
         run: npm install
