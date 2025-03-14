@@ -77,7 +77,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
-            aws sts get-caller-identity
+            aws ecr get-login-password --region ap-northeast-2 | sudo docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
             sudo docker stop coing-server || true
             sudo docker rm coing-server || true
             sudo docker pull ${{ steps.login-ecr.outputs.registry }}/coing-server:latest
