@@ -39,9 +39,10 @@ jobs:
         working-directory: backend
         run: nohup java -jar build/libs/*.jar > backend.log 2>&1 & echo $! > backend_pid.txt && sleep 10
 
-      - name: Check if Backend Server is Running
+      - name: Wait for Backend Server
         working-directory: backend
-        run: curl --retry 5 --retry-delay 5 --retry-connrefused http://localhost:8080/actuator/health
+        run: |
+          timeout 180s bash -c 'until curl -sSf http://localhost:8080/actuator/health; do sleep 5; done'
 
       - name: Stop Backend Server
         working-directory: backend
