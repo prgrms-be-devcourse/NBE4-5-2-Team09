@@ -1,0 +1,37 @@
+name: Deploy To Vercel
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+on:
+  workflow_run:
+    workflows: ["PR SpringBoot Test"]
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Github Repository 파일 불러오기
+        uses: actions/checkout@v4
+
+      - name: Install Vercel CLI
+        working-directory: frontend
+        run: npm install -g vercel
+
+      - name: Pull Vercel Environment Information
+        working-directory: frontend
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        working-directory: frontend
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel
+        working-directory: frontend
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
