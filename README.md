@@ -97,8 +97,8 @@ npm run codegen:watch # Watch for API changes and regenerate types automatically
 ## Architecture
 
 ### System Architecture
-[시스템 구성도](https://github.com/prgrms-be-devcourse/NBE4-5-2-Team09/wiki/%EC%8B%9C%EC%8A%A4%ED%85%9C-%EA%B5%AC%EC%84%B1%EB%8F%84(%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98))
-[프로젝트 구조](https://github.com/prgrms-be-devcourse/NBE4-5-2-Team09/wiki/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EA%B5%AC%EC%A1%B0)
+- [💻 시스템 구성도](https://github.com/prgrms-be-devcourse/NBE4-5-2-Team09/wiki/%EC%8B%9C%EC%8A%A4%ED%85%9C-%EA%B5%AC%EC%84%B1%EB%8F%84(%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98))
+- [📃 프로젝트 구조](https://github.com/prgrms-be-devcourse/NBE4-5-2-Team09/wiki/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EA%B5%AC%EC%A1%B0)
 
 ### 🛠️ Technology Stack
 
