@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.coing.domain.coin.common.dto.PagedResponse;
 import com.coing.domain.coin.market.controller.dto.MarketResponse;
 import com.coing.domain.coin.market.service.MarketService;
-import com.coing.domain.user.CustomUserPrincipal;
+import com.coing.domain.user.dto.CustomUserPrincipal;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

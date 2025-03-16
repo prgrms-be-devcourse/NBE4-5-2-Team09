@@ -108,8 +108,15 @@ export default function LoginPage() {
               로그인
             </Button>
           </form>
+          <Button
+            className="w-full mt-4 bg-muted text-foreground cursor-pointer hover:bg-background"
+            onClick={() => router.push('/user/social-login')}
+          >
+            간편 로그인
+          </Button>
         </CardContent>
       </Card>
+
       <div className="flex flex-col mt-4">
         <Button
           variant="link"

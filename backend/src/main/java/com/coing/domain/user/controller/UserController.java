@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.coing.domain.user.CustomUserPrincipal;
+import com.coing.domain.user.dto.CustomUserPrincipal;
 import com.coing.domain.user.controller.dto.EmailVerificationResponse;
 import com.coing.domain.user.controller.dto.PasswordResetConfirmRequest;
 import com.coing.domain.user.controller.dto.PasswordResetRequest;
@@ -73,12 +73,12 @@ public class UserController {
 	@Operation(summary = "이메일 인증")
 	@GetMapping("/verify-email")
 	public ResponseEntity<?> verifyEmail(@RequestParam(name = "token") String token) {
-		Map<String, Object> claims = authTokenService.verifyToken(token);
-		if (claims == null || claims.get("id") == null) {
+		UUID userId = authTokenService.parseId(token);
+		if (userId == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 				.body(Map.of("status", "error", "message", "유효하지 않은 토큰입니다."));
 		}
-		UUID userId = UUID.fromString(claims.get("id").toString());
+
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new BusinessException(messageUtil.resolveMessage("member.not.found"),
 				HttpStatus.BAD_REQUEST, ""));
@@ -135,15 +135,8 @@ public class UserController {
 		if (!user.verified()) {
 			throw new BusinessException("이메일 인증이 완료되지 않았습니다.", HttpStatus.UNAUTHORIZED, "");
 		}
-		String accessToken = authTokenService.genAccessToken(user);
-		String refreshToken = authTokenService.genRefreshToken(user);
-		Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-		refreshCookie.setHttpOnly(true);
-		refreshCookie.setSecure(false);
-		refreshCookie.setPath("/");
-		refreshCookie.setMaxAge(604800);
-		response.addCookie(refreshCookie);
-		response.setHeader("Authorization", "Bearer " + accessToken);
+
+		issuedToken(response, user);
 		BasicResponse basicResponse = new BasicResponse(HttpStatus.OK, "로그인 성공", "");
 		return ResponseEntity.ok(basicResponse);
 	}
@@ -176,15 +169,7 @@ public class UserController {
 		if (user == null) {
 			throw new BusinessException(messageUtil.resolveMessage("member.not.found"), HttpStatus.BAD_REQUEST, "");
 		}
-		String newAccessToken = authTokenService.genAccessToken(user);
-		String newRefreshToken = authTokenService.genRefreshToken(user);
-		Cookie newRefreshCookie = new Cookie("refreshToken", newRefreshToken);
-		newRefreshCookie.setHttpOnly(true);
-		newRefreshCookie.setSecure(false);
-		newRefreshCookie.setPath("/");
-		newRefreshCookie.setMaxAge(604800);
-		response.addCookie(newRefreshCookie);
-		response.setHeader("Authorization", "Bearer " + newAccessToken);
+		issuedToken(response, user);
 		return ResponseEntity.ok(new BasicResponse(HttpStatus.OK, "토큰 재발급 성공", ""));
 	}
 
@@ -240,12 +225,12 @@ public class UserController {
 	@PostMapping("/password-reset/confirm")
 	public ResponseEntity<?> confirmPasswordReset(@RequestParam("token") String token,
 		@RequestBody @Validated PasswordResetConfirmRequest request) {
-		Map<String, Object> claims = authTokenService.verifyToken(token);
-		if (claims == null || claims.get("id") == null) {
+		UUID userId = authTokenService.parseId(token);
+		if (userId == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 				.body(Map.of("status", "error", "message", "유효하지 않은 토큰입니다."));
 		}
-		UUID userId = UUID.fromString(claims.get("id").toString());
+
 		// 비밀번호와 확인 비밀번호가 일치하는지 검증
 		if (!request.newPassword().equals(request.newPasswordConfirm())) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -253,5 +238,22 @@ public class UserController {
 		}
 		userService.updatePassword(userId, request.newPassword());
 		return ResponseEntity.ok(Map.of("status", "success", "message", "비밀번호가 재설정되었습니다."));
+	}
+
+	@Operation(summary = "리다이렉트")
+	@GetMapping
+	public void redirectSocialLogin() {
+	}
+
+	private void issuedToken(HttpServletResponse response, UserResponse user) {
+		String accessToken = authTokenService.genAccessToken(user);
+		String refreshToken = authTokenService.genRefreshToken(user);
+		Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+		refreshCookie.setHttpOnly(true);
+		refreshCookie.setSecure(false);
+		refreshCookie.setPath("/");
+		refreshCookie.setMaxAge(604800);
+		response.addCookie(refreshCookie);
+		response.setHeader("Authorization", "Bearer " + accessToken);
 	}
 }

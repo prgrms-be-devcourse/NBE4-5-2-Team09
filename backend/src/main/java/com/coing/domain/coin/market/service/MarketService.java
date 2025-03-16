@@ -24,7 +24,7 @@ import com.coing.domain.coin.market.dto.MarketDto;
 import com.coing.domain.coin.market.dto.MarketResponseDto;
 import com.coing.domain.coin.market.entity.Market;
 import com.coing.domain.coin.market.repository.MarketRepository;
-import com.coing.domain.user.CustomUserPrincipal;
+import com.coing.domain.user.dto.CustomUserPrincipal;
 import com.coing.global.exception.BusinessException;
 import com.coing.util.MessageUtil;
 import com.coing.util.PageUtil;

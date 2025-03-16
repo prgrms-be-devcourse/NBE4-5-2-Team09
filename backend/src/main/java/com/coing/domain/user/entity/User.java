@@ -1,6 +1,5 @@
 package com.coing.domain.user.entity;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
@@ -9,6 +8,8 @@ import com.coing.util.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
@@ -50,17 +51,17 @@ public class User extends BaseEntity {
 	private Authority authority;
 
 	// 회원 가입 시각 기록
-	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
+	// @Column(name = "created_at", nullable = false, updatable = false)
+	// private LocalDateTime createdAt;
 
 	@PrePersist
 	public void prePersist() {
 		if (authority == null) {
 			authority = Authority.USER;
 		}
-		if (createdAt == null) {
+		/*if (createdAt == null) {
 			createdAt = LocalDateTime.now();
-		}
+		}*/
 	}
 
 	// 이메일 인증 여부
@@ -73,4 +74,8 @@ public class User extends BaseEntity {
 	public User verifyEmail() {
 		return this.withVerified(true);
 	}
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "provider", nullable = false)
+	private Provider provider;
 }

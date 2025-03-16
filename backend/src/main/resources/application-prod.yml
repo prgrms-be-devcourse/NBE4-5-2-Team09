@@ -12,3 +12,7 @@ logging:
   level:
     root: WARN
     org.hibernate: WARN
+
+next:
+  server:
+    url: https://${NEXT_SERVER_HOST}

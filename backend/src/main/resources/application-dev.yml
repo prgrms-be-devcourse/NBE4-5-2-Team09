@@ -20,3 +20,7 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
+
+next:
+  server:
+    url: http://${NEXT_SERVER_HOST}:${NEXT_SERVER_PORT}

@@ -1,4 +1,4 @@
-package com.coing.domain.user;
+package com.coing.domain.user.dto;
 
 import java.util.UUID;
 

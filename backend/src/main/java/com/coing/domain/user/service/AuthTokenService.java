@@ -2,11 +2,12 @@ package com.coing.domain.user.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.coing.domain.user.CustomUserPrincipal;
+import com.coing.domain.user.dto.CustomUserPrincipal;
 import com.coing.domain.user.controller.dto.UserResponse;
 import com.coing.util.Ut;
 
@@ -72,5 +73,13 @@ public class AuthTokenService {
 			log.error("토큰 검증 실패", e);
 			return null;
 		}
+	}
+
+	public UUID parseId(String token) {
+		Map<String, Object> claims = verifyToken(token);
+		if (claims == null || claims.get("id") == null) {
+			return null;
+		}
+		return UUID.fromString(claims.get("id").toString());
 	}
 }

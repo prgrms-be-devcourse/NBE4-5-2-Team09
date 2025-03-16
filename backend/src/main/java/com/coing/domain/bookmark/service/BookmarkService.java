@@ -15,7 +15,7 @@ import com.coing.domain.bookmark.entity.Bookmark;
 import com.coing.domain.bookmark.repository.BookmarkRepository;
 import com.coing.domain.coin.market.entity.Market;
 import com.coing.domain.coin.market.repository.MarketRepository;
-import com.coing.domain.user.CustomUserPrincipal;
+import com.coing.domain.user.dto.CustomUserPrincipal;
 import com.coing.domain.user.entity.User;
 import com.coing.domain.user.repository.UserRepository;
 import com.coing.global.exception.BusinessException;

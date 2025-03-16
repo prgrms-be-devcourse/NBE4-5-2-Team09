@@ -20,7 +20,7 @@ import com.coing.domain.bookmark.controller.dto.BookmarkRequest;
 import com.coing.domain.bookmark.controller.dto.BookmarkResponse;
 import com.coing.domain.bookmark.service.BookmarkService;
 import com.coing.domain.coin.common.dto.PagedResponse;
-import com.coing.domain.user.CustomUserPrincipal;
+import com.coing.domain.user.dto.CustomUserPrincipal;
 import com.coing.util.BasicResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
