@@ -4,10 +4,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,6 @@ import com.coing.domain.user.dto.OAuth2UserDto;
 import com.coing.domain.user.entity.Provider;
 import com.coing.domain.user.entity.User;
 import com.coing.domain.user.repository.UserRepository;
-import com.coing.global.exception.BusinessException;
 import com.coing.util.MessageUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -52,15 +51,12 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 		// 기존 방식(이메일+비밀번호)으로 가입한 사용자일 경우 리다이렉트
 		Optional<User> existing = userRepository.findByEmail(dto.email());
 		if (existing.isPresent() && existing.get().getProvider().equals(Provider.EMAIL)) {
-			throw new BusinessException(
-				messageUtil.resolveMessage("already.registered.email"),
-				HttpStatus.BAD_REQUEST,
-				""
+			throw new OAuth2AuthenticationException(
+				new OAuth2Error("different_login_methods", messageUtil.resolveMessage("different.login.methods"), null)
 			);
 		}
 
-		return userRepository.findByEmail(dto.email())
-			.orElseGet(() -> {
+		return existing.orElseGet(() -> {
 				User savedUser = User.builder()
 					.name(dto.name())
 					.email(dto.email())

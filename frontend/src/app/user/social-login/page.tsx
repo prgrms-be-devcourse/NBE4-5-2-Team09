@@ -1,11 +1,25 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
 
 export default function SocialLoginPage() {
     const router = useRouter();
+
+    useEffect(() => {
+        // URL에서 error 파라미터 가져오기
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+
+        // error 파라미터가 존재하면 alert 띄우기
+        if (error) {
+            alert(error);
+            urlParams.delete("error");
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }, []);
 
     const handleKakaoLogin = () => {
         window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/kakao`;

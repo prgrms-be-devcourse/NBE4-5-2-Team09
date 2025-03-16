@@ -129,11 +129,6 @@ public class UserService {
 
 	private User validateUser(String password, Optional<User> optionalUser) {
 
-		if (optionalUser.isPresent() && optionalUser.get().getProvider().equals(Provider.KAKAO)) {
-			throw new BusinessException(messageUtil.resolveMessage("login.with.oauth2"),
-				HttpStatus.BAD_REQUEST, optionalUser.get().getProvider().toString());
-		}
-
 		if (optionalUser.isEmpty()) {
 			throw new BusinessException(messageUtil.resolveMessage("member.not.found"),
 				HttpStatus.BAD_REQUEST, "");
