@@ -2,7 +2,6 @@
 
 프로그래머스 백엔드 데브코스 4기 5회차 9팀 시고르백구의 2차 팀 프로젝트입니다.
 
----
 
 ## 👥 Team Introduction
 
@@ -13,7 +12,6 @@
 | 이승민 | [min429](https://github.com/min429)        | 팀원       |
 | 장무영 | [wkdan](https://github.com/wkdan)          | 팀원       |
 
----
 
 ## 📊 Project Overview
 
@@ -98,13 +96,13 @@ npm run codegen:watch # Watch for API changes and regenerate types automatically
 
 ## Architecture
 
-### 1.1. System Architecture
+### System Architecture
 [시스템 구성도](https://github.com/prgrms-be-devcourse/NBE4-5-2-Team09/wiki/%EC%8B%9C%EC%8A%A4%ED%85%9C-%EA%B5%AC%EC%84%B1%EB%8F%84(%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98))
 [프로젝트 구조](https://github.com/prgrms-be-devcourse/NBE4-5-2-Team09/wiki/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EA%B5%AC%EC%A1%B0)
 
-## 🛠️ Technology Stack
+### 🛠️ Technology Stack
 
-### 🎨 Frontend
+#### 🎨 Frontend
 <div align=""> 
   <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white"/>
   <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white"/>
