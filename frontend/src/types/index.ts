@@ -162,3 +162,9 @@ export type UserInfoDto = {
   name: string;
   email: string;
 };
+
+export interface ChatMessageDto {
+  sender: string;
+  content: string;
+  timestamp: string;
+}
