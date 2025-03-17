@@ -21,6 +21,8 @@ import com.coing.domain.bookmark.controller.dto.BookmarkResponse;
 import com.coing.domain.bookmark.service.BookmarkService;
 import com.coing.domain.coin.common.dto.PagedResponse;
 import com.coing.domain.user.dto.CustomUserPrincipal;
+import com.coing.global.exception.doc.ApiErrorCodeExamples;
+import com.coing.global.exception.doc.ErrorCode;
 import com.coing.util.BasicResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,6 +38,7 @@ public class BookmarkController {
 
 	@Operation(summary = "북마크 등록", security = @SecurityRequirement(name = "bearerAuth"))
 	@PostMapping("/bookmark")
+	@ApiErrorCodeExamples({ErrorCode.BOOKMARK_NOT_FOUND, ErrorCode.MEMBER_NOT_FOUND, ErrorCode.BOOKMARK_ALREADY_EXISTS})
 	public ResponseEntity<BasicResponse> addBookmark(
 		@RequestBody @Validated BookmarkRequest request,
 		@AuthenticationPrincipal CustomUserPrincipal principal) {
@@ -46,6 +49,7 @@ public class BookmarkController {
 
 	@Operation(summary = "유저 북마크 조회", security = @SecurityRequirement(name = "bearerAuth"))
 	@GetMapping("/bookmarks/{quote}")
+	@ApiErrorCodeExamples({ErrorCode.MEMBER_NOT_FOUND})
 	public ResponseEntity<PagedResponse<BookmarkResponse>> getBookmarksByQuote(
 		@AuthenticationPrincipal CustomUserPrincipal principal,
 		@PathVariable("quote") String quote,
@@ -64,6 +68,7 @@ public class BookmarkController {
 
 	@Operation(summary = "특정 북마크 삭제", security = @SecurityRequirement(name = "bearerAuth"))
 	@DeleteMapping("/bookmark/{marketCode}")
+	@ApiErrorCodeExamples({ErrorCode.BOOKMARK_ACCESS_DENIED, ErrorCode.BOOKMARK_NOT_FOUND})
 	public ResponseEntity<BasicResponse> deleteBookmark(
 		@PathVariable("marketCode") String marketCode,
 		@AuthenticationPrincipal CustomUserPrincipal principal) {

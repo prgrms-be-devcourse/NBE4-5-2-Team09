@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.coing.domain.coin.ticker.dto.TickerResponse;
 import com.coing.domain.coin.ticker.service.TickerService;
+import com.coing.global.exception.doc.ApiErrorCodeExamples;
+import com.coing.global.exception.doc.ErrorCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +25,7 @@ public class TickerController {
 
 	@Operation(summary = "특정 마켓 현재가 조회")
 	@GetMapping("/{market}")
+	@ApiErrorCodeExamples({ErrorCode.TICKER_NOT_FOUND})
 	public ResponseEntity<TickerResponse> getTicker(@PathVariable("market") String market) {
 		TickerResponse response = TickerResponse.from(tickerService.getTicker(market));
 		return ResponseEntity.ok(response);

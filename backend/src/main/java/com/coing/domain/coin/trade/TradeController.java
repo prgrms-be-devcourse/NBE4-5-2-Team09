@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.coing.domain.coin.trade.dto.TradeResponse;
 import com.coing.domain.coin.trade.service.TradeService;
+import com.coing.global.exception.doc.ApiErrorCodeExamples;
+import com.coing.global.exception.doc.ErrorCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +25,7 @@ public class TradeController {
 
 	@Operation(summary = "특정 마켓 체결 내역 조회")
 	@GetMapping("/{market}")
+	@ApiErrorCodeExamples({ErrorCode.TRADE_NOT_FOUND})
 	public ResponseEntity<TradeResponse> getTrades(@PathVariable("market") String market) {
 		TradeResponse response = TradeResponse.from(tradeService.getTrades(market));
 		return ResponseEntity.ok(response);

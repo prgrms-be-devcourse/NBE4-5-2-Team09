@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.coing.domain.user.dto.CustomUserPrincipal;
 import com.coing.domain.user.controller.dto.EmailVerificationResponse;
 import com.coing.domain.user.controller.dto.PasswordResetConfirmRequest;
 import com.coing.domain.user.controller.dto.PasswordResetRequest;
@@ -25,6 +24,7 @@ import com.coing.domain.user.controller.dto.UserLoginRequest;
 import com.coing.domain.user.controller.dto.UserResponse;
 import com.coing.domain.user.controller.dto.UserSignUpRequest;
 import com.coing.domain.user.controller.dto.UserSignupResponse;
+import com.coing.domain.user.dto.CustomUserPrincipal;
 import com.coing.domain.user.email.service.EmailVerificationService;
 import com.coing.domain.user.email.service.PasswordResetService;
 import com.coing.domain.user.entity.User;
@@ -32,6 +32,8 @@ import com.coing.domain.user.repository.UserRepository;
 import com.coing.domain.user.service.AuthTokenService;
 import com.coing.domain.user.service.UserService;
 import com.coing.global.exception.BusinessException;
+import com.coing.global.exception.doc.ApiErrorCodeExamples;
+import com.coing.global.exception.doc.ErrorCode;
 import com.coing.util.BasicResponse;
 import com.coing.util.MessageUtil;
 
@@ -58,6 +60,8 @@ public class UserController {
 
 	@Operation(summary = "일반 유저 회원 가입")
 	@PostMapping("/signup")
+	@ApiErrorCodeExamples({ErrorCode.MAIL_SEND_FAIL, ErrorCode.ALREADY_REGISTERED_EMAIL,
+		ErrorCode.INVALID_PASSWORD_CONFIRM})
 	public ResponseEntity<UserSignupResponse> signUp(@RequestBody @Validated UserSignUpRequest request,
 		HttpServletResponse response) {
 		UserResponse user = userService.join(request);
@@ -72,6 +76,7 @@ public class UserController {
 
 	@Operation(summary = "이메일 인증")
 	@GetMapping("/verify-email")
+	@ApiErrorCodeExamples({ErrorCode.MEMBER_NOT_FOUND})
 	public ResponseEntity<?> verifyEmail(@RequestParam(name = "token") String token) {
 		UUID userId = authTokenService.parseId(token);
 		if (userId == null) {
@@ -94,6 +99,7 @@ public class UserController {
 
 	@Operation(summary = "이메일 인증 상태 확인", description = "회원가입을 요청한 사용자의 UUID(userId)를 기준으로 이메일 인증 여부를 확인합니다.")
 	@GetMapping("/is-verified")
+	@ApiErrorCodeExamples({ErrorCode.MEMBER_NOT_FOUND})
 	public ResponseEntity<EmailVerificationResponse> isVerified(@RequestParam(name = "userId") UUID userId) {
 		Optional<User> userOpt = userRepository.findById(userId);
 		if (userOpt.isEmpty()) {
@@ -107,6 +113,7 @@ public class UserController {
 
 	@Operation(summary = "이메일 인증 메일 재전송")
 	@PostMapping("/resend-email")
+	@ApiErrorCodeExamples({ErrorCode.MAIL_SEND_FAIL, ErrorCode.MEMBER_NOT_FOUND})
 	public ResponseEntity<?> resendEmail(@RequestParam(name = "userId") UUID userId) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new BusinessException(
@@ -129,6 +136,7 @@ public class UserController {
 
 	@Operation(summary = "일반 유저 로그인")
 	@PostMapping("/login")
+	@ApiErrorCodeExamples({ErrorCode.EMAIL_NOT_VERIFIED, ErrorCode.MEMBER_NOT_FOUND, ErrorCode.PASSWORD_MISMATCH})
 	public ResponseEntity<BasicResponse> login(@RequestBody @Validated UserLoginRequest request,
 		HttpServletResponse response) {
 		UserResponse user = userService.login(request.email(), request.password());
@@ -143,6 +151,8 @@ public class UserController {
 
 	@Operation(summary = "토큰 재발급")
 	@PostMapping("/refresh")
+	@ApiErrorCodeExamples({ErrorCode.MEMBER_NOT_FOUND, ErrorCode.INVALID_REFRESH_TOKEN,
+		ErrorCode.REFRESH_TOKEN_REQUIRED})
 	public ResponseEntity<BasicResponse> refreshToken(HttpServletRequest request,
 		HttpServletResponse response) {
 		Cookie[] cookies = request.getCookies();
@@ -189,6 +199,7 @@ public class UserController {
 
 	@Operation(summary = "회원 탈퇴", security = @SecurityRequirement(name = "bearerAuth"))
 	@DeleteMapping("/signout")
+	@ApiErrorCodeExamples({ErrorCode.MEMBER_NOT_FOUND, ErrorCode.EMPTY_TOKEN_PROVIDED, ErrorCode.PASSWORD_MISMATCH})
 	public ResponseEntity<?> signOut(@RequestBody @Validated SignOutRequest request,
 		@AuthenticationPrincipal CustomUserPrincipal principal) {
 		if (principal == null) {
@@ -200,6 +211,7 @@ public class UserController {
 
 	@Operation(summary = "회원 정보 조회", security = @SecurityRequirement(name = "bearerAuth"))
 	@GetMapping("/info")
+	@ApiErrorCodeExamples({ErrorCode.MEMBER_NOT_FOUND, ErrorCode.EMPTY_TOKEN_PROVIDED})
 	public ResponseEntity<?> getUserInfo(@AuthenticationPrincipal CustomUserPrincipal principal) {
 		if (principal == null) {
 			throw new BusinessException(messageUtil.resolveMessage("empty.token.provided"), HttpStatus.FORBIDDEN, "");
@@ -210,6 +222,7 @@ public class UserController {
 
 	@Operation(summary = "비밀번호 재설정 요청")
 	@PostMapping("/password-reset/request")
+	@ApiErrorCodeExamples({ErrorCode.MAIL_SEND_FAIL})
 	public ResponseEntity<?> requestPasswordReset(@RequestBody @Validated PasswordResetRequest request) {
 		Optional<User> userOptional = userRepository.findByEmail(request.email());
 		if (userOptional.isEmpty()) {
@@ -223,6 +236,7 @@ public class UserController {
 
 	@Operation(summary = "비밀번호 재설정 확인")
 	@PostMapping("/password-reset/confirm")
+	@ApiErrorCodeExamples({ErrorCode.MEMBER_NOT_FOUND})
 	public ResponseEntity<?> confirmPasswordReset(@RequestParam("token") String token,
 		@RequestBody @Validated PasswordResetConfirmRequest request) {
 		UUID userId = authTokenService.parseId(token);

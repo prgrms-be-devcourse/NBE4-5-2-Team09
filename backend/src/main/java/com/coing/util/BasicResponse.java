@@ -1,8 +1,10 @@
 package com.coing.util;
 
-import com.coing.global.exception.BusinessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import com.coing.global.exception.BusinessException;
+import com.coing.global.exception.doc.ErrorCode;
 
 public record BasicResponse(
         HttpStatus status,
@@ -29,5 +31,11 @@ public record BasicResponse(
         return ResponseEntity
                 .status(exception.getStatus())
                 .body(BasicResponse.of(exception));
+    }
+
+    public static BasicResponse from(ErrorCode errorCode, MessageUtil messageUtil) {
+        return new BasicResponse(errorCode.getStatus(),
+            messageUtil.resolveMessage(errorCode.getMessageKey()),
+            "");
     }
 }
