@@ -42,66 +42,53 @@ export default function NewsList({ news: initialNews }: NewsListProps) {
   };
 
   return (
-      <div className="bg-card rounded-lg shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-muted flex justify-between items-center">
-          <h2 className="text-lg font-semibold">뉴스</h2>
-          <button
-              onClick={refreshNews}
-              className="px-3 py-1 text-sm border rounded hover:bg-muted"
-          >
-            새로고침
-          </button>
-        </div>
-
-        <div className="overflow-y-auto max-h-[400px]">
-          <ul className="divide-y divide-muted">
-            {currentNews.map((item, index) => (
-                <li key={item.id || index} className="p-4 hover:bg-muted">
-                  <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block"
-                  >
-                    <h3
-                        className="font-medium mb-1"
-                        dangerouslySetInnerHTML={{ __html: item.title }}
-                    />
-                    <p
-                        className="text-sm text-secondary mb-2"
-                        dangerouslySetInnerHTML={{ __html: item.summary }}
-                    />
-                    <div className="flex justify-between text-xs text-primary">
-                      <span>{item.source}</span>
-                      <span>{formatDate(item.publishedAt)}</span>
-                    </div>
-                  </a>
-                </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="flex justify-center items-center p-4 space-x-4">
-          <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-3 py-1 text-sm border rounded disabled:opacity-50"
-          >
-            이전
-          </button>
-          <span className="text-sm">
-            {currentPage} / {totalPages}
-          </span>
-          <button
-              onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 text-sm border rounded disabled:opacity-50"
-          >
-            다음
-          </button>
-        </div>
+    <div className="bg-card rounded-lg shadow-sm overflow-hidden">
+      <div className="p-4 border-b border-muted flex justify-between items-center">
+        <h2 className="text-lg font-semibold">뉴스</h2>
+        <button onClick={refreshNews} className="px-3 py-1 text-sm border rounded hover:bg-muted">
+          새로고침
+        </button>
       </div>
+
+      <div className="overflow-y-auto max-h-[400px]">
+        <ul className="divide-y divide-muted">
+          {currentNews.map((item, index) => (
+            <li key={item.id || index} className="p-4 hover:bg-muted">
+              <a href={item.url} target="_blank" rel="noopener noreferrer" className="block">
+                <h3 className="font-medium mb-1" dangerouslySetInnerHTML={{ __html: item.title }} />
+                <p
+                  className="text-sm text-secondary mb-2"
+                  dangerouslySetInnerHTML={{ __html: item.summary }}
+                />
+                <div className="flex justify-between text-xs text-primary">
+                  <span>{item.source}</span>
+                  <span>{formatDate(item.publishedAt)}</span>
+                </div>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="flex justify-center items-center p-4 space-x-4">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-3 py-1 text-sm border rounded disabled:opacity-50"
+        >
+          이전
+        </button>
+        <span className="text-sm">
+          {currentPage} / {totalPages}
+        </span>
+        <button
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 text-sm border rounded disabled:opacity-50"
+        >
+          다음
+        </button>
+      </div>
+    </div>
   );
 }
