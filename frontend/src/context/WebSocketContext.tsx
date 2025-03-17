@@ -7,7 +7,7 @@ import type { TickerDto, OrderbookDto, TradeDto, CandleChartDto } from '@/types'
 import { useWebSocketStore } from '@/store/web-socket.store';
 
 // 구독 가능한 타입 정의
-type SubscriptionType = 'ticker' | 'orderbook' | 'trade' | 'candle';
+type SubscriptionType = 'ticker' | 'orderbook' | 'trade' | 'candle' | 'chat';
 
 interface Subscription {
   type: SubscriptionType;
@@ -19,7 +19,9 @@ interface WebSocketContextProps {
   orderbooks: Record<string, OrderbookDto | null>;
   trades: Record<string, TradeDto | null>;
   candleCharts: Record<string, CandleChartDto[] | null>;
+  chatMessages: Record<string, any[]>; // 채팅 메시지 전용 상태
   updateSubscriptions: (newSubscriptions: Subscription[]) => void;
+  publishMessage: (destination: string, body: string, headers?: Record<string, string>) => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextProps>({
@@ -27,34 +29,34 @@ const WebSocketContext = createContext<WebSocketContextProps>({
   orderbooks: {},
   trades: {},
   candleCharts: {},
+  chatMessages: {},
   updateSubscriptions: () => {},
+  publishMessage: () => {},
 });
 
 export const WebSocketProvider = ({
-  children,
-  subscriptions = [],
-}: {
+                                    children,
+                                    subscriptions = [],
+                                  }: {
   children: ReactNode;
   subscriptions: Subscription[];
 }) => {
   const { market } = useParams() as { market: string };
   const pathname = usePathname();
-  const { connect, isConnected, subscribe, unsubscribe } = useWebSocketStore();
+  const { connect, isConnected, subscribe, unsubscribe, publish } = useWebSocketStore();
 
   const [tickers, setTicker] = useState<Record<string, TickerDto | null>>({});
   const [orderbooks, setOrderbook] = useState<Record<string, OrderbookDto | null>>({});
   const [trades, setTrades] = useState<Record<string, TradeDto | null>>({});
   const [candles, setCandles] = useState<Record<string, CandleChartDto[] | null>>({});
+  const [chatMessages, setChatMessages] = useState<Record<string, any[]>>({});
 
-  // 현재 구독 상태를 state로 관리
   const [currentSubscriptions, setCurrentSubscriptions] = useState<Subscription[]>(subscriptions);
 
-  // WebSocket 구독 변경 함수
   const updateSubscriptions = (newSubscriptions: Subscription[]) => {
     setCurrentSubscriptions(newSubscriptions);
   };
 
-  // WebSocket 연결
   useEffect(() => {
     connect();
   }, []);
@@ -63,39 +65,48 @@ export const WebSocketProvider = ({
     if (!isConnected || currentSubscriptions.length === 0) return;
 
     const availableSubscriptions: Record<
-      SubscriptionType,
-      (market: string) => { dest: string; callback: (msg: IMessage) => void }
+        SubscriptionType,
+        (market: string) => { dest: string; callback: (msg: IMessage) => void }
     > = {
       ticker: (market) => ({
         dest: `/sub/coin/ticker/${market}`,
         callback: (msg: IMessage) =>
-          setTicker((prev) => ({ ...prev, [market]: JSON.parse(msg.body) })),
+            setTicker((prev) => ({ ...prev, [market]: JSON.parse(msg.body) })),
       }),
       orderbook: (market) => ({
         dest: `/sub/coin/orderbook/${market}`,
         callback: (msg: IMessage) =>
-          setOrderbook((prev) => ({ ...prev, [market]: JSON.parse(msg.body) })),
+            setOrderbook((prev) => ({ ...prev, [market]: JSON.parse(msg.body) })),
       }),
       trade: (market) => ({
         dest: `/sub/coin/trade/${market}`,
         callback: (msg: IMessage) =>
-          setTrades((prev) => ({ ...prev, [market]: JSON.parse(msg.body) })),
+            setTrades((prev) => ({ ...prev, [market]: JSON.parse(msg.body) })),
       }),
       candle: (market) => ({
         dest: `/sub/coin/candle/${market}`,
         callback: (msg: IMessage) =>
-          setCandles((prev) => ({ ...prev, [market]: JSON.parse(msg.body) })),
+            setCandles((prev) => ({ ...prev, [market]: JSON.parse(msg.body) })),
+      }),
+      chat: (market) => ({
+        dest: `/sub/coin/chat/${market}`,
+        callback: (msg: IMessage) => {
+          const parsed = JSON.parse(msg.body);
+          setChatMessages((prev) => ({
+            ...prev,
+            [market]: [...(prev[market] || []), parsed],
+          }));
+        },
       }),
     };
 
-    // `markets`가 없거나 빈 배열이면 `useParams()`에서 market을 가져와 사용
     const updatedSubscriptions = currentSubscriptions.map(({ type, markets }) => ({
       type,
       markets: markets && markets.length > 0 ? markets : [market],
     }));
 
     const activeSubscriptions = updatedSubscriptions.flatMap(({ type, markets }) =>
-      markets!.map((market) => availableSubscriptions[type](market)),
+        markets!.map((m) => availableSubscriptions[type](m))
     );
 
     activeSubscriptions.forEach(({ dest, callback }) => {
@@ -110,20 +121,21 @@ export const WebSocketProvider = ({
   }, [market, pathname, isConnected, currentSubscriptions]);
 
   return (
-    <WebSocketContext.Provider
-      value={{
-        tickers,
-        orderbooks,
-        trades,
-        candleCharts: candles,
-        updateSubscriptions, // 구독 변경 함수 제공
-      }}
-    >
-      {children}
-    </WebSocketContext.Provider>
+      <WebSocketContext.Provider
+          value={{
+            tickers,
+            orderbooks,
+            trades,
+            candleCharts: candles,
+            chatMessages,
+            updateSubscriptions,
+            publishMessage: publish,
+          }}
+      >
+        {children}
+      </WebSocketContext.Provider>
   );
 };
 
-// WebSocket 데이터를 쉽게 가져오는 커스텀 훅
 export const useWebSocket = () => useContext(WebSocketContext);
 export default WebSocketProvider;
