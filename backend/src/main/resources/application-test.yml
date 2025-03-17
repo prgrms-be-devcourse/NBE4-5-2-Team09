@@ -8,3 +8,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+
+next:
+  server:
+    url: http://${NEXT_SERVER_HOST:localhost}:${NEXT_SERVER_PORT:3000}
