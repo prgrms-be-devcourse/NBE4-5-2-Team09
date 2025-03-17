@@ -46,8 +46,10 @@
     - 종목/마켓 단위 현재가, 체결가 및 호가 정보 조회
  - 추가 기능 (향후 확장)
     - 소셜 회원가입/로그인
-    - 코인 항목 별 관련 뉴스 실시간 집계\
+    - 코인 항목 별 관련 뉴스 실시간 집계
       
+### User Flow
+- [👨‍💻 User Flow](https://github.com/prgrms-be-devcourse/NBE4-5-2-Team09/wiki/User-Flow)
 
 ## 🛠️ Development Setup
 
@@ -101,7 +103,7 @@ npm run codegen:watch # Watch for API changes and regenerate types automatically
 - [📃 프로젝트 구조](https://github.com/prgrms-be-devcourse/NBE4-5-2-Team09/wiki/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EA%B5%AC%EC%A1%B0)
 
 ### 🛠️ Technology Stack
-
+[기술 스택 문서화](https://github.com/prgrms-be-devcourse/NBE4-5-2-Team09/wiki/%EA%B8%B0%EC%88%A0-%EC%8A%A4%ED%83%9D)
 #### 🎨 Frontend
 <div align=""> 
   <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white"/>
@@ -126,7 +128,7 @@ npm run codegen:watch # Watch for API changes and regenerate types automatically
 #### 🚀 Deployment & Infra
 <div align=""> 
   <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black"/>
-  <img src="https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white"/>
+  <img src="https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonwebservices&logoColor=white"/>
   <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white"/>
   <img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white"/>
   <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white"/>
@@ -137,6 +139,7 @@ npm run codegen:watch # Watch for API changes and regenerate types automatically
 ## 📡 API & Communication
 - **Upbit API:** 실시간 WebSocket 및 REST API 연동
 - **Naver Search API:** 코인 관련 실시간 뉴스 데이터 제공
+- **Kakao Login API:** 소셜 로그인 기능 제공
 
 
 ## 🚀 Deployment & CI/CD
