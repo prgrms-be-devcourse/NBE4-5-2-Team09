@@ -21,7 +21,7 @@ interface WebSocketContextProps {
   candleCharts: Record<string, CandleChartDto[] | null>;
   chatMessages: Record<string, any[]>; // 채팅 메시지 전용 상태
   updateSubscriptions: (newSubscriptions: Subscription[]) => void;
-  publishMessage: (destination: string, body: string) => void;
+  publishMessage: (destination: string, body: string, headers?: Record<string, string>) => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextProps>({

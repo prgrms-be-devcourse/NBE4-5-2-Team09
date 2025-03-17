@@ -7,7 +7,7 @@ interface WebSocketState {
   connect: () => void;
   subscribe: (destination: string, callback: (message: IMessage) => void) => void;
   unsubscribe: (destination: string) => void;
-  publish: (destination: string, body: string) => void;
+  publish: (destination: string, body: string, headers?: Record<string, string>) => void;
 }
 
 export const useWebSocketStore = create<WebSocketState>((set, get) => ({
@@ -61,7 +61,7 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => ({
     }
   },
 
-  // 퍼블리시 함수: 메시지 전송때 사용
+  // 퍼블리시 함수: 메시지 전송 때 사용, headers 인자 추가
   publish: (destination: string, body: string, headers: Record<string, string> = {}) => {
     const client = get().client;
     if (!client || !client.connected) {

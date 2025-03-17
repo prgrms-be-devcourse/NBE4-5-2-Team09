@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import com.coing.domain.user.entity.User;
 import com.coing.util.BaseEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -34,12 +35,12 @@ public class ChatMessage extends BaseEntity {
 	private Long id;
 
 	// 이 메시지가 속한 채팅방
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "chat_room_id", nullable = false)
 	private ChatRoom chatRoom;
 
 	// 메시지를 보낸 유저
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User sender;
 
