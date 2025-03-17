@@ -11,6 +11,7 @@ import com.coing.domain.chat.entity.ChatMessage;
 import com.coing.domain.chat.service.ChatService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,33 +61,11 @@ public class ChatWebSocketHandler implements WebSocketHandler {
 	}
 
 	// 내부 DTO for WebSocket 메시지 요청
+	@Getter
 	public static class ChatMessageRequest {
 		private Long roomId;
 		private java.util.UUID senderId;
 		private String content;
 
-		public Long getRoomId() {
-			return roomId;
-		}
-
-		public void setRoomId(Long roomId) {
-			this.roomId = roomId;
-		}
-
-		public java.util.UUID getSenderId() {
-			return senderId;
-		}
-
-		public void setSenderId(java.util.UUID senderId) {
-			this.senderId = senderId;
-		}
-
-		public String getContent() {
-			return content;
-		}
-
-		public void setContent(String content) {
-			this.content = content;
-		}
 	}
 }
