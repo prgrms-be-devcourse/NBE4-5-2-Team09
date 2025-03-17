@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -44,6 +45,14 @@ public class TickerService {
 		return Optional.ofNullable(tickerCache.get(market)).orElseThrow(() -> new BusinessException(
 			messageUtil.resolveMessage("ticker.not.found"),
 			HttpStatus.NOT_FOUND));
+	}
+
+	public List<TickerDto> getTickers(List<String> markets) {
+		return tickerCache.entrySet()
+			.stream()
+			.filter(e -> markets.contains(e.getKey()))
+			.map(Map.Entry::getValue)
+			.collect(Collectors.toList());
 	}
 
 	public void updateTicker(Ticker ticker) {
