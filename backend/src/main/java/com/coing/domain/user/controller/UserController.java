@@ -189,7 +189,7 @@ public class UserController {
 		// 리프레시 토큰 쿠키를 삭제하는 로직
 		Cookie cookie = new Cookie("refreshToken", null);
 		cookie.setHttpOnly(true);
-		cookie.setSecure(false);
+		cookie.setSecure(true);
 		cookie.setPath("/");
 		cookie.setMaxAge(0);
 		response.addCookie(cookie);
