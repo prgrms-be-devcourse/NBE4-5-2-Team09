@@ -36,8 +36,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const backendUrl = 'http://localhost:8080';
-    const url = `${backendUrl}/api/news?market=${encodeURIComponent(
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/news?market=${encodeURIComponent(
       market,
     )}&display=100&start=1&sort=sim&format=json`;
     const response = await fetch(url);
