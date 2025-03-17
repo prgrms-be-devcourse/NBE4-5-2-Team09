@@ -9,7 +9,7 @@ import { client } from '@/lib/api';
 import RequireAuthenticated from '@/components/RequireAutenticated';
 import { useBookmarkToggle } from '@/hooks/useBookmarkToggle'; // 훅 불러오기
 import PaginationComponent from '@/components/Pagination';
-import { MarketDto, PaginationDto } from '@/types';
+import { MarketDto, PaginationDto, TickerDto } from '@/types';
 import MarketCard from '../coin/components/MarketCard';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -26,7 +26,8 @@ export default function ClientPage({ bookmarks }: ClientPageProps) {
     totalElements: 0,
     totalPages: 0,
   });
-  const { tickers, updateSubscriptions } = useWebSocket();
+  const { tickers: wsTickers, updateSubscriptions } = useWebSocket();
+  const [tickers, setTickers] = useState<Record<string, TickerDto | null>>({});
   const { accessToken } = useAuth();
 
   // 기본 필터링: "KRW" (탭의 값으로 사용)
@@ -43,7 +44,7 @@ export default function ClientPage({ bookmarks }: ClientPageProps) {
     return renderError('로그인이 필요합니다.');
   }
 
-  // API 호출 (페이지나 quote가 변경될 때)
+  // 북마크 목록 API 호출 (페이지나 quote가 변경될 때)
   useEffect(() => {
     async function fetchBookmarks() {
       if (!accessToken) return;
@@ -65,7 +66,7 @@ export default function ClientPage({ bookmarks }: ClientPageProps) {
         if (error || !data) {
           throw new Error('북마크 데이터를 불러오는 중 오류 발생');
         }
-        setBookmarksData(data.content);
+        setBookmarksData(data.content); // 북마크 데이터 업데이트
         setPagination(data);
       } catch (err) {
         console.error('북마크 데이터를 불러오는 중 오류 발생:', err);
@@ -76,8 +77,56 @@ export default function ClientPage({ bookmarks }: ClientPageProps) {
     fetchBookmarks();
   }, [accessToken, page, quote]);
 
+  // 북마크 데이터를 받은 후에만 `ticker` API 호출 (북마크가 업데이트된 후 실행)
+  useEffect(() => {
+    async function fetchInitialTickers() {
+      try {
+        if (marketCodes.length === 0) return; // 빈 배열이면 API 요청하지 않음
+
+        const requestBody = {
+          markets: marketCodes,
+        };
+
+        const { data, error } = await client.POST('/api/ticker', {
+          body: requestBody,
+        });
+
+        if (error || !data || !data.tickers) {
+          throw new Error('Ticker 데이터를 불러오는 중 오류 발생');
+        }
+
+        // ticker를 code 기반의 객체로 변환
+        const tickerMap: Record<string, TickerDto> = (data.tickers as TickerDto[]).reduce(
+          (acc, ticker) => {
+            acc[ticker.code] = ticker;
+            return acc;
+          },
+          {} as Record<string, TickerDto>,
+        );
+
+        setTickers(tickerMap);
+      } catch (err) {
+        console.error('Ticker 데이터를 불러오는 중 오류 발생:', err);
+      }
+    }
+
+    if (bookmarksData.length > 0) {
+      fetchInitialTickers();
+    }
+  }, [bookmarksData]); // 북마크 데이터가 변경되었을 때 실행
+
+  // 웹소켓 데이터가 변경될 때 API에서 가져온 tickers를 웹소켓 데이터로 갱신
+  useEffect(() => {
+    if (Object.keys(wsTickers).length > 0) {
+      setTickers((prevTickers) => ({
+        ...prevTickers,
+        ...wsTickers, // 기존 API 데이터에 웹소켓 데이터 덮어쓰기
+      }));
+    }
+  }, [wsTickers]);
+
   // WebSocket 구독용 마켓 리스트를 useMemo로 계산 (불필요한 재계산 방지)
-  const marketsForWS = useMemo(() => {
+  const marketCodes = useMemo(() => {
     return bookmarksData.map((bookmark) => bookmark.code!).filter((code) => Boolean(code));
   }, [bookmarksData]);
 
@@ -86,15 +135,15 @@ export default function ClientPage({ bookmarks }: ClientPageProps) {
 
   // 마켓 리스트가 변경되었을 때만 구독 업데이트 실행
   useEffect(() => {
-    if (marketsForWS.length > 0) {
-      const newMarketsJSON = JSON.stringify(marketsForWS);
+    if (marketCodes.length > 0) {
+      const newMarketsJSON = JSON.stringify(marketCodes);
       const prevMarketsJSON = JSON.stringify(prevMarketsRef.current);
       if (newMarketsJSON !== prevMarketsJSON) {
-        prevMarketsRef.current = marketsForWS;
-        updateSubscriptions([{ type: 'ticker', markets: marketsForWS }]);
+        prevMarketsRef.current = marketCodes;
+        updateSubscriptions([{ type: 'ticker', markets: marketCodes }]);
       }
     }
-  }, [marketsForWS, updateSubscriptions]);
+  }, [marketCodes, updateSubscriptions]);
 
   if (!accessToken) {
     return renderError('로그인이 필요합니다.');
