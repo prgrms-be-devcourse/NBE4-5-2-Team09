@@ -15,4 +15,4 @@ logging:
 
 next:
   server:
-    url: https://${NEXT_SERVER_HOST}
+    url: https://${NEXT_SERVER_HOST:coing}
