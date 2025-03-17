@@ -7,6 +7,7 @@ interface WebSocketState {
   connect: () => void;
   subscribe: (destination: string, callback: (message: IMessage) => void) => void;
   unsubscribe: (destination: string) => void;
+  publish: (destination: string, body: string) => void;
 }
 
 export const useWebSocketStore = create<WebSocketState>((set, get) => ({
@@ -58,5 +59,16 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => ({
       client.unsubscribe(destination);
       console.log(`🗑️ Unsubscribed from ${destination}`);
     }
+  },
+
+  // 퍼블리시 함수: 메시지 전송때 사용
+  publish: (destination: string, body: string, headers: Record<string, string> = {}) => {
+    const client = get().client;
+    if (!client || !client.connected) {
+      console.error(`Cannot publish to ${destination} - WebSocket not connected`);
+      return;
+    }
+    client.publish({ destination, body, headers });
+    console.log(`Publishing to ${destination} with body: ${body}`);
   },
 }));
