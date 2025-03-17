@@ -1,0 +1,94 @@
+name: Deploy To EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Github Repository 파일 불러오기
+        uses: actions/checkout@v4
+
+      - name: Doppler CLI 설치
+        uses: dopplerhq/cli-action@v3
+
+      - name: Doppler 설정
+        working-directory: backend
+        run: |
+          doppler setup --no-interactive
+          doppler configure set config prd
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_BACKEND_TOKEN }}
+
+      - name: .env 파일 다운로드
+        working-directory: backend
+        run: doppler secrets download --no-file --format env-no-quotes > .env
+
+      - name: JDK 설치
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 23
+
+      - name: 테스트 및 빌드
+        working-directory: backend
+        run: ./gradlew clean build
+        env:
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          JWT_EXPIRE_SECONDS: ${{ secrets.JWT_EXPIRE_SECONDS }}
+          JWT_REFRESH_EXPIRE_SECONDS: ${{ secrets.JWT_REFRESH_EXPIRE_SECONDS }}
+          UPBIT_WS_URI: ${{ secrets.UPBIT_WS_URI }}
+          MAIL_HOST: ${{ secrets.MAIL_HOST }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+
+      - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-northeast-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: ECR에 로그인
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Docker 이미지 생성
+        working-directory: backend
+        run: docker build -t coing-server .
+
+      - name: Docker 이미지에 Tag 붙이기
+        working-directory: backend
+        run: docker tag coing-server ${{ steps.login-ecr.outputs.registry }}/coing-server:latest
+
+      - name: ECR에 Docker 이미지 Push
+        working-directory: backend
+        run: docker push ${{ steps.login-ecr.outputs.registry }}/coing-server:latest
+
+      - name: .env 파일을 EC2로 복사
+        working-directory: backend
+        run: |
+          echo "${{ secrets.EC2_PRIVATE_KEY }}" > devcoing-keypair.pem
+          chmod 600 devcoing-keypair.pem
+          scp -o StrictHostKeyChecking=no -i devcoing-keypair.pem .env ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USERNAME }}/.env
+          rm -f devcoing-keypair.pem
+
+      - name: SSH로 EC2에 접속
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            aws ecr get-login-password --region ap-northeast-2 | sudo docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
+            sudo docker stop coing-server || true
+            sudo docker rm coing-server || true
+            sudo docker pull ${{ steps.login-ecr.outputs.registry }}/coing-server:latest
+            sudo docker run -d --name coing-server -p 8080:8080 \
+              --env-file .env \
+              ${{ steps.login-ecr.outputs.registry }}/coing-server:latest
