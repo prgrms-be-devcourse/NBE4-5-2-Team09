@@ -2,6 +2,7 @@ package com.coing.global.config;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,6 +37,9 @@ public class SecurityConfig {
 	private final OAuth2LoginSuccessHandler successHandler;
 	private final OAuth2LoginFailureHandler failureHandler;
 
+	@Value("${next.server.url}")
+	private String frontUrl;
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
@@ -66,7 +70,7 @@ public class SecurityConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		// 모든 출처 허용 (운영 환경 배포 시 수정 필요)
-		configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+		configuration.setAllowedOriginPatterns(Arrays.asList(frontUrl));
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(Arrays.asList("*"));
 		configuration.setAllowCredentials(true);
