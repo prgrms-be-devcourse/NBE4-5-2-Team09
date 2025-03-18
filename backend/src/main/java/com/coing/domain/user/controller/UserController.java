@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -186,13 +187,15 @@ public class UserController {
 	@Operation(summary = "회원 로그아웃")
 	@PostMapping("/logout")
 	public ResponseEntity<BasicResponse> logout(HttpServletRequest request, HttpServletResponse response) {
-		// 리프레시 토큰 쿠키를 삭제하는 로직
-		Cookie cookie = new Cookie("refreshToken", null);
-		cookie.setHttpOnly(true);
-		cookie.setSecure(true);
-		cookie.setPath("/");
-		cookie.setMaxAge(0);
-		response.addCookie(cookie);
+		ResponseCookie expiredCookie = ResponseCookie.from("refreshToken", "")
+			.httpOnly(true)
+			.secure(true)
+			.path("/")
+			.maxAge(0) // 쿠키 삭제
+			.sameSite("None")
+			.build();
+
+		response.setHeader("Set-Cookie", expiredCookie.toString());
 
 		return ResponseEntity.ok(new BasicResponse(HttpStatus.OK, "로그아웃 성공", "로그아웃 처리 완료"));
 	}
@@ -262,12 +265,17 @@ public class UserController {
 	private void issuedToken(HttpServletResponse response, UserResponse user) {
 		String accessToken = authTokenService.genAccessToken(user);
 		String refreshToken = authTokenService.genRefreshToken(user);
-		Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-		refreshCookie.setHttpOnly(true);
-		refreshCookie.setSecure(true);
-		refreshCookie.setPath("/");
-		refreshCookie.setMaxAge(604800);
-		response.addCookie(refreshCookie);
+
+		ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+			.httpOnly(true)
+			.secure(true)
+			.path("/")
+			.maxAge(604800) // 7일
+			.sameSite("None")
+			.build();
+
+		// 쿠키 헤더를 수동으로 설정
+		response.setHeader("Set-Cookie", refreshCookie.toString());
 		response.setHeader("Authorization", "Bearer " + accessToken);
 	}
 }
