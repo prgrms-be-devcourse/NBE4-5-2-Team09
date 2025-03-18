@@ -1,5 +1,11 @@
 server:
   port: ${SERVER_PORT:8080}
+  use-forward-headers: true
+  servlet:
+    session:
+      cookie:
+        secure: true
+        http-only: true
 
 spring:
   application:
