@@ -259,9 +259,25 @@ public class UserController {
 		return ResponseEntity.ok(Map.of("status", "success", "message", "비밀번호가 재설정되었습니다."));
 	}
 
-	@Operation(summary = "리다이렉트")
-	@GetMapping
-	public void redirectSocialLogin() {
+	@Operation(summary = "소셜 로그인 후 토큰 발급")
+	@PostMapping("/social-login/redirect")
+	@ApiErrorCodeExamples({ErrorCode.EMPTY_TOKEN_PROVIDED})
+	public ResponseEntity<?> redirectSocialLogin(@RequestParam("tempToken") String tempToken, HttpServletResponse response) {
+		String token = "tempToken:" + tempToken;
+
+		String userIdStr = authTokenService.getUserIdWithTempToken(token);
+		if (userIdStr == null) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN)
+				.body(Map.of("status", "error", "message", "유효하지 않은 토큰입니다."));
+		}
+
+		UUID userId = UUID.fromString(userIdStr);
+		UserResponse userResponse = userService.findById(userId);
+
+		issuedToken(response, userResponse);
+		authTokenService.removeTempToken(token);
+
+		return ResponseEntity.ok(Map.of("status", "success", "message", "소셜 로그인 성공"));
 	}
 
 	private void issuedToken(HttpServletResponse response, UserResponse user) {
