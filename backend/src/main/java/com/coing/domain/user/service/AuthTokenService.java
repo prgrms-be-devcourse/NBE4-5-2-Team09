@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.coing.domain.user.dto.CustomUserPrincipal;
@@ -81,5 +84,19 @@ public class AuthTokenService {
 			return null;
 		}
 		return UUID.fromString(claims.get("id").toString());
+	}
+
+	@CachePut(cacheNames = "tempTokens", key = "#root.args[0]")
+	public String setTempToken(String token, String userId) {
+		return userId;
+	}
+
+	@Cacheable(cacheNames = "tempTokens", key = "#root.args[0]")
+	public String getUserIdWithTempToken(String token) {
+		return null;
+	}
+
+	@CacheEvict(cacheNames = "tempTokens", key = "#root.args[0]")
+	public void removeTempToken(String token) {
 	}
 }

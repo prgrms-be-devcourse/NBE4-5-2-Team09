@@ -30,8 +30,14 @@ public class CacheConfig {
 				.maximumSize(1_000)
 				.build());
 
+		CaffeineCache tokensCache = new CaffeineCache("tempTokens",
+			Caffeine.newBuilder()
+				.expireAfterWrite(Duration.ofMinutes(5))
+				.maximumSize(10_000)
+				.build());
+
 		SimpleCacheManager manager = new SimpleCacheManager();
-		manager.setCaches(Arrays.asList(candlesCache, marketsCache));
+		manager.setCaches(Arrays.asList(candlesCache, marketsCache, tokensCache));
 		return manager;
 	}
 }
